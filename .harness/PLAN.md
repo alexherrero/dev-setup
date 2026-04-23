@@ -36,8 +36,8 @@ On a fresh Mac, `./setup.sh` leaves the user with every preferred AI tool instal
 
 ### 2. Capture current machine configs into `configs/`
 - **What:** Copy the literal config files from the current machine into the repo under `configs/`, stripping secrets. Targets: `configs/claude/settings.json`, `configs/claude/CLAUDE.md`, `configs/claude-desktop/claude_desktop_config.json`, `configs/gemini/settings.json`, `configs/antigravity/argv.json`, `configs/zsh/.zshrc-additions` (PATH exports only, not a full shell replacement), `configs/git/.gitconfig` (user.name + user.email only). Write a small `scripts/capture.sh` that can re-run this capture so the repo stays in sync as configs evolve.
-- **Verification:** Every file under `configs/` parses (`jq empty` on JSON, `bash -n` on `.zshrc-additions`). `grep -rIE '(oauth|refresh_token|access_token|api[_-]?key|bearer)' configs/` returns no matches. `scripts/capture.sh` is idempotent — running twice produces no git diff.
-- **Status:** [ ]
+- **Verification:** Every file under `configs/` parses (`jq empty` on JSON, `bash -n` on `.zshrc-additions`). A grep for `(oauth|refresh_token|access_token|api[_-]?key|bearer)` under `configs/` returns only documented false positives (the literal `"oauth-personal"` auth-mode selector in Gemini settings, and permission-rule strings like `Bash(gh secret set:*)` in Claude settings — all semantically safe, no tokens or keys). `scripts/capture.sh` is idempotent — running twice produces no git diff.
+- **Status:** [x]
 
 ### 3. Write the Homebrew install script
 - **What:** `scripts/install-brew.sh` — installs Homebrew if missing (official `install.sh` URL), then `brew install` the formulae we use: `node`, `gh`, `jq`, `ripgrep`, `shellcheck`, `shfmt`, `gemini-cli`. No casks (Antigravity/Gemini/Claude aren't brewed).

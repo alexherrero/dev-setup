@@ -1,0 +1,8 @@
+{
+  "preferences": {
+    "ccdScheduledTasksEnabled": true,
+    "coworkScheduledTasksEnabled": true,
+    "coworkWebSearchEnabled": true,
+    "sidebarMode": "epitaxy"
+  }
+}
