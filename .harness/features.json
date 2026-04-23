@@ -7,8 +7,8 @@
       "steps": [
         "scaffold configs/ scripts/ and setup.sh orchestrator",
         "capture current-machine configs into configs/ with secret-stripping",
-        "install Homebrew formulae (node, gh, jq, ripgrep, shellcheck, shfmt, gemini-cli)",
-        "install Claude Code CLI via Anthropic's curl installer",
+        "install Homebrew formulae (node, gh, jq, ripgrep, shellcheck, shfmt)",
+        "install Claude Code CLI (curl) and Gemini CLI (npm global)",
         "install GUI apps from official DMGs (Antigravity, Gemini, Claude)",
         "link captured configs into OS locations with backup of pre-existing files",
         "orchestrator wires stages with --dry-run / --skip-apps / --only flags",

@@ -40,13 +40,13 @@ On a fresh Mac, `./setup.sh` leaves the user with every preferred AI tool instal
 - **Status:** [x]
 
 ### 3. Write the Homebrew install script
-- **What:** `scripts/install-brew.sh` — installs Homebrew if missing (official `install.sh` URL), then `brew install` the formulae we use: `node`, `gh`, `jq`, `ripgrep`, `shellcheck`, `shfmt`, `gemini-cli`. No casks (Antigravity/Gemini/Claude aren't brewed).
-- **Verification:** Running twice does not reinstall. After running, `brew list` contains every required formula; `node`, `gh`, `jq`, `rg`, `shellcheck`, `shfmt`, `gemini` are on PATH.
-- **Status:** [ ]
+- **What:** `scripts/install-brew.sh` — installs Homebrew if missing (official `install.sh` URL), then `brew install` the formulae we use: `node`, `gh`, `jq`, `ripgrep`, `shellcheck`, `shfmt`. No casks (Antigravity/Gemini/Claude aren't brewed). Note: `gemini` is an npm global, not a brew formula — it installs in task 4.
+- **Verification:** Running twice does not reinstall. After running, `brew list` contains every required formula; `node`, `gh`, `jq`, `rg`, `shellcheck`, `shfmt` are on PATH.
+- **Status:** [x]
 
-### 4. Write the Claude Code CLI install script
-- **What:** `scripts/install-claude-cli.sh` — runs Anthropic's official curl installer, confirms the binary lands at `~/.local/bin/claude`, ensures `~/.local/bin` is on PATH for future shells (appended to `~/.zshrc` if missing, single marker line for idempotency).
-- **Verification:** After running, `command -v claude` resolves and `claude --version` exits 0. Running twice makes no changes.
+### 4. Write the CLI-install script (Claude Code CLI + gemini-cli)
+- **What:** `scripts/install-clis.sh` — installs both non-brew CLIs. Runs Anthropic's official curl installer for Claude Code (lands at `~/.local/bin/claude`), then `npm install -g @google/gemini-cli` for the Gemini CLI (requires node from task 3). Ensures `~/.local/bin` is on PATH for future shells (idempotent append to `~/.zshrc`).
+- **Verification:** After running, `command -v claude` resolves and `claude --version` exits 0; `command -v gemini` resolves and `gemini --version` exits 0. Running twice makes no changes (npm reports "already up to date" or equivalent; curl installer is re-entrant).
 - **Status:** [ ]
 
 ### 5. Write the GUI-apps install script

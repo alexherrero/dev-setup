@@ -15,8 +15,8 @@
 set -euo pipefail
 
 readonly STAGES=(
-  "brew           Install Homebrew + formulae (node, gh, jq, ripgrep, shellcheck, shfmt, gemini-cli)"
-  "claude-cli     Install Claude Code CLI via Anthropic's curl installer"
+  "brew           Install Homebrew + formulae (node, gh, jq, ripgrep, shellcheck, shfmt)"
+  "clis           Install Claude Code CLI (curl) + gemini CLI (npm global)"
   "gui-apps       Download + install Antigravity, Gemini Desktop, Claude Desktop"
   "link-configs   Place captured configs from configs/ into their OS locations"
   "auth-checklist Print the manual auth steps (claude login, gh auth login, etc.)"
