@@ -45,9 +45,9 @@ On a fresh Mac, `./setup.sh` leaves the user with every preferred AI tool instal
 - **Status:** [x]
 
 ### 4. Write the CLI-install script (Claude Code CLI + gemini-cli)
-- **What:** `scripts/install-clis.sh` — installs both non-brew CLIs. Runs Anthropic's official curl installer for Claude Code (lands at `~/.local/bin/claude`), then `npm install -g @google/gemini-cli` for the Gemini CLI (requires node from task 3). Ensures `~/.local/bin` is on PATH for future shells (idempotent append to `~/.zshrc`).
-- **Verification:** After running, `command -v claude` resolves and `claude --version` exits 0; `command -v gemini` resolves and `gemini --version` exits 0. Running twice makes no changes (npm reports "already up to date" or equivalent; curl installer is re-entrant).
-- **Status:** [ ]
+- **What:** `scripts/install-clis.sh` — installs both non-brew CLIs. Runs Anthropic's official curl installer for Claude Code (lands at `~/.local/bin/claude`, pinned to the `stable` channel), then `npm install -g @google/gemini-cli` for the Gemini CLI (requires node from task 3). Ensures `~/.local/bin` is on PATH for future shells (idempotent append to `~/.zshrc` with a marker comment).
+- **Verification:** After running, `command -v claude` resolves and `claude --version` exits 0; `command -v gemini` resolves and `gemini --version` exits 0. Running twice converges to the same end state (same claude + gemini versions, PATH marker not re-appended). npm may report non-empty "changed N packages" on re-run from dependency churn — that's intrinsic to npm and does not change the user-facing binaries.
+- **Status:** [x]
 
 ### 5. Write the GUI-apps install script
 - **What:** `scripts/install-gui-apps.sh` — downloads the official DMG/installer for Antigravity, Gemini Desktop, and Claude Desktop; mounts, copies to `/Applications`, unmounts, removes quarantine xattr. Skip-if-exists for each app. Installer URLs live in a top-of-file table so they're easy to update when versions change.
