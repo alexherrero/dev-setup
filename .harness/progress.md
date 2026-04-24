@@ -9,6 +9,7 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 2026-04-23 06:48 /work — completed task 3: "Write the Homebrew install script" (4 files, 0 tests added)
 2026-04-23 07:03 /work — completed task 4: "Write the CLI-install script" (3 files, 0 tests added)
 2026-04-24 01:55 /work — completed task 5: "Write the GUI-apps install script" (1 file, 0 tests added) — browser-assisted (direct-URL curl infeasible: CF JS challenge on Claude, no canonical URL for Antigravity/Gemini)
+2026-04-24 02:07 /work — completed task 6: "Write the config-link script" (1 file, 0 tests added) — confirmed Claude Code + Claude Desktop rewrite their JSONs in place; used copy-if-absent for all app-owned JSON, symlink for CLAUDE.md only, append-with-marker for zshrc, git config --global merge for user info. Backup under ~/.dev-machine-setup-backup/<utc>/, lazy-created.
 
 ## compaction event — 2026-04-24T01:45:13Z
 - trigger: auto
