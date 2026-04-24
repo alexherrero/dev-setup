@@ -1,6 +1,6 @@
 # Plan: One-shot Mac dev-machine setup
 
-**Status:** in-progress
+**Status:** complete (all 9 tasks done; release-gate + Windows-VM validation remain as `/release` work)
 **Created:** 2026-04-22
 **Brief:** Build a single-command bootstrap for a fresh Mac that reproduces the current dev environment — Antigravity, Gemini Desktop, Claude Desktop, Claude Code CLI, antigravity CLI, gemini CLI, the supporting Homebrew CLIs, and the literal config files captured from this machine (especially `~/.claude/settings.json` with its ~170/121 allow/ask permissions). Windows support is stubbed for a later pass using a reference VM.
 
@@ -70,9 +70,9 @@ On a fresh Mac, `./setup.sh` leaves the user with every preferred AI tool instal
 - **Status:** [x]
 
 ### 9. Windows stubs
-- **What:** `setup.ps1` and `scripts/install-*.ps1` skeletons with the same stage banners but bodies that print `TODO: implement on Windows reference VM` and exit 0. A `docs/windows.md` note describing the deferral. Ensures the repo's contract is cross-platform even if Mac is the only live implementation today.
-- **Verification:** Every `.ps1` parses under PowerShell AST (`.harness/verify.sh` handles this if `pwsh` is installed — otherwise confirmed later on the VM). `setup.ps1 --help` / equivalent prints the same stage list. `docs/windows.md` exists.
-- **Status:** [ ]
+- **What:** `setup.ps1` at repo root + `scripts/install-brew.ps1`, `scripts/install-clis.ps1`, `scripts/install-gui-apps.ps1`, `scripts/link-configs.ps1`, `scripts/auth-checklist.ps1`. The orchestrator mirrors `setup.sh`: same stage list, `-DryRun` / `-SkipApps` / `-Only <stage>` / `-Help` flags, missing-script warn+skip, halt-on-first-failure. Each sub-script is a small stub that prints its `==> <stage> (Windows)` banner, then `TODO: implement on Windows reference VM`, and exits 0. `docs/windows.md` covers the deferral rationale and a per-stage table of remaining work (including a likely future `scripts/capture.ps1`, not in the current PLAN).
+- **Verification:** `.harness/verify.sh` runs on all six `.ps1` files and the new doc — pwsh isn't installed on this Mac so the AST check no-ops per the verify.sh contract; real AST validation deferred to the Windows reference VM (PLAN-acknowledged). The bash-side orchestrator is unaffected (`./setup.sh --dry-run` still prints 5 stages). Every stage script path referenced from `setup.ps1` now exists. `docs/windows.md` exists and every `.ps1` it links to is under `scripts/`.
+- **Status:** [x]
 
 ## Risks / open questions
 
