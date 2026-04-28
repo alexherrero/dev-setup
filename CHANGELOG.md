@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.5.0] — 2026-04-27
+
+> ⚠️ **Mid-feature release.** Tasks 1–4 of 8 done for `feat-debian-cli-support`. Mac path is unchanged and stable. The Debian path now runs through `apt → clis → link-configs` cleanly — no Mac-flavored paths get written into the Linux home. `verify-install.sh` and `auth-checklist.sh` still have Mac-only assumptions (`/Applications/*.app` checks, GUI sign-in steps); end-to-end Debian readiness lands with task 7. Stay on **v0.2.0 for production Mac use** until this feature ships in full.
+
+### Changed
+- **`scripts/lib/os.sh`** now also exports `rc_file()` — returns the rc file PATH-marker writes should target. Mac → `~/.zshrc`; Debian → `~/.zshrc` if `$SHELL` ends in `/zsh`, else `~/.bashrc`. Centralized so `install-clis.sh` and `link-configs.sh` route to the same file.
+- **`scripts/install-clis.sh`** uses the shared `rc_file()` instead of its own local copy from v0.4.0.
+- **`scripts/link-configs.sh`** sources `os.sh`. The Mac-only Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`) is now gated on `OS==macos` — on Debian the entry prints `skip ... (Mac-only — Claude Desktop)` and the path is never created. Post-check JSON validation drops the Library path on Debian too. `append_zshrc_additions` renamed to `append_shell_additions` since the destination is now `rc_file()`-driven (the old name was misleading on Debian-with-bash, where the additions go to `~/.bashrc`). All other strategies (CLAUDE.md symlink, Claude / Gemini / Antigravity JSONs, `git config --global` user.name/email merge) are platform-portable as-is and behave identically on both platforms.
+
+**Full diff:** https://github.com/alexherrero/dev-machine-setup/compare/v0.4.0...v0.5.0
+
 ## [v0.4.0] — 2026-04-27
 
 > ⚠️ **Mid-feature release.** Tasks 1–3 of 8 done for `feat-debian-cli-support`. Mac path is unchanged and stable. The Debian path now has the `apt` install stage and a cross-platform `install-clis.sh`, so `OS=debian ./setup.sh` runs further than it did at v0.3.0 — but `link-configs.sh`, `verify-install.sh`, and `auth-checklist.sh` still have Mac-only assumptions (Claude Desktop config path, `/Applications/*.app` checks, GUI sign-in steps). End-to-end Debian readiness lands with task 7. Stay on **v0.2.0 for production Mac use** until this feature ships in full.
@@ -84,6 +95,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Initial project scaffold: bootstrapped with [agentic-harness](https://github.com/alexherrero/agentic-harness) v0.8.7 + hooks. Includes adapters for Claude Code, Antigravity, Codex, and Gemini plus `PostToolUse` / `PreCompact` / `SessionStart(compact)` hooks.
 
+[v0.5.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.5.0
 [v0.4.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.4.0
 [v0.3.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.3.0
 [v0.2.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.2.0
