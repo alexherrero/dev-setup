@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.6.1] — 2026-04-28
+
+### Changed
+- **Wiki**: `feat-debian-cli-support` close-out (task 8/8). New `wiki/how-to/Bootstrap-A-New-Debian-Or-Ubuntu.md` (links out to `docs/debian.md` rather than duplicating; cites `antigravity.google/docs/command` for the GUI-only-on-Linux rationale). `wiki/how-to/Bootstrap-A-New-Mac.md` flipped pending → implemented (v0.1.0). `wiki/explanation/Dev-Machine-Setup-Design.md` rewritten for the cross-platform OS-dispatch architecture with per-component Mac/Debian comparison table and Trade-offs covering GUI-only-on-Linux, the shared-scripts architecture, the `rc_file()` helper, and the Codex opt-in. `wiki/Home.md` + `wiki/_Sidebar.md` index the new page. All 9 flat-namespace wiki links resolve.
+- **`.harness/PLAN.md`** plan-level Status flipped from "in progress" to "complete pending VM verification". All 8 tasks marked `[x]`. `features.passes` stays `false` (per plan contract — flips only after a real Debian VM run, scheduled for `/release`-gate).
+
+> No code changes vs v0.6.0. The Debian path is feature-complete via static verification but **still has not been exercised on a real Debian/Ubuntu host**. Same "should work but unverified" caveat as v0.6.0 applies. Mac users on v0.2.0+ are unaffected.
+
+**Full diff:** https://github.com/alexherrero/dev-machine-setup/compare/v0.6.0...v0.6.1
+
 ## [v0.6.0] — 2026-04-28
 
 > **First Debian-runnable release.** Tasks 1–7 of 8 done for `feat-debian-cli-support`. The Mac path is unchanged and stable. The Debian path is now feature-complete end-to-end via static verification (forced `OS=debian` dispatch on Mac dev box across every stage) but **has not yet been exercised on a real Debian VM** — task 8 closes that out and flips `features.passes=true`. Treat v0.6.0 as "should work but unverified" on actual Debian/Ubuntu hosts. Mac users on v0.2.0+ are unaffected.
@@ -110,6 +120,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Initial project scaffold: bootstrapped with [agentic-harness](https://github.com/alexherrero/agentic-harness) v0.8.7 + hooks. Includes adapters for Claude Code, Antigravity, Codex, and Gemini plus `PostToolUse` / `PreCompact` / `SessionStart(compact)` hooks.
 
+[v0.6.1]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.6.1
 [v0.6.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.6.0
 [v0.5.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.5.0
 [v0.4.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.4.0
