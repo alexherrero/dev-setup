@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.0] — 2026-04-27
+
+> ⚠️ **Mid-feature release.** This is task 1 of 8 for `feat-debian-cli-support`. The Mac path is unchanged and stable. The Debian path is **not yet runnable end-to-end** — `OS=debian ./setup.sh` will warn-skip the not-yet-existent `install-apt.sh` and then fail at `install-clis.sh` (still Mac-only until task 3). Stay on **v0.2.0 for production Mac use**; this tag exists for incremental tagging hygiene only.
+
+### Added
+- `scripts/lib/os.sh` — sourced helper that exports `$OS` (`macos` | `debian`) based on `uname -s` plus `/etc/debian_version` / `lsb_release` probes. Anything else exits 2 with a descriptive error (uname, kernel rev, `/etc/os-release` ID + PRETTY_NAME). External `$OS` overrides are validated against the allowed values so `OS=plan9 ./setup.sh` exits 2 rather than silently dispatching to the Debian branch. Tests can force the Debian path on a Mac with `OS=debian ./setup.sh --dry-run`.
+- `setup.sh` — sources the OS helper and builds platform-specific `STAGE_NAMES` / `STAGE_SCRIPTS` / `STAGE_DESCS` arrays. Mac plan unchanged: `brew → clis → gui-apps → link-configs → verify-install → auth-checklist`. Debian plan: `apt → clis → link-configs → verify-install → auth-checklist` (no GUI stage — Antigravity is GUI-only by design and out of scope; CLI-only Debian flow). `--help` shows the detected OS and the per-OS stage list. `--only` validates against the per-OS list (so `--only gui-apps` correctly errors on Debian).
+
 ## [v0.2.0] — 2026-04-27
 
 ### Added
@@ -65,6 +73,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Initial project scaffold: bootstrapped with [agentic-harness](https://github.com/alexherrero/agentic-harness) v0.8.7 + hooks. Includes adapters for Claude Code, Antigravity, Codex, and Gemini plus `PostToolUse` / `PreCompact` / `SessionStart(compact)` hooks.
 
+[v0.3.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.3.0
 [v0.2.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.2.0
 [v0.1.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.1.0
 [v0.0.5]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.0.5
