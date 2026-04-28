@@ -1,88 +1,94 @@
-# Plan: One-shot Mac dev-machine setup
+# Plan: Debian CLI-only dev-machine support
 
-**Status:** complete (all 9 tasks done; release-gate + Windows-VM validation remain as `/release` work)
-**Created:** 2026-04-22
-**Brief:** Build a single-command bootstrap for a fresh Mac that reproduces the current dev environment — Antigravity, Gemini Desktop, Claude Desktop, Claude Code CLI, antigravity CLI, gemini CLI, the supporting Homebrew CLIs, and the literal config files captured from this machine (especially `~/.claude/settings.json` with its ~170/121 allow/ask permissions). Windows support is stubbed for a later pass using a reference VM.
+**Status:** in progress (open question 1 resolved 2026-04-27: Codex CLI is in scope on both platforms)
+**Created:** 2026-04-27
+**Brief:** Add Debian (and Debian-derivatives like Ubuntu) support to the dev-machine-setup install script. Scope is **CLI agents only — no GUI apps**, and includes **Codex CLI** alongside Claude Code + Gemini CLI on both Mac and Debian. Antigravity is GUI-only on every platform and remains out of scope. Mirror the existing Mac flow (idempotent, captured-config-driven, post-setup health-checked) where the logic is portable; diverge only where the OS forces us to.
 
 ## Goal
 
-On a fresh Mac, `./setup.sh` leaves the user with every preferred AI tool installed, every config file in place, and a clear prompt to complete interactive auth steps (Claude login, gh auth, Gemini oauth, Antigravity sign-in). Re-running the script is safe and idempotent. Configs live as literal files in this repo under `configs/` so edits are tracked in git and portable.
+On a fresh Debian/Ubuntu machine, `./setup.sh` leaves the user with the supported CLI agents (Claude Code, Gemini CLI; Codex pending decision) installed, the supporting toolchain on PATH (`node`, `gh`, `jq`, `ripgrep`, `shellcheck`, `shfmt`), the captured agent configs placed at their Linux locations (`~/.claude/`, `~/.gemini/`), the global Claude Code instructions (`~/.claude/CLAUDE.md`, the `Co-Authored-By` kill-switch) in effect, and a clear printed checklist for the manual auth steps that can't be scripted. Re-running is safe and idempotent. The script auto-detects platform — no separate entry point.
 
 ## Constraints
 
-- Literal config files in the repo (not templated). No secret-stripping via templating — we strip secrets at capture time and keep the repo public-safe.
-- Claude Code CLI installed via Anthropic's official curl installer (not npm), to match the current machine.
-- GUI apps (Antigravity, Gemini Desktop, Claude Desktop) pulled from official installer URLs; we do not rehost binaries.
-- Secrets (oauth tokens, GitHub tokens, API keys) never enter the repo. Fresh machines re-authenticate.
-- Mac-first. Windows gets skeleton files + a README note; real Windows implementation deferred to a later plan.
-- Every script must be idempotent — safe to re-run without clobbering or re-prompting.
+- **CLI agents only.** No GUI apps on Linux. The `gui-apps` stage is filtered out of the Linux stage list at the orchestrator level. Antigravity is documented as Mac-only.
+- **No Codex on Mac unless we also add it to Debian, and vice-versa** — the Mac and Linux stage lists must stay in lockstep on which agents they install. (See open question 1.)
+- **Claude Code via curl installer**, not apt repo. Mirrors the Mac path exactly (`curl https://claude.ai/install.sh | bash -s stable` → `~/.local/bin/claude`). Self-updates in background; matches existing user expectations.
+- **Node 22 LTS via NodeSource**, not distro-shipped `nodejs`. apt's package is too old for Gemini CLI's Node ≥ 20 requirement on older Debian/Ubuntu.
+- **No `sudo npm install -g`.** Configure a user-local npm prefix (`~/.npm-global`) so the npm globals (Gemini, optionally Codex) install without root. PATH-export idempotently appended to `~/.zshrc`.
+- **One script set, OS-aware internally.** Add a small `scripts/lib/os.sh` that exports `OS=macos|debian` and helper predicates. `setup.sh` builds the stage list per OS; sub-scripts that diverge (`install-brew.sh` vs new `install-apt.sh`) live as siblings; sub-scripts that converge (`install-clis.sh`, `link-configs.sh`, `verify-install.sh`, `auth-checklist.sh`) gain internal `if linux` branches but stay single files.
+- **Idempotent everywhere.** Same contract as Mac: re-running converges; pre-existing files are backed up to `~/.dev-machine-setup-backup/<utc>/` before being replaced.
+- **Configs stay literal in `configs/`**, not templated. The Mac and Debian setups place the same `configs/claude/CLAUDE.md`, `configs/claude/settings.json`, `configs/gemini/settings.json` into the same `~/.claude/` and `~/.gemini/` paths (these are platform-neutral). The Mac-only `~/Library/Application Support/Claude/claude_desktop_config.json` is skipped on Linux.
 
 ## Out of scope
 
-- Windows implementation beyond stubs (deferred — intentional, revisit with reference VM).
-- SSH key generation and GitHub key upload.
-- Version managers (nvm, fnm, asdf, pyenv).
-- Additional tooling the current machine doesn't have (Docker, VS Code, Cursor, tmux, fzf, starship, zoxide).
-- Secret management / keychain integration.
-- A dotfile manager (chezmoi, yadm) — plain copy/symlink is sufficient.
-- Restoring `~/.claude.json` state (projects, caches, oauth) — each machine regenerates it.
+- **GUI apps on Linux** (Antigravity, Claude Desktop, Gemini Desktop). Antigravity is GUI-only by design; Claude Desktop ships an `.AppImage`/`.deb` but pulling it in violates the CLI-only scope. If wanted later, that's a separate plan.
+- **Other Linux distros** (Fedora/RHEL `dnf`, Arch `pacman`, openSUSE `zypper`, NixOS, Alpine). Debian and derivatives only. The OS-detection helper will fail fast with a clear error on anything else.
+- **WSL-specific handling.** WSL Ubuntu hits the same code path as native Debian; we don't add WSL detection or special-case anything (the user can `apt install` and run scripts the same way).
+- **`nvm` / `fnm` / version managers.** Same posture as Mac — single global Node.
+- **Codex CLI on either platform** unless open question 1 resolves to "yes."
+- **Capturing live Linux configs** (`scripts/capture.sh` Linux variant). The repo's captured configs come from the reference Mac; the Linux setup *consumes* them. Adding a `capture.sh` Linux mode is a follow-up, not in this plan.
 
 ## Tasks
 
-### 1. Scaffold the setup-scripts layout
-- **What:** Create the directory layout and empty entry points: `configs/` (captured app configs), `scripts/` (per-concern install scripts — brew, claude-cli, gui-apps, link-configs, auth-checklist), `setup.sh` (top-level orchestrator, stub only), and a `README.md` describing usage.
-- **Verification:** `bash setup.sh --help` exits 0 and prints a usage banner listing the stages. `tree -L 2 .` shows `configs/`, `scripts/`, `setup.sh`, `README.md`. `.harness/verify.sh setup.sh` passes.
-- **Status:** [x]
+### 1. OS-detection helper + setup.sh dispatch
 
-### 2. Capture current machine configs into `configs/`
-- **What:** Copy the literal config files from the current machine into the repo under `configs/`, stripping secrets. Targets: `configs/claude/settings.json`, `configs/claude/CLAUDE.md`, `configs/claude-desktop/claude_desktop_config.json`, `configs/gemini/settings.json`, `configs/antigravity/argv.json`, `configs/zsh/.zshrc-additions` (PATH exports only, not a full shell replacement), `configs/git/.gitconfig` (user.name + user.email only). Write a small `scripts/capture.sh` that can re-run this capture so the repo stays in sync as configs evolve.
-- **Verification:** Every file under `configs/` parses (`jq empty` on JSON, `bash -n` on `.zshrc-additions`). A grep for `(oauth|refresh_token|access_token|api[_-]?key|bearer)` under `configs/` returns only documented false positives (the literal `"oauth-personal"` auth-mode selector in Gemini settings, and permission-rule strings like `Bash(gh secret set:*)` in Claude settings — all semantically safe, no tokens or keys). `scripts/capture.sh` is idempotent — running twice produces no git diff.
-- **Status:** [x]
+- **What:** Create `scripts/lib/os.sh` exporting `OS=macos|debian` (sourced by other scripts via `. "$REPO_ROOT/scripts/lib/os.sh"`). Detection: `[[ "$(uname -s)" == "Darwin" ]]` → macos; else `[[ -f /etc/debian_version ]] || (lsb_release -i | grep -qiE 'debian|ubuntu')` → debian; otherwise print a single-line error naming the unsupported distro and exit 2. Update `setup.sh` to source the helper, then build platform-specific `STAGE_NAMES` / `STAGE_SCRIPTS` / `STAGE_DESCS` arrays. On Debian: drop `gui-apps`; replace `brew` with `apt`.
+- **Verification:** `bash -n scripts/lib/os.sh` and `shellcheck` pass. On Mac (this dev box): `OS` resolves to `macos`; `./setup.sh --dry-run` still shows the existing 6-stage Mac plan unchanged. Force the path on Mac with `OS=debian ./setup.sh --dry-run` (helper respects an externally-set `$OS` for testing) → 5-stage Debian plan with `apt` instead of `brew` and no `gui-apps`. Unsupported-OS path: stub `uname` to return `Linux` while removing `/etc/debian_version` access in a sandbox subshell — exit code 2, error names the distro.
+- **Status:** [x] (verified 2026-04-27: `shellcheck` clean on `scripts/lib/os.sh` + `setup.sh`. Mac default → `macos`, 6-stage plan unchanged. `OS=debian ./setup.sh --dry-run` → 5-stage Debian plan with `install-apt.sh` in slot 1. `OS=plan9` exits 2 with `invalid $OS=plan9` (override-validation case added during build to prevent invalid externals falling through to the Debian dispatch branch). `OS=debian ./setup.sh --only gui-apps` correctly rejects with `unknown stage: gui-apps` against the Debian-specific stage list. `OS=debian ./setup.sh --only apt` warn-skips the missing `install-apt.sh` per existing setup.sh contract.)
 
-### 3. Write the Homebrew install script
-- **What:** `scripts/install-brew.sh` — installs Homebrew if missing (official `install.sh` URL), then `brew install` the formulae we use: `node`, `gh`, `jq`, `ripgrep`, `shellcheck`, `shfmt`. No casks (Antigravity/Gemini/Claude aren't brewed). Note: `gemini` is an npm global, not a brew formula — it installs in task 4.
-- **Verification:** Running twice does not reinstall. After running, `brew list` contains every required formula; `node`, `gh`, `jq`, `rg`, `shellcheck`, `shfmt` are on PATH.
-- **Status:** [x]
+### 2. `scripts/install-apt.sh` (Debian equivalent of install-brew.sh)
 
-### 4. Write the CLI-install script (Claude Code CLI + gemini-cli)
-- **What:** `scripts/install-clis.sh` — installs both non-brew CLIs. Runs Anthropic's official curl installer for Claude Code (lands at `~/.local/bin/claude`, pinned to the `stable` channel), then `npm install -g @google/gemini-cli` for the Gemini CLI (requires node from task 3). Ensures `~/.local/bin` is on PATH for future shells (idempotent append to `~/.zshrc` with a marker comment).
-- **Verification:** After running, `command -v claude` resolves and `claude --version` exits 0; `command -v gemini` resolves and `gemini --version` exits 0. Running twice converges to the same end state (same claude + gemini versions, PATH marker not re-appended). npm may report non-empty "changed N packages" on re-run from dependency churn — that's intrinsic to npm and does not change the user-facing binaries.
-- **Status:** [x]
+- **What:** New script. Steps: (a) `sudo install -d -m 0755 /etc/apt/keyrings`; (b) NodeSource keyring + sources.list (`https://deb.nodesource.com/node_22.x nodistro main`); (c) GitHub CLI keyring + sources.list (`https://cli.github.com/packages stable main` with `arch=$(dpkg --print-architecture)` so amd64 + arm64 both work); (d) `sudo apt update && sudo apt install -y nodejs gh jq ripgrep shellcheck shfmt`; (e) `shfmt` fallback: if `apt-cache show shfmt` reports nothing (older Debian/Ubuntu), `curl -fsSL` the matching `shfmt_v3.x.x_linux_$(dpkg --print-architecture)` GitHub-release binary into `/usr/local/bin/shfmt` with `install -m755`. Idempotent throughout — re-running is a no-op (apt key add, sources.list write, install all skip if already done). Pin NodeSource and GitHub apt-repo lines to literal strings at the top of the file for one-line updates.
+- **Verification:** `shellcheck` passes. On a fresh Debian VM: every binary in `node`, `npm`, `gh`, `jq`, `rg`, `shellcheck`, `shfmt` resolves on PATH and `--version` exits 0. Re-run produces "0 upgraded, 0 newly installed" from apt and no rewrite of the keyring/sources files. Architecture parity check: same script on amd64 and arm64 hosts. (VM verification is a `/release`-gate manual step, not per-task.)
+- **Status:** [ ]
 
-### 5. Write the GUI-apps install script
-- **What:** `scripts/install-gui-apps.sh` — **browser-assisted installer** (curl-direct download was investigated and abandoned: Claude's canonical DMG redirect sits behind a Cloudflare JS challenge that returns 403 to curl regardless of User-Agent, and Antigravity + Gemini Desktop have no discoverable direct-DMG URL). For each app, if `/Applications/<App>.app` is absent, the script `open`s the vendor's download page in the default browser and polls until the user has dragged the `.app` into `/Applications`, then strips Gatekeeper quarantine with `xattr -rc`. Skip-if-exists per app — fully no-op on an already-configured machine. URLs live in a top-of-file parallel-array table for one-line updates.
-- **Verification:** Skip-if-exists path + post-check verified on this dev Mac (all three apps present — script runs silent and exits 0). `shellcheck` passes. Interactive download path can only be verified on a fresh Mac and is a `/release`-gate manual step, not a per-task gate. Non-interactive invocations (no TTY on stdin) fail fast with a pointer to `setup.sh --skip-apps` rather than hanging on `read`.
-- **Status:** [x]
+### 3. Make `install-clis.sh` cross-platform + add Codex
 
-### 6. Write the config-link script
-- **What:** `scripts/link-configs.sh` — places captured configs at their real OS locations using four per-file strategies driven by who writes the file in steady state: **symlink** for user-authored files (only `~/.claude/CLAUDE.md`); **copy-if-absent** for app-owned JSON that the owning tool rewrites in place (confirmed for `~/.claude/settings.json` — Claude Code reorders permissions arrays and inserts `autoUpdatesChannel` between runs; and for `~/Library/.../claude_desktop_config.json` — key order differs from sorted capture; extended by analogy to gemini and antigravity JSONs); **append-idempotent** with a marker comment for `~/.zshrc` (each PATH line added only if not already present verbatim); and **`git config --global` merge** for user.name/user.email so existing gitconfig includes / credential helpers / signing config survive. Any pre-existing non-matching file at a destination is moved to `~/.dev-machine-setup-backup/<utc-timestamp>/` before being replaced; backup dir is lazy-created so a converged re-run leaves no trace.
-- **Verification:** `shellcheck` passes. Run 1 on this dev Mac: CLAUDE.md is backed up + symlinked; all four JSON dests are preserved (existed already); `~/.zshrc` gets the marker + the antigravity PATH line (the `~/.local/bin` line was deduped — already present from `install-clis.sh`); `user.name/email` match → no-op. Run 2 is fully no-op (no new backup dir created under `~/.dev-machine-setup-backup/`). `jq empty` passes on all strict JSONs; `argv.json` validates via the same JSONC strip (`sed 's|//.*||' | jq empty`) that `capture.sh` uses. `readlink ~/.claude/CLAUDE.md` points into the repo. The PLAN's original "readlink ~/.claude/settings.json points into the repo OR byte-exact copy" test resolved to the **copy branch** once live-file inspection confirmed Claude rewrites settings.json in place.
-- **Status:** [x]
+- **What:** The existing Claude (curl) + Gemini (`npm install -g @google/gemini-cli`) logic is already platform-portable. **Add Codex CLI** as a third install: `npm install -g @openai/codex` (same npm-prefix as Gemini). Other changes: (a) source `scripts/lib/os.sh`; (b) update header comment from "Mac-specific" prose to platform-neutral, three-CLI; (c) replace the unconditional zshrc-only PATH marker with a per-OS rc-file pick (zshrc on Mac since it's the captured shell; on Debian detect `$SHELL` and write to `~/.zshrc` if zsh else `~/.bashrc`); (d) configure user-local npm prefix on Debian (`npm config set prefix "$HOME/.npm-global"` + idempotent PATH append for `~/.npm-global/bin`). Mac path unchanged (brew's npm prefix is already user-writable on Apple Silicon). (e) Hard-fail with a clear message if `node --version` < 20 on Debian. (f) The post-check verifies `claude`, `gemini`, **and `codex`** all resolve and `--version` exits 0.
+- **Verification:** `shellcheck` passes. On Mac: re-running produces existing converged output (no new PATH lines, no npm prefix change), plus `codex --version` resolves. On Debian VM: `claude --version`, `gemini --version`, `codex --version` all exit 0 from a fresh shell after `source ~/.zshrc` (or `~/.bashrc`). Node-version guard: stub `node` to return `v18.0.0` and confirm the script exits 1 with the upgrade-Node message.
+- **Status:** [ ]
 
-### 7. Wire the top-level orchestrator
-- **What:** Flesh out `setup.sh` to run stages 3–6 in order. Flags: `--dry-run` (print ordered plan + script paths, exit 0), `--skip-apps` (drops the gui-apps stage — CI / headless), `--only <stage>` (filter to a single stage; validates against the known list). Each sub-script already prints its own `==> <name>` banner per harness convention; the orchestrator wraps each invocation in an outer `====> stage: <name>` so stage boundaries remain obvious in long logs. `set -euo pipefail` + direct `"$script"` invocation means any non-zero exit halts the pipeline. Stages whose scripts are not yet on disk (currently `auth-checklist` — task 8) warn + skip rather than failing, so partial pipelines still run what exists.
-- **Verification:** `shellcheck` passes. `./setup.sh --help` → usage banner, exits 0. `./setup.sh --dry-run` → prints 5-stage plan with resolved script paths, exits 0. `./setup.sh --dry-run --skip-apps` → 4 stages (gui-apps dropped). `./setup.sh --dry-run --only brew` → 1 stage. `./setup.sh --only bogus` → exits 2 with error listing valid stages. `./setup.sh --only link-configs` runs on this dev Mac, produces fully-converged idempotent output, exits 0. Full `./setup.sh` on a fresh Mac is a `/release`-gate manual test (requires a clean VM / wiped account).
-- **Status:** [x]
+### 4. `link-configs.sh` Linux paths
 
-### 8. Post-setup auth checklist
-- **What:** `scripts/auth-checklist.sh` — numbered, informational output enumerating the five manual steps that can't be scripted: `claude login`, `gh auth login`, `gemini` (first run triggers Google oauth — no `login` subcommand), `open -a Antigravity`, `open -a Claude`. Always exits 0 (informational, not a gate). `docs/first-run.md` covers the same five steps with extra context: which install stage provisioned each tool, where each tool's state lands on disk, and what `setup.sh` leaves behind (symlinks, seeded configs, zshrc marker block, gitconfig merge, backup dir).
-- **Verification:** `shellcheck` passes on `scripts/auth-checklist.sh`. Script exits 0 and prints all five items. `./setup.sh --only auth-checklist` runs the stage via the orchestrator (no longer warn-skipped since the file now exists). `docs/first-run.md` exists and every listed command is one that an earlier install stage actually provisions: `claude` / `gemini` from `install-clis.sh`, `gh` from `install-brew.sh`, Antigravity.app / Claude.app from `install-gui-apps.sh`.
-- **Status:** [x]
+- **What:** Source `scripts/lib/os.sh`. Make the `~/Library/Application Support/Claude/claude_desktop_config.json` `link_copy_if_absent` call Mac-only (skip on Debian — Claude Desktop isn't installed on Linux in this scope). Everything else (`~/.claude/CLAUDE.md` symlink, `~/.claude/settings.json`, `~/.gemini/settings.json`, `~/.antigravity/argv.json`, zshrc/bashrc PATH, `git config --global` user.name/email) is platform-portable as-is — Linux uses the same `$HOME/.claude` etc. paths. Update the post-check JSON validation list to skip the Mac-only path on Debian.
+- **Verification:** `shellcheck` passes. On Mac: re-run is fully no-op (existing Mac contract preserved). On Debian VM: after running, `~/.claude/CLAUDE.md` is a symlink into the repo; `jq empty` succeeds on the three Linux JSONs; `~/.zshrc` (or `~/.bashrc`) has the PATH marker once; `~/Library/...` is not created (verified with `[ ! -e "$HOME/Library/Application Support/Claude" ]`). `git config --global user.name/email` matches the captured values. `~/.antigravity/argv.json` is still seeded — even though the GUI isn't installed, the JSONC config is harmless on disk and matches the "configs are literal" constraint; if we later add Antigravity-CLI parity, the file is already in place.
+- **Status:** [ ]
 
-### 9. Windows stubs
-- **What:** `setup.ps1` at repo root + `scripts/install-brew.ps1`, `scripts/install-clis.ps1`, `scripts/install-gui-apps.ps1`, `scripts/link-configs.ps1`, `scripts/auth-checklist.ps1`. The orchestrator mirrors `setup.sh`: same stage list, `-DryRun` / `-SkipApps` / `-Only <stage>` / `-Help` flags, missing-script warn+skip, halt-on-first-failure. Each sub-script is a small stub that prints its `==> <stage> (Windows)` banner, then `TODO: implement on Windows reference VM`, and exits 0. `docs/windows.md` covers the deferral rationale and a per-stage table of remaining work (including a likely future `scripts/capture.ps1`, not in the current PLAN).
-- **Verification:** `.harness/verify.sh` runs on all six `.ps1` files and the new doc — pwsh isn't installed on this Mac so the AST check no-ops per the verify.sh contract; real AST validation deferred to the Windows reference VM (PLAN-acknowledged). The bash-side orchestrator is unaffected (`./setup.sh --dry-run` still prints 5 stages). Every stage script path referenced from `setup.ps1` now exists. `docs/windows.md` exists and every `.ps1` it links to is under `scripts/`.
-- **Status:** [x]
+### 5. `verify-install.sh` Linux skips + Codex check
+
+- **What:** Source `scripts/lib/os.sh`. Wrap the `/Applications/*.app` checks (Antigravity / Gemini / Claude) in `if [[ "$OS" == "macos" ]]` — otherwise emit `[SKIP] GUI app checks (Linux: CLI-only scope)`. Same for the `~/Library/...` JSON validity check. **Add `codex` to the PATH-binary loop and the CLI-version smoke-test loop** (alongside `claude` and `gemini`) on both platforms. The CLAUDE.md symlink check, the global `~/.claude/settings.json` JSON check, the `includeCoAuthoredBy:false` kill-switch check, the harness-tier project checks — all stay unchanged.
+- **Verification:** `shellcheck` passes. On Mac: existing-plus-Codex output (the count goes from 30 ok to 32 ok once Codex is installed via task 3). On Debian VM after a full setup run: GUI-app + Mac-only-JSON checks emit `[SKIP]`; `claude` / `gemini` / `codex` all `[ OK ]`. Force the Linux path on Mac with `OS=debian ./scripts/verify-install.sh` and confirm the GUI-app checks all skip and the global tier still passes the rest.
+- **Status:** [ ]
+
+### 6. `auth-checklist.sh` Linux trim + Codex login step
+
+- **What:** Source `scripts/lib/os.sh`. **Add a `codex login` step** (or whatever Codex's first-run auth command is — verify against `codex --help` in this task; OpenAI's CLI uses interactive oauth) to the checklist on both platforms. On Debian, drop the GUI sign-in steps (`open -a Antigravity`, `open -a Claude`); the Mac list keeps them. Update the heading text to "completed CLI install" rather than "installed tooling" on Linux to make the GUI-omission deliberate. `docs/first-run.md` gets a parallel Linux subsection.
+- **Verification:** `shellcheck` passes. On Mac: 6 numbered items (was 5; +Codex). On Debian (force with `OS=debian`): 4 numbered items (claude, gh, gemini, codex; no Antigravity / Claude Desktop). `grep -E "Antigravity|Claude Desktop"` over the Linux output returns nothing; `grep codex` returns one line on both platforms.
+- **Status:** [ ]
+
+### 7. Docs: README + new `docs/debian.md`
+
+- **What:** README — add a `### Debian / Ubuntu` subsection alongside the existing `### macOS / Linux` (rename the current one to `### macOS`, since "/ Linux" was aspirational). Subsection includes the `git clone` + `./setup.sh` lines plus the Linux PATH-refresh (`source ~/.zshrc` or `source ~/.bashrc`). Status section gains a Debian row. New `docs/debian.md`: supported-distro matrix (Debian 11/12/13, Ubuntu 22.04/24.04 LTS), what's omitted vs Mac (GUI apps, Claude Desktop config), why Antigravity isn't supported on Linux (one-paragraph callout citing the docs URL), and a "If you want GUI apps on Linux too" pointer for future plans.
+- **Verification:** Markdown renders (no broken links via `grep -oE '\]\([^)]+\)' docs/debian.md README.md` cross-referenced against `find docs scripts -name '*.md' -o -name '*.sh' -o -name '*.ps1'`). README's three subsections (`### macOS`, `### Debian / Ubuntu`, `### Windows`) all present. `docs/debian.md` exists; the explicit Antigravity-not-supported callout is grep-able.
+- **Status:** [ ]
+
+### 8. Update `features.json` + close out
+
+- **What:** Add a new feature entry `feat-debian-cli-support` to `.harness/features.json` with the 7 task summaries. Mark `passes: false` until tasks 1–7 are all `[x]` and verified end-to-end on a Debian VM. Append a single line to `.harness/progress.md` per task as work lands. Update CHANGELOG.md only at `/release` time, not per-task.
+- **Verification:** `jq empty .harness/features.json` passes; the new feature entry is present and well-formed. `.harness/progress.md` has one line per completed task.
+- **Status:** [ ]
 
 ## Risks / open questions
 
-- **Installer URLs for Antigravity + Gemini Desktop may not be stable.** Google doesn't publish permanent direct-download URLs for either. If the URL breaks, task 5 fails and we either pin a version, scrape the download page, or fall back to a manual-install prompt. Mitigation: centralize URLs in a single table file so one-line fixes are cheap.
-- **Claude Code may rewrite `~/.claude/settings.json` in place.** If it does, a symlink into the repo could cause inode churn or unintended commits. Task 6 must probe this behavior and choose symlink-vs-copy accordingly; falling back to copy-with-diff-detect is acceptable.
-- **Gatekeeper quarantine on downloaded DMGs** will block first-launch. Task 5 handles this with `xattr -d com.apple.quarantine`, which requires the user to confirm once if the DMG is notarized unusually.
+1. ~~**Codex CLI: include or exclude?**~~ **Resolved 2026-04-27: include.** Codex is now part of tasks 3 (install), 5 (verify), and 6 (auth checklist) on both Mac and Debian.
+2. **Are you on Debian-proper or Ubuntu?** Affects whether `shfmt` is available in apt out-of-the-box (Ubuntu 24.04 yes, Debian 12 yes, Debian 11 needs the GitHub-release fallback, Ubuntu 22.04 needs the fallback). Plan covers both via a runtime probe; just want to confirm the dev box's `lsb_release -ds` so I know which path will fire on first run.
+3. **Shell on Debian box: zsh or bash?** `install-clis.sh` and `link-configs.sh` need to know which rc-file to write the PATH marker into. Plan auto-detects via `$SHELL`; surfacing as a sanity check.
+4. **GitHub CLI: apt repo signing-key fingerprint** can change. We pin to the URL, not the fingerprint, but should document where to refresh from if it ever rotates (`https://github.com/cli/cli/blob/trunk/docs/install_linux.md`).
+5. **Claude Code curl installer behavior on Debian** (auto-updates in background) might surprise a sysadmin who expected apt-managed lifecycles. The plan keeps the curl path for parity with Mac; if you'd rather use the signed apt repo on Debian, that's a one-task switch — say the word.
 
 ## Verification strategy
 
-- `.harness/verify.sh` runs per-file on every `Write|Edit` (bash `-n` + shellcheck if present, pwsh AST parse, `jq empty` on JSON).
-- Each task's own verification command (see above) is the primary gate before marking status `[x]`.
-- `/review` produces the final deterministic pass (clean tree, all verification commands pass, no TODOs outside the Windows stubs).
-- Manual: run the completed `./setup.sh` against a snapshot Mac VM (or a wiped user account) and confirm the resulting state matches the reference machine. This is a `/release`-gate, not per-task.
+- `.harness/verify.sh` runs per-file on every `Write|Edit` (bash `-n` + shellcheck, jq for JSON, pwsh AST for `.ps1`).
+- Each task's own verification command (above) is the per-task gate. Anywhere I write "on Debian VM", that's a `/release`-gate manual step, not per-task.
+- The two reproducible test surfaces on this Mac without a VM: (a) `OS=debian ./scripts/<name>.sh` to force the Linux branch on a Mac filesystem (good for argument parsing, dispatch, dry-runs, error paths); (b) the existing Mac path remains green throughout — if any of the five touched scripts (`install-clis.sh`, `link-configs.sh`, `verify-install.sh`, `auth-checklist.sh`, `setup.sh`) regresses on Mac, that's a per-task failure.
+- Final `/release`-gate: full `./setup.sh` on a clean Debian VM (or container) producing the expected end-state. That work happens in `/release`, not here.

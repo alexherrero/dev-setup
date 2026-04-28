@@ -27,3 +27,14 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - The session was compacted at this point. To re-anchor on the
   in-flight task, read .harness/PLAN.md and the entries above
   this marker. The compaction summary alone is not enough.
+
+## /plan — feat-debian-cli-support — 2026-04-27
+- Drafted 8-task plan for Debian CLI-only support in .harness/PLAN.md
+- features.json: appended feat-debian-cli-support (passes: false)
+- Open question 1: include Codex CLI? (recommend yes)
+- Next: /work after open questions resolved
+
+## /work — feat-debian-cli-support task 1 — 2026-04-27
+- scripts/lib/os.sh: OS detection helper (macos|debian|exit 2). External $OS override path validates against allowed values.
+- setup.sh: sources os.sh, builds per-OS STAGE_* arrays. Mac: 6 stages unchanged. Debian: 5 stages (apt instead of brew, no gui-apps).
+- Verified: shellcheck clean; Mac auto-detect works; OS=debian forced works; OS=plan9 exits 2; --only validates per-OS list.

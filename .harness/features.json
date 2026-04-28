@@ -15,6 +15,21 @@
         "print post-setup auth checklist"
       ],
       "passes": true
+    },
+    {
+      "id": "feat-debian-cli-support",
+      "description": "Debian/Ubuntu CLI-only path for setup.sh: OS detection, apt install stage, shared cross-platform CLI/link-configs/verify/auth-checklist scripts, GUI-app stage filtered out.",
+      "steps": [
+        "OS-detection helper + setup.sh dispatch (macos | debian | else error)",
+        "scripts/install-apt.sh — NodeSource + gh apt repos, apt install + shfmt fallback",
+        "make scripts/install-clis.sh cross-platform (npm prefix, rc-file pick, Node-version guard)",
+        "link-configs.sh skip Mac-only Claude Desktop path on Debian",
+        "verify-install.sh skip GUI app + Mac-only-JSON checks on Debian",
+        "auth-checklist.sh trim Antigravity + Claude Desktop steps on Debian",
+        "docs: README Debian subsection + new docs/debian.md",
+        "features.json + progress.md bookkeeping"
+      ],
+      "passes": false
     }
   ]
 }

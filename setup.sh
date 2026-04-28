@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
-# setup.sh — one-shot bootstrap for a fresh Mac dev environment.
+# setup.sh — one-shot bootstrap for a fresh dev environment.
 #
-# Runs the install stages in order: Homebrew formulae, non-brew CLIs,
-# GUI apps (browser-assisted), config linking, and the post-setup auth
-# checklist. Each stage's banner is printed by the sub-script (`==> <name>`);
-# this orchestrator adds an outer `====> stage: <name>` so the boundary is
-# obvious in long logs.
+# Detects OS (macos | debian) via scripts/lib/os.sh, then runs the platform's
+# install stages in order. Each stage's banner is printed by the sub-script
+# (`==> <name>`); this orchestrator adds an outer `====> stage: <name>` so
+# the boundary is obvious in long logs.
+#
+# Stage lists differ by OS:
+#   macos   : brew → clis → gui-apps → link-configs → verify-install → auth-checklist
+#   debian  : apt  → clis → link-configs → verify-install → auth-checklist
+# (no gui-apps on Debian — CLI-only scope; Antigravity is GUI-only by design)
 #
 # Individual stage scripts live in scripts/; captured configs live in
 # configs/. See README.md for the full layout.
@@ -14,34 +18,57 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Parallel arrays — bash 3.2 compat (no associative arrays on macOS's
-# system bash). Indexes line up across the three.
+# Source OS detection. Sets $OS to macos|debian, exits 2 on unsupported.
+# shellcheck source=scripts/lib/os.sh
+. "$REPO_ROOT/scripts/lib/os.sh"
 
-STAGE_NAMES=(brew clis gui-apps link-configs verify-install auth-checklist)
-STAGE_SCRIPTS=(
-  "$REPO_ROOT/scripts/install-brew.sh"
-  "$REPO_ROOT/scripts/install-clis.sh"
-  "$REPO_ROOT/scripts/install-gui-apps.sh"
-  "$REPO_ROOT/scripts/link-configs.sh"
-  "$REPO_ROOT/scripts/verify-install.sh"
-  "$REPO_ROOT/scripts/auth-checklist.sh"
-)
-STAGE_DESCS=(
-  "Install Homebrew + formulae (node, gh, jq, ripgrep, shellcheck, shfmt)"
-  "Install Claude Code CLI (curl) + Gemini CLI (npm global)"
-  "Install Antigravity, Gemini Desktop, Claude Desktop (browser-assisted)"
-  "Place captured configs from configs/ into their OS locations"
-  "Health-check the install (warn-only — tools, configs, agents, skills)"
-  "Print the manual auth steps (claude login, gh auth login, etc.)"
-)
+# Parallel arrays — bash 3.2 compat (no associative arrays on macOS's
+# system bash). Indexes line up across the three. Built per-OS below.
+
+if [[ "$OS" == "macos" ]]; then
+  STAGE_NAMES=(brew clis gui-apps link-configs verify-install auth-checklist)
+  STAGE_SCRIPTS=(
+    "$REPO_ROOT/scripts/install-brew.sh"
+    "$REPO_ROOT/scripts/install-clis.sh"
+    "$REPO_ROOT/scripts/install-gui-apps.sh"
+    "$REPO_ROOT/scripts/link-configs.sh"
+    "$REPO_ROOT/scripts/verify-install.sh"
+    "$REPO_ROOT/scripts/auth-checklist.sh"
+  )
+  STAGE_DESCS=(
+    "Install Homebrew + formulae (node, gh, jq, ripgrep, shellcheck, shfmt)"
+    "Install Claude Code CLI (curl) + Gemini CLI + Codex CLI (npm globals)"
+    "Install Antigravity, Gemini Desktop, Claude Desktop (browser-assisted)"
+    "Place captured configs from configs/ into their OS locations"
+    "Health-check the install (warn-only — tools, configs, agents, skills)"
+    "Print the manual auth steps (claude login, gh auth login, etc.)"
+  )
+else # debian
+  STAGE_NAMES=(apt clis link-configs verify-install auth-checklist)
+  STAGE_SCRIPTS=(
+    "$REPO_ROOT/scripts/install-apt.sh"
+    "$REPO_ROOT/scripts/install-clis.sh"
+    "$REPO_ROOT/scripts/link-configs.sh"
+    "$REPO_ROOT/scripts/verify-install.sh"
+    "$REPO_ROOT/scripts/auth-checklist.sh"
+  )
+  STAGE_DESCS=(
+    "Install apt formulae (NodeSource node 22, gh, jq, ripgrep, shellcheck, shfmt)"
+    "Install Claude Code CLI (curl) + Gemini CLI + Codex CLI (npm globals)"
+    "Place captured configs from configs/ into their OS locations"
+    "Health-check the install (warn-only — tools, configs, agents, skills)"
+    "Print the manual auth steps (claude login, gh auth login, etc.)"
+  )
+fi
 
 usage() {
-  cat <<'EOF'
+  cat <<EOF
 Usage: ./setup.sh [OPTIONS]
 
-Bootstrap a fresh Mac dev environment by running each install stage in order.
+Bootstrap a fresh dev environment by running each install stage in order.
+Detected OS: $OS
 
-Stages:
+Stages ($OS):
 EOF
   local i
   for i in "${!STAGE_NAMES[@]}"; do
@@ -51,11 +78,12 @@ EOF
 
 Options:
   --dry-run           Print the ordered stage list and exit (no scripts run)
-  --skip-apps         Skip the gui-apps stage (useful in CI / headless)
+  --skip-apps         Skip the gui-apps stage (no-op on Debian — no GUI stage)
   --only <stage>      Run only the named stage
   -h, --help          Show this help
 
-Mac-first. Windows: see setup.ps1 (stubbed — PLAN.md task 9).
+Supported: macOS (Darwin), Debian/Ubuntu (Linux). Windows: see setup.ps1
+(stubbed). Force the Debian path on a Mac for testing with `OS=debian`.
 EOF
 }
 
