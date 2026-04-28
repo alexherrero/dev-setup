@@ -1,23 +1,40 @@
 # dev-machine-setup <img src="https://img.shields.io/badge/Claude-D97757?logo=claude&logoColor=white&style=flat-square" alt="Claude" align="right"> <img src="https://img.shields.io/badge/Gemini-4285F4?logo=googlegemini&logoColor=white&style=flat-square" alt="Gemini" align="right"> <img src="https://img.shields.io/badge/Antigravity-1A73E8?logo=google&logoColor=white&style=flat-square" alt="Antigravity" align="right">
 
-Opinionated one-shot bootstrap for a Mac dev environment built around AI
-coding tools (Antigravity, Gemini Desktop, Claude Desktop, and their
-respective CLIs) plus a minimal Homebrew toolchain. Configuration lives
-as literal files in `configs/` so the setup is diffable, auditable, and
-portable.
+Opinionated one-shot bootstrap for a Mac (full GUI + CLI) or Debian /
+Ubuntu (CLI-only) dev environment built around AI coding tools (Claude,
+Gemini, optionally OpenAI Codex; Antigravity Desktop on Mac).
+Configuration lives as literal files in `configs/` so the setup is
+diffable, auditable, and portable.
 
 ---
 
 ## Usage
 
-### macOS / Linux
+### macOS
 
 ```bash
 git clone git@github.com:alexherrero/dev-machine-setup.git
 cd dev-machine-setup
-./setup.sh --help    # prints the stage list
-./setup.sh           # end-to-end bootstrap
-source ~/.zshrc      # refresh PATH so newly-installed CLIs resolve in this shell
+./setup.sh --help               # prints the stage list
+./setup.sh                      # end-to-end bootstrap
+./setup.sh --with-codex         # also install Codex CLI (opt-in)
+source ~/.zshrc                 # refresh PATH so newly-installed CLIs resolve
+```
+
+### Debian / Ubuntu
+
+CLI-only scope: Claude Code + Gemini CLI (+ optional Codex CLI), no GUI
+apps. Antigravity Desktop is GUI-only and out of scope on Linux. See
+[docs/debian.md](docs/debian.md) for the supported-distro matrix and
+what's omitted vs Mac.
+
+```bash
+git clone git@github.com:alexherrero/dev-machine-setup.git
+cd dev-machine-setup
+./setup.sh --help               # prints the Debian-flavored stage list
+./setup.sh                      # end-to-end bootstrap (sudo prompts during apt)
+./setup.sh --with-codex         # also install Codex CLI (opt-in)
+source ~/.zshrc || source ~/.bashrc   # whichever rc file matches your $SHELL
 ```
 
 ### Windows
@@ -31,31 +48,42 @@ cd dev-machine-setup
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 ```
 
-The orchestrator runs each stage in order and stops on the first
-failure. Every stage is idempotent — re-running the script does not
-reinstall or clobber. After the script finishes, it prints a manual
-auth checklist (`claude login`, `gh auth login`, `gemini`, sign in to
-Antigravity, sign in to Claude Desktop).
+The orchestrator detects OS, runs each stage in order, and stops on the
+first failure. Every stage is idempotent — re-running the script does
+not reinstall or clobber. After the script finishes, it prints a manual
+auth checklist tailored to the platform and the flags used (`claude
+login`, `gh auth login`, `gemini`, optionally `codex login`, plus the
+Mac-only GUI sign-ins).
 
 ## Layout
 
 ```
 .
-├── setup.sh              Top-level orchestrator (Mac)
-├── setup.ps1             Windows entry point (stubbed — PLAN.md task 9)
+├── setup.sh              Top-level orchestrator (Mac + Debian/Ubuntu)
+├── setup.ps1             Windows entry point (stubbed — see docs/windows.md)
 ├── configs/              Literal captured app configs (claude, gemini, antigravity, …)
-├── scripts/              Per-concern install stages (install-brew, install-claude-cli, …)
-├── docs/                 First-run guide and Windows deferral note
+├── scripts/              Per-concern install stages
+│   ├── lib/os.sh         OS detection helper (sets $OS = macos|debian)
+│   ├── install-brew.sh   Mac toolchain (Homebrew + formulae)
+│   ├── install-apt.sh    Debian toolchain (apt + NodeSource + gh repos)
+│   ├── install-clis.sh   Claude + Gemini (+ Codex when --with-codex)
+│   ├── install-gui-apps.sh  Mac-only GUI apps (browser-assisted)
+│   ├── link-configs.sh   Place captured configs at OS locations
+│   ├── verify-install.sh Warn-only post-setup health check
+│   └── auth-checklist.sh Print manual auth steps
+├── docs/                 First-run guide, Debian + Windows notes
 └── .harness/             agentic-harness state (PLAN.md, progress.md, hooks)
 ```
 
 ## Status
 
-**Mac:** in progress — see [.harness/PLAN.md](.harness/PLAN.md) for the
-task list.
-**Windows:** deferred; skeleton files only. Real implementation happens
-against a reference VM in a later plan ([.harness/PLAN.md](.harness/PLAN.md)
-task 9).
+**Mac:** ready (full GUI + CLI install path).
+**Debian / Ubuntu:** ready (CLI-only). See [docs/debian.md](docs/debian.md)
+for the supported-distro matrix.
+**Windows:** deferred. `setup.ps1` and the per-stage `.ps1` files exist
+as stubs (matching the Mac shape) so the orchestrator's flag surface
+stays coherent across platforms; real Windows work happens against a
+reference VM in a future plan. See [docs/windows.md](docs/windows.md).
 
 ## Development
 

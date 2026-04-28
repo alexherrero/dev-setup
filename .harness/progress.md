@@ -69,3 +69,8 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - scripts/auth-checklist.sh: sources os.sh; dynamic steps array; codex login conditional on WITH_CODEX=1; GUI sign-ins Mac-only; OS-specific heading text.
 - docs/first-run.md: rewritten with ## Mac (5/6 steps) and ## Debian / Ubuntu (3/4 steps) subsections; optional codex documented in both; trailing "What setup.sh leaves behind" updated for platform-specific paths.
 - Verified: 4 configurations all correct (Mac default 5 items, Mac+codex 6, Debian 3, Debian+codex 4). Linux output has no Antigravity/Claude Desktop refs. Codex first-run verified as `codex login` via npx.
+
+## /work — feat-debian-cli-support task 7 — 2026-04-28
+- README.md: intro reframed for Mac/Debian/Windows; new ### Debian / Ubuntu Usage subsection with --with-codex documented; expanded Layout per-script tree; Status section gets Debian-ready row.
+- docs/debian.md: new (~6.3 KB) — quick-start, supported-distros matrix (Debian 11/12/13 + Ubuntu 20.04/22.04/24.04), Antigravity-GUI-only callout citing official docs, toolchain detail, future-work.
+- Verified: README has 3 platform subsections; all 5 internal links from README resolve; all 5 internal links from docs/debian.md resolve; Antigravity-not-supported callout grep-matches.
