@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # link-configs.sh — place captured configs at their real OS locations.
 #
+# Cross-platform. Mac places the full set; Debian skips the Mac-only
+# Claude Desktop config path (Claude Desktop isn't installed on Linux
+# in our CLI-only scope) and routes the shell-fragment append to either
+# ~/.zshrc or ~/.bashrc per $SHELL.
+#
 # Strategy per-file, based on who writes the file in steady state:
 #
 #   symlink              : user-authored, tools don't rewrite.
@@ -13,14 +18,19 @@
 #                          cause constant repo churn. Fresh-machine seed only;
 #                          drift is managed by re-running scripts/capture.sh.
 #     - ~/.claude/settings.json               (Claude Code rewrites regularly)
-#     - ~/Library/.../claude_desktop_config.json (Claude Desktop reorders keys)
+#     - ~/Library/.../claude_desktop_config.json (Mac only — Claude Desktop)
 #     - ~/.gemini/settings.json               (Gemini CLI writes back preferences)
-#     - ~/.antigravity/argv.json              (Electron/VS Code derivative)
+#     - ~/.antigravity/argv.json              (Electron/VS Code derivative;
+#                                              seeded on both platforms in
+#                                              case Antigravity-CLI parity
+#                                              lands later)
 #
 #   append-idempotent    : shell fragment, not a file replacement.
 #                          Guarded by a marker comment; each PATH line is
 #                          only appended if not already present verbatim.
-#     - configs/zsh/.zshrc-additions → appended to ~/.zshrc
+#                          Target rc file picked from $OS + $SHELL via
+#                          scripts/lib/os.sh::rc_file().
+#     - configs/zsh/.zshrc-additions → appended to ~/.zshrc or ~/.bashrc
 #
 #   git-config merge     : use `git config --global` so existing includes,
 #                          credential helpers, and signing config survive.
@@ -33,6 +43,8 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=scripts/lib/os.sh
+. "$REPO_ROOT/scripts/lib/os.sh"
 BACKUP_ROOT="$HOME/.dev-machine-setup-backup"
 TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 BACKUP_DIR="$BACKUP_ROOT/$TIMESTAMP"
@@ -93,9 +105,10 @@ link_copy_if_absent() {
   printf '    seeded    %-55s (copy of %s)\n' "$dest" "$src_rel"
 }
 
-append_zshrc_additions() {
+append_shell_additions() {
   local src="$REPO_ROOT/configs/zsh/.zshrc-additions"
-  local dest="$HOME/.zshrc"
+  local dest
+  dest="$(rc_file)"
   local marker='# dev-machine-setup PATH additions (link-configs.sh)'
   [[ -f "$src" ]] || return 0
   touch "$dest"
@@ -156,20 +169,32 @@ echo "==> linking configs"
 
 link_symlink       configs/claude/CLAUDE.md                       "$HOME/.claude/CLAUDE.md"
 link_copy_if_absent configs/claude/settings.json                  "$HOME/.claude/settings.json"
-link_copy_if_absent configs/claude-desktop/claude_desktop_config.json "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+# Claude Desktop is Mac-only in our scope (no GUI apps on Linux).
+if [[ "$OS" == "macos" ]]; then
+  link_copy_if_absent configs/claude-desktop/claude_desktop_config.json "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+else
+  printf '    skip      %-55s (Mac-only — Claude Desktop)\n' "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+fi
 link_copy_if_absent configs/gemini/settings.json                  "$HOME/.gemini/settings.json"
 link_copy_if_absent configs/antigravity/argv.json                 "$HOME/.antigravity/argv.json"
-append_zshrc_additions
+append_shell_additions
 merge_gitconfig
 
 # --- post-check -------------------------------------------------------------
 
 echo "==> verifying"
-# Strict JSON files.
-for json in \
-  "$HOME/.claude/settings.json" \
-  "$HOME/Library/Application Support/Claude/claude_desktop_config.json" \
-  "$HOME/.gemini/settings.json"; do
+# Strict JSON files. The Claude Desktop path only enters the validation
+# loop on Mac — on Linux the path was never written, so a stale check
+# would just skip via the `-e` guard anyway, but excluding it keeps
+# the post-check output honest about what we placed.
+strict_jsons=(
+  "$HOME/.claude/settings.json"
+  "$HOME/.gemini/settings.json"
+)
+if [[ "$OS" == "macos" ]]; then
+  strict_jsons+=("$HOME/Library/Application Support/Claude/claude_desktop_config.json")
+fi
+for json in "${strict_jsons[@]}"; do
   if [[ -e "$json" ]]; then
     if jq empty "$json" >/dev/null 2>&1; then
       printf '    jq-ok     %s\n' "$json"

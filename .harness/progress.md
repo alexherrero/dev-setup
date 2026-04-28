@@ -54,3 +54,9 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - setup.sh: --with-codex flag added; exports WITH_CODEX to env. install-clis.sh: Codex install + post-check entry both gated.
 - Codex uninstalled from this Mac. Default run skips Codex with informative banner; post-check verifies only claude+gemini.
 - Tasks 5 (verify-install) and 6 (auth-checklist) updated to honor the same flag conditionally.
+
+## /work — feat-debian-cli-support task 4 — 2026-04-27
+- scripts/lib/os.sh: rc_file() helper centralized (moved from install-clis.sh).
+- scripts/install-clis.sh: uses shared rc_file() instead of local copy.
+- scripts/link-configs.sh: sources os.sh; Claude Desktop block gated on OS==macos; append_zshrc_additions renamed to append_shell_additions and routes via rc_file(); post-check JSON list excludes ~/Library/... on Debian.
+- Verified: Mac re-run no-op; OS=debian forced run skips Mac-only path correctly and validates 3 JSONs; rc_file() correct across debian/zsh, debian/bash, macos.

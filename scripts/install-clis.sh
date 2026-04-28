@@ -38,18 +38,9 @@ readonly CODEX_NPM_PACKAGE="@openai/codex"
 
 # --- helpers ----------------------------------------------------------------
 
-# Pick the rc file to append PATH markers to. Mac is captured zsh; Debian
-# follows whatever $SHELL points at.
-rc_file() {
-  if [[ "$OS" == "debian" ]]; then
-    case "${SHELL:-}" in
-      */zsh) echo "$HOME/.zshrc" ;;
-      *)     echo "$HOME/.bashrc" ;;
-    esac
-  else
-    echo "$HOME/.zshrc"
-  fi
-}
+# rc_file() lives in scripts/lib/os.sh — sourced above. It returns the
+# absolute path of the rc file we should append PATH markers to (~/.zshrc
+# on Mac; ~/.zshrc or ~/.bashrc on Debian per $SHELL).
 
 # Append a single-line PATH export to $rc, guarded by a marker comment
 # so re-runs are a no-op.

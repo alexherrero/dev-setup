@@ -54,3 +54,21 @@ case "$OS" in
 esac
 
 export OS
+
+# rc_file — print the absolute path of the rc file we should append PATH
+# markers to. Mac is captured-zsh, so always ~/.zshrc. Debian inspects
+# $SHELL: zsh -> ~/.zshrc, anything else -> ~/.bashrc. Idempotent
+# callers should `touch` the result before grep'ing it.
+#
+# Used by scripts/install-clis.sh and scripts/link-configs.sh; centralized
+# here so both stages write to the same file and stay in sync.
+rc_file() {
+  if [[ "$OS" == "debian" ]]; then
+    case "${SHELL:-}" in
+      */zsh) echo "$HOME/.zshrc" ;;
+      *)     echo "$HOME/.bashrc" ;;
+    esac
+  else
+    echo "$HOME/.zshrc"
+  fi
+}
