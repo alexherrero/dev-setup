@@ -4,6 +4,24 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.0] — 2026-04-29
+
+> **First stable release.** Both `feat-debian-cli-support` and `feat-ci-verification` are complete with `passes: true` in `.harness/features.json`. The Mac and Debian/Ubuntu paths are end-to-end CI-verified on a single dispatch — [run 25087515129](https://github.com/alexherrero/dev-machine-setup/actions/runs/25087515129) (macOS 1m34s, Ubuntu 1m20s, Windows-smoke 0m25s, all `success`). Windows is **smoke-only** (orchestrator + AST parse); real Windows install verification is the next plan, `feat-windows-cli-support`.
+
+### Added
+- **`.github/workflows/ci-tests.yml`** — manually-dispatched CI workflow with three parallel jobs:
+  - **`macos-test`** (`macos-latest`) runs `setup.sh --skip-apps` end-to-end (GUI installer needs a human, hence skipped). Asserts `verify-install` reports zero warns, idempotency on re-run, and that `--with-codex` actually installs Codex.
+  - **`ubuntu-test`** (`ubuntu-latest`) runs `setup.sh` end-to-end including the full apt path (NodeSource node 22 LTS, GitHub CLI repo, all six apt packages). Asserts zero warns, idempotency, `--with-codex`, and a negative test that the Mac-only `~/Library/Application Support/Claude/` is **not** created on Linux.
+  - **`windows-test`** (`windows-latest`) is smoke-only: orchestrator stubs run cleanly + every `.ps1` AST-parses.
+  Triggered by `workflow_dispatch` only — no push, no PR, no schedule. Workflow-level `concurrency: cancel-in-progress` so a second dispatch on the same ref supersedes the older run. README has a CI status badge + `## Testing` section explaining the manual-dispatch flow.
+- **`SKIP_APPS=1` env-var pattern** in `setup.sh` and `verify-install.sh`. Mirrors `WITH_CODEX`. When `--skip-apps` is passed, `verify-install.sh` consolidates the three `/Applications/*.app` checks + the Mac-only Claude Desktop config check into a single `[SKIP] /Applications/*.app + Claude Desktop config (--skip-apps was set)` line, so a CI Mac run with `--skip-apps` reports `0 warn` instead of false-WARNing on apps it deliberately didn't install.
+
+### Fixed
+- **NodeSource apt key signature failure on Debian.** `install-apt.sh::install_keyring` was writing the upstream URL's response verbatim via `tee`. NodeSource serves the key ASCII-armored at `.gpg.key` while modern apt with `signed-by=/etc/apt/keyrings/...gpg` expects the file to be **dearmored binary**, so `apt update` failed with `NO_PUBKEY 2F59B5F99B1BE0B4`. Helper now takes an `armored` flag; NodeSource pipes through `gpg --dearmor` before write. GitHub CLI's URL serves binary already → unchanged.
+- **`includeCoAuthoredBy` kill-switch missing on fresh Macs.** On a fresh-install Mac, the Claude Code installer (or its first `claude --version` invocation in `install-clis.sh`'s post-check) writes a default `~/.claude/settings.json` *before* `link-configs.sh` runs. `link_copy_if_absent` then preserves the default file and our captured kill-switch from `configs/claude/settings.json` never lands. New `link-configs.sh::ensure_claude_co_authored_by_disabled()` merges `includeCoAuthoredBy=false` into whatever's on disk via a `jq`-driven temp-file rename. Idempotent: already-false is a no-op print.
+
+**Full diff:** https://github.com/alexherrero/dev-machine-setup/compare/v0.6.1...v1.0.0
+
 ## [v0.6.1] — 2026-04-28
 
 ### Changed
@@ -120,6 +138,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Initial project scaffold: bootstrapped with [agentic-harness](https://github.com/alexherrero/agentic-harness) v0.8.7 + hooks. Includes adapters for Claude Code, Antigravity, Codex, and Gemini plus `PostToolUse` / `PreCompact` / `SessionStart(compact)` hooks.
 
+[v1.0.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v1.0.0
 [v0.6.1]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.6.1
 [v0.6.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.6.0
 [v0.5.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.5.0
