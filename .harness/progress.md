@@ -169,3 +169,9 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - Help text rewrites: lists all 6 stages, documents Codex Windows caveat.
 - scripts/install-brew.ps1 deleted (dead stub from feat-debian-cli-support task 9).
 - Six .ps1 stage scripts now wired up. Coupled with task 8 (CI workflow upgrade) — running CI between task 7 and 8 would exercise the full pipeline without -SkipApps. Saving dispatch for after task 8.
+
+## /work — feat-windows-cli-support task 8 — 2026-04-29
+- ci-tests.yml windows-test: 5-step smoke → 8-step real install pipeline. Symmetric with macos-test and ubuntu-test.
+- New steps: end-to-end -SkipApps, verify-install 0-warn assertion (with SKIP_APPS=1 env), idempotency git-status check, -WithCodex exits 0 + codex-NOT-on-PATH invariant, AST-parse preserved.
+- Job timeout bumped 10m → 30m to match Mac install budget. Job name: "Windows smoke" → "Windows".
+- actionlint clean. Empirical verification on next CI dispatch.

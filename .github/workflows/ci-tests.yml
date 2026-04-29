@@ -116,30 +116,74 @@ jobs:
           fi
           echo "OK: ~/Library/Application Support/Claude was not created"
 
-  # --- Windows: smoke-only ---------------------------------------------------
+  # --- Windows: full install pipeline ----------------------------------------
   #
-  # Per-stage scripts are currently TODO stubs. This job verifies the
-  # orchestrator runs cleanly + every .ps1 file AST-parses. Real install
-  # verification is the immediate follow-on plan (feat-windows-cli-support),
-  # which will replace this job with a real install pipeline.
+  # Real install verification, parallel to the Mac job (also -SkipApps —
+  # GUI sign-ins need a human). winget for the toolchain + Claude Code,
+  # npm for Gemini, Codex skip-with-warn (upstream broken on Windows).
+  # AST-parse step preserved from the prior smoke job as a regression catch.
   windows-test:
-    name: Windows smoke (windows-latest)
+    name: Windows (windows-latest)
     runs-on: windows-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     defaults:
       run:
         shell: pwsh
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup.ps1 -Help
-        run: ./setup.ps1 -Help
+      - name: setup.ps1 -Help shows the 6-stage list
+        run: |
+          ./setup.ps1 -Help
+          $help = ./setup.ps1 -Help
+          if (-not ($help -match 'tooling') -or -not ($help -match 'auth-checklist')) {
+            Write-Error "setup.ps1 -Help missing expected stages"
+            exit 1
+          }
 
-      - name: setup.ps1 -DryRun
+      - name: setup.ps1 -DryRun resolves all 6 stages
         run: ./setup.ps1 -DryRun
 
-      - name: setup.ps1 runs all stubs cleanly
-        run: ./setup.ps1
+      - name: end-to-end install (-SkipApps)
+        run: ./setup.ps1 -SkipApps
+
+      - name: verify-install reports 0 warn
+        # SKIP_APPS=1 is what setup.ps1 -SkipApps exports; we set it explicitly
+        # here because each GH Actions step is a fresh shell. Without it,
+        # verify-install would WARN on the missing GUI apps that we deliberately
+        # didn't install. Same posture as the macOS job.
+        env:
+          SKIP_APPS: '1'
+        run: |
+          $output = ./scripts/verify-install.ps1
+          $output | Tee-Object -FilePath verify.out
+          if (-not (Select-String -Path verify.out -Pattern 'summary:.*0 warn' -Quiet)) {
+            Write-Error "verify-install reported warns; expected 0"
+            exit 1
+          }
+
+      - name: idempotency — re-run produces no repo drift
+        run: |
+          ./setup.ps1 -SkipApps
+          $changed = git status --porcelain
+          if ($changed) {
+            Write-Error "FAIL: re-run produced repo drift:"
+            Write-Host $changed
+            exit 1
+          }
+
+      - name: -WithCodex still exits 0 (Codex skip-with-warn on Windows)
+        # Codex on Windows is currently skip-with-warn even when the user opts
+        # in (install-clis.ps1 cites openai/codex#18648 + #11744). The -WithCodex
+        # variant must therefore exit 0 cleanly, NOT install codex. The
+        # assertion is "exit code 0", not "codex resolves on PATH".
+        run: |
+          ./setup.ps1 -SkipApps -WithCodex
+          if (Get-Command codex -ErrorAction SilentlyContinue) {
+            Write-Error "FAIL: codex unexpectedly resolved on PATH — Windows path should skip-with-warn"
+            exit 1
+          }
+          Write-Host "OK: codex correctly skipped on Windows even with -WithCodex"
 
       - name: AST-parse all .ps1 files
         run: |
