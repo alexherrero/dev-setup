@@ -122,6 +122,16 @@ foreach ($s in $plan) {
     Write-Warning ("{0} does not exist — skipping (see PLAN.md)" -f $scriptPath)
     continue
   }
+  # Refresh PATH from the registry before launching the next stage so the
+  # child process inherits the current PATH including anything winget /
+  # Node / npm just installed in a prior stage. Without this, install-
+  # tooling.ps1's ripgrep + install-clis.ps1's Claude Code (both winget'd
+  # into %LOCALAPPDATA%\Microsoft\WinGet\Links and added to the user PATH
+  # in the registry) wouldn't be visible to verify-install.ps1 — its
+  # parent process (this script) was started before those PATH updates.
+  $machinePath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
+  $userPath    = [System.Environment]::GetEnvironmentVariable('Path', 'User')
+  $env:Path    = "$machinePath;$userPath"
   & pwsh -NoProfile -File $scriptPath
   if ($LASTEXITCODE -ne 0) {
     Write-Error ("stage {0} failed with exit code {1}" -f $s.Name, $LASTEXITCODE)
