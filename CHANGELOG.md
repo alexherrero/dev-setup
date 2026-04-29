@@ -4,6 +4,23 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.0] — 2026-04-29
+
+> ⚠️ **Mid-feature release.** Tasks 1–6 of 9 done for `feat-windows-cli-support`. Mac and Debian paths are unchanged and stable. The six Windows `.ps1` scripts are now real implementations (no longer stubs), but `setup.ps1` still wires up to the *old* stub names (`install-brew.ps1` etc.) — task 7 renames the stages to point at the new files. Until then the new scripts exist on disk but aren't reachable via `setup.ps1`. **Stay on v1.0.0 if you're using Windows now**; this tag is incremental tagging hygiene only. v2.0.0 ships when CI's windows-test goes green end-to-end (real install pipeline, task 8) and `feat-windows-cli-support.passes=true` lands (task 9).
+
+### Added
+- **`scripts/install-tooling.ps1`** — Windows equivalent of `install-brew.sh` / `install-apt.sh`. Pre-flight winget existence check; installs Git.Git (required by Claude Code — shells out to Git Bash), OpenJS.NodeJS.LTS, GitHub.cli, BurntSushi.ripgrep.MSVC. Skips jq (PowerShell native `ConvertFrom-Json`), shellcheck, shfmt (no bash on Windows). Idempotent skip-if-on-PATH; PATH refresh from registry into running shell; post-check loop verifies five binaries.
+- **`scripts/install-clis.ps1`** rewritten from stub. Claude via `winget install Anthropic.ClaudeCode`; Gemini via `npm install -g @google/gemini-cli`; **Codex skip-with-warn on Windows** (cites `openai/codex#18648` and `#11744` — upstream npm package broken). Three approved-verb helpers (`Update-PathFromRegistry`, `Add-DirToUserPath`, `Test-NodeVersion`) plus a Node ≥ 20 hard-fail guard.
+- **`scripts/install-gui-apps.ps1`** rewritten from stub. Antigravity Desktop (`Google.Antigravity` — winget id unconfirmed in Google's docs; falls back to skip-with-warn + manual-URL pointer if winget can't find it), Claude Desktop (`Anthropic.Claude` — distinct from `Anthropic.ClaudeCode`). Gemini Desktop explicitly skipped (no first-party Windows app).
+- **`scripts/link-configs.ps1`** rewritten from stub. Five PowerShell-native helpers (`Backup-IfNeeded`, `Set-RepoSymlink` with copy-fallback on `UnauthorizedAccessException`, `Copy-RepoFileIfAbsent`, `Merge-Gitconfig`, `Set-ClaudeCoAuthoredByDisabled`). Symlink-with-copy-fallback for `CLAUDE.md` (Dev Mode toggle documented); copy-if-absent for the three JSON configs at Windows-native `%USERPROFILE%\.claude\`, `\.gemini\`, `\.antigravity\` paths. Antigravity `argv.json` placed at the VSCode-convention path pending empirical verification on a Windows runner. Co-Authored-By kill-switch merge via `ConvertFrom-Json` / `ConvertTo-Json` roundtrip (no jq dep). Explicit skip with rationale for the MSIX-redirected Claude Desktop config (`claude-code#26073`).
+- **`scripts/verify-install.ps1`** rewritten from stub. Two tiers (global + harness). Eight approved-verb helpers including `Test-WindowsApp` (registry uninstall-key search across HKLM + HKLM\WOW6432Node + HKCU). Codex skip-only regardless of `WITH_CODEX`; `SKIP_APPS=1` consolidates GUI app checks; symlink-or-copy both accepted as OK. PostToolUse hook check via `ConvertTo-Json -Compress` + regex match for `verify\.sh`.
+- **`scripts/auth-checklist.ps1`** rewritten from stub. Always 5 numbered items on Windows (claude, gh, gemini, Antigravity, Claude Desktop); Codex note appended at end with `WITH_CODEX`-aware messaging (no numbered codex login step since install-clis.ps1 doesn't install it).
+
+### Plan
+- New feature `feat-windows-cli-support` in `.harness/features.json` (`passes: false` until CI green). Three open questions surfaced and resolved during planning: (1) Codex Windows → skip-with-warn; (2) Claude Code install → winget (override of original native-installer recommendation, per user preference for system-managed installs); (3) Antigravity `argv.json` path → verify empirically with skip-the-file fallback.
+
+**Full diff:** https://github.com/alexherrero/dev-machine-setup/compare/v1.0.0...v1.1.0
+
 ## [v1.0.0] — 2026-04-29
 
 > **First stable release.** Both `feat-debian-cli-support` and `feat-ci-verification` are complete with `passes: true` in `.harness/features.json`. The Mac and Debian/Ubuntu paths are end-to-end CI-verified on a single dispatch — [run 25087515129](https://github.com/alexherrero/dev-machine-setup/actions/runs/25087515129) (macOS 1m34s, Ubuntu 1m20s, Windows-smoke 0m25s, all `success`). Windows is **smoke-only** (orchestrator + AST parse); real Windows install verification is the next plan, `feat-windows-cli-support`.
@@ -138,6 +155,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Initial project scaffold: bootstrapped with [agentic-harness](https://github.com/alexherrero/agentic-harness) v0.8.7 + hooks. Includes adapters for Claude Code, Antigravity, Codex, and Gemini plus `PostToolUse` / `PreCompact` / `SessionStart(compact)` hooks.
 
+[v1.1.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v1.1.0
 [v1.0.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v1.0.0
 [v0.6.1]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.6.1
 [v0.6.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.6.0
