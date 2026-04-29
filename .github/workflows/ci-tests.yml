@@ -134,9 +134,13 @@ jobs:
 
       - name: setup.ps1 -Help shows the 6-stage list
         run: |
+          # setup.ps1 prints via Write-Host (Information stream, #6). The
+          # `6>&1` redirect routes it to the success stream so we can capture
+          # into a variable for the regex assertion. Also call once without
+          # capture so the help is visible in the GH Actions log for debugging.
           ./setup.ps1 -Help
-          $help = ./setup.ps1 -Help
-          if (-not ($help -match 'tooling') -or -not ($help -match 'auth-checklist')) {
+          $help = ./setup.ps1 -Help 6>&1 | Out-String
+          if ($help -notmatch 'tooling' -or $help -notmatch 'auth-checklist') {
             Write-Error "setup.ps1 -Help missing expected stages"
             exit 1
           }
@@ -152,11 +156,13 @@ jobs:
         # here because each GH Actions step is a fresh shell. Without it,
         # verify-install would WARN on the missing GUI apps that we deliberately
         # didn't install. Same posture as the macOS job.
+        # `6>&1` redirects the Information stream (Write-Host output) into the
+        # success pipeline so Tee-Object can capture it. Without this the file
+        # would be empty and the Select-String assertion would always fail.
         env:
           SKIP_APPS: '1'
         run: |
-          $output = ./scripts/verify-install.ps1
-          $output | Tee-Object -FilePath verify.out
+          ./scripts/verify-install.ps1 6>&1 | Tee-Object -FilePath verify.out
           if (-not (Select-String -Path verify.out -Pattern 'summary:.*0 warn' -Quiet)) {
             Write-Error "verify-install reported warns; expected 0"
             exit 1
