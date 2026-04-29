@@ -163,3 +163,9 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - scripts/auth-checklist.ps1: rewritten from stub. 5 numbered items (claude, gh, gemini, Antigravity, Claude Desktop) regardless of WITH_CODEX since Codex is skip-only on Windows.
 - Codex note appended at end with WITH_CODEX-aware message.
 - pscustomobject array + auto-numbering loop. PowerShell-native, no jq/bash artifacts.
+
+## /work — feat-windows-cli-support task 7 — 2026-04-29
+- setup.ps1: stage `brew` renamed to `tooling` (script install-tooling.ps1); Desc strings rewritten; -WithCodex switch added; both -SkipApps and -WithCodex now set $env:SKIP_APPS / $env:WITH_CODEX for sub-stage scripts.
+- Help text rewrites: lists all 6 stages, documents Codex Windows caveat.
+- scripts/install-brew.ps1 deleted (dead stub from feat-debian-cli-support task 9).
+- Six .ps1 stage scripts now wired up. Coupled with task 8 (CI workflow upgrade) — running CI between task 7 and 8 would exercise the full pipeline without -SkipApps. Saving dispatch for after task 8.

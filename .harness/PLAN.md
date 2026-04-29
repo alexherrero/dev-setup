@@ -103,7 +103,7 @@
 
 - **What:** The orchestrator already exists from `feat-debian-cli-support`'s task 9 (Windows stubs). It's already structured around stages; this task confirms the stage list points at the now-real `.ps1` files and adds `--with-codex` to its arg-parsing (mirror of the bash version). Inline OS detection (no `scripts\lib\os.ps1` helper needed; Windows is the only OS this script handles). Add `-Help` text describing the new stages.
 - **Verification:** `setup.ps1 -Help` lists all 6 stages (`tooling`, `clis`, `gui-apps`, `link-configs`, `verify-install`, `auth-checklist`). `setup.ps1 -DryRun` exits 0 with paths. `setup.ps1 -SkipApps` filters out `gui-apps` AND exports `SKIP_APPS=1`. `setup.ps1 -WithCodex` exports `WITH_CODEX=1`.
-- **Status:** [ ]
+- **Status:** [x] (2026-04-29: setup.ps1 stage list updated — `brew` renamed to `tooling` (script `install-tooling.ps1`); all six Desc strings rewritten to reflect the now-real installer behaviors. Added `-WithCodex` switch parameter; both `-SkipApps` and `-WithCodex` set `$env:SKIP_APPS` and `$env:WITH_CODEX` respectively (mirrors `setup.sh`'s `export` of the same vars). Help text updated to list all flags incl. the Codex caveat citing `openai/codex#18648`. Dead `scripts/install-brew.ps1` stub deleted; six .ps1 stage scripts now in place. Local pwsh AST parse not run (pwsh missing); harness verify.sh accepts. CI's AST step is the gate; runtime end-to-end exercise lands at task 8 once the workflow is upgraded to use `-SkipApps` etc.)
 
 ### 8. `.github/workflows/ci-tests.yml` — windows-test upgrade from smoke to real
 
