@@ -40,6 +40,22 @@
         "close out: flip feat-ci-verification.passes and feat-debian-cli-support.passes to true after first three-platform green run; v1.0.0 release"
       ],
       "passes": true
+    },
+    {
+      "id": "feat-windows-cli-support",
+      "description": "Real Windows install verification — replaces the smoke-only Windows job from feat-ci-verification with a full install pipeline. Windows scope matches Mac (full GUI + CLI: Antigravity Desktop + Claude Desktop installed via winget; Gemini Desktop has no first-party app, skipped). winget for toolchain (Git, Node LTS, gh, ripgrep). Claude Code via native PowerShell installer; Gemini via npm; Codex skipped on Windows (upstream npm packaging bugs). v1.1.0 ships when ci-tests.yml windows-test job goes green end-to-end.",
+      "steps": [
+        "scripts/install-tooling.ps1 — winget Git + Node LTS + gh + ripgrep",
+        "scripts/install-clis.ps1 — Claude native installer + Gemini npm; Codex skip-with-warn",
+        "scripts/install-gui-apps.ps1 — winget Antigravity + Claude Desktop",
+        "scripts/link-configs.ps1 — symlink-with-copy-fallback CLAUDE.md, Windows-native paths, Co-Authored-By kill-switch merge",
+        "scripts/verify-install.ps1 — Windows post-setup health check",
+        "scripts/auth-checklist.ps1 — Windows manual auth steps",
+        "setup.ps1 — orchestrator wiring + --with-codex flag",
+        "ci-tests.yml windows-test upgraded from smoke to real install pipeline",
+        "docs/windows.md rewrite + README + close out features.passes=true; v1.1.0"
+      ],
+      "passes": false
     }
   ]
 }

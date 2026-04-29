@@ -113,3 +113,10 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - features.json: feat-ci-verification.passes and feat-debian-cli-support.passes both flipped to true.
 - PLAN.md plan-level Status: complete. All 3 tasks [x].
 - Next: ship-release v1.0.0 (explicit version, major bump).
+
+## /plan — feat-windows-cli-support — 2026-04-29
+- 9-task plan written to .harness/PLAN.md.
+- features.json: appended feat-windows-cli-support (passes:false).
+- Scope: Windows = Mac scope (full GUI + CLI). Antigravity + Claude Desktop via winget. Gemini Desktop no first-party app — skipped. Codex skip-with-warn (upstream npm broken). Native Claude installer + winget for everything else. PowerShell-native JSON parsing, no jq on Windows.
+- 3 open questions surfaced inline with defaults: (1) Codex skip-with-warn vs GitHub-Release fallback; (2) Claude Code native installer vs winget; (3) Antigravity argv.json path empirical verification.
+- Next: confirm open questions then /work task 1.
