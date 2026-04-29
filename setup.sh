@@ -120,6 +120,7 @@ while (($# > 0)); do
 done
 
 export WITH_CODEX
+export SKIP_APPS
 
 # --- validate --only target -------------------------------------------------
 

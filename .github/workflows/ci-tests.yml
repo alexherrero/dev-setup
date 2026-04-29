@@ -1,0 +1,168 @@
+name: CI tests
+
+# Manually-dispatched only — no push, no PR, no schedule. The user
+# controls when this fires. See .harness/PLAN.md (feat-ci-verification).
+on:
+  workflow_dispatch:
+
+# If a run is already in progress on the same ref and the user dispatches
+# again, cancel the older run. Each runner is a fresh VM that's discarded
+# after cancellation, so dpkg/apt/brew partial-install states don't carry
+# over.
+concurrency:
+  group: ci-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # --- macOS: full Mac pipeline minus GUI apps -------------------------------
+  #
+  # GUI installer (install-gui-apps.sh) is browser-assisted and can't run in
+  # CI, so we use --skip-apps. Homebrew is pre-installed on macos-latest, so
+  # install-brew.sh exercises only its "brew already installed; install
+  # formulae" branch — the bootstrap-brew-from-scratch branch is an
+  # acknowledged gap.
+  macos-test:
+    name: macOS (macos-latest)
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup.sh --help shows the macOS stage list
+        run: |
+          ./setup.sh --help
+          ./setup.sh --help | grep -qF 'Stages (macos):'
+
+      - name: setup.sh --dry-run resolves all 6 Mac stages
+        run: ./setup.sh --dry-run
+
+      - name: end-to-end install (--skip-apps)
+        run: ./setup.sh --skip-apps
+
+      - name: verify-install reports 0 warn
+        # SKIP_APPS=1 is what setup.sh exports when --skip-apps is passed;
+        # we set it explicitly here because each GH Actions step is a fresh
+        # shell. Without it, verify-install would WARN on the missing
+        # /Applications/*.app entries that we deliberately didn't install.
+        env:
+          SKIP_APPS: '1'
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          ./scripts/verify-install.sh | tee /tmp/verify.out
+          grep -qE 'summary:.*0 warn' /tmp/verify.out
+
+      - name: idempotency — re-run produces no repo drift
+        run: |
+          ./setup.sh --skip-apps
+          git status --porcelain
+          [[ -z "$(git status --porcelain)" ]]
+
+      - name: --with-codex installs Codex CLI
+        run: |
+          ./setup.sh --skip-apps --with-codex
+          export PATH="$HOME/.local/bin:$PATH"
+          command -v codex
+          codex --version
+
+  # --- Ubuntu: full Debian pipeline -----------------------------------------
+  #
+  # ubuntu-latest is currently 24.04 (Noble), where shfmt is in apt. The
+  # GitHub-release shfmt fallback path (Debian 11 / Ubuntu 22.04) is an
+  # acknowledged gap; could be added as a matrix later if regression
+  # warrants. Job runs as the runner user with passwordless sudo.
+  ubuntu-test:
+    name: Ubuntu (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup.sh --help shows the Debian stage list
+        run: |
+          ./setup.sh --help
+          ./setup.sh --help | grep -qF 'Stages (debian):'
+
+      - name: setup.sh --dry-run resolves all 5 Debian stages
+        run: ./setup.sh --dry-run
+
+      - name: end-to-end install
+        run: ./setup.sh
+
+      - name: verify-install reports 0 warn
+        run: |
+          export PATH="$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
+          ./scripts/verify-install.sh | tee /tmp/verify.out
+          grep -qE 'summary:.*0 warn' /tmp/verify.out
+
+      - name: idempotency — re-run produces no repo drift
+        run: |
+          ./setup.sh
+          git status --porcelain
+          [[ -z "$(git status --porcelain)" ]]
+
+      - name: --with-codex installs Codex CLI
+        run: |
+          ./setup.sh --with-codex
+          export PATH="$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
+          command -v codex
+          codex --version
+
+      - name: negative test — Mac-only paths not created on Linux
+        run: |
+          if [[ -e "$HOME/Library/Application Support/Claude" ]]; then
+            echo "FAIL: Mac-only Claude Desktop config path was created on Linux"
+            ls -la "$HOME/Library/Application Support/Claude"
+            exit 1
+          fi
+          echo "OK: ~/Library/Application Support/Claude was not created"
+
+  # --- Windows: smoke-only ---------------------------------------------------
+  #
+  # Per-stage scripts are currently TODO stubs. This job verifies the
+  # orchestrator runs cleanly + every .ps1 file AST-parses. Real install
+  # verification is the immediate follow-on plan (feat-windows-cli-support),
+  # which will replace this job with a real install pipeline.
+  windows-test:
+    name: Windows smoke (windows-latest)
+    runs-on: windows-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup.ps1 -Help
+        run: ./setup.ps1 -Help
+
+      - name: setup.ps1 -DryRun
+        run: ./setup.ps1 -DryRun
+
+      - name: setup.ps1 runs all stubs cleanly
+        run: ./setup.ps1
+
+      - name: AST-parse all .ps1 files
+        run: |
+          $files = Get-ChildItem -Recurse -Filter *.ps1
+          if ($files.Count -eq 0) {
+            Write-Error "no .ps1 files found"
+            exit 1
+          }
+          $failed = @()
+          foreach ($f in $files) {
+            $errs = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              $f.FullName, [ref]$null, [ref]$errs)
+            if ($errs) {
+              Write-Host "PARSE ERROR in $($f.FullName):"
+              $errs | ForEach-Object { Write-Host "  $_" }
+              $failed += $f.FullName
+            } else {
+              Write-Host "OK: $($f.FullName)"
+            }
+          }
+          if ($failed.Count -gt 0) {
+            Write-Error "AST parse errors in $($failed.Count) of $($files.Count) files"
+            exit 1
+          }
+          Write-Host "$($files.Count) .ps1 files parsed cleanly"

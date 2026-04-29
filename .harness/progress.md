@@ -81,3 +81,17 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - documenter sub-agent dispatched: 1 new wiki page (Bootstrap-A-New-Debian-Or-Ubuntu) + 4 edits (Bootstrap-A-New-Mac flipped pending->implemented, Dev-Machine-Setup-Design rewritten for cross-platform OS-dispatch architecture, Home + _Sidebar index updates).
 - 9 flat-namespace wiki links all resolve to .md files. Antigravity-GUI-only callout grep-matches in two wiki pages.
 - Remaining work for /release: Debian VM run; flip features.passes=true; final v1.0.0 release.
+
+## /plan — feat-ci-verification — 2026-04-28
+- 3-task plan written to .harness/PLAN.md.
+- features.json: appended feat-ci-verification (passes:false).
+- Scope: workflow_dispatch only, no push/PR/cron triggers; macos-latest + ubuntu-latest full pipeline; windows-latest smoke-only (real Windows = next plan); cancel-in-progress concurrency.
+- Next: /work task 1 (write the workflow file).
+
+## /work — feat-ci-verification task 1 — 2026-04-28
+- .github/workflows/ci-tests.yml: workflow_dispatch only, cancel-in-progress concurrency, 3 parallel jobs (macos-test, ubuntu-test, windows-test).
+- Mac job (macos-latest): --help/--dry-run smoke, end-to-end --skip-apps, verify-install 0-warn assertion (with SKIP_APPS=1), idempotency check, --with-codex variant.
+- Ubuntu job (ubuntu-latest): same shape + apt path + negative test for ~/Library/... not created on Linux.
+- Windows job (windows-latest): smoke only — orchestrator runs cleanly + AST-parse all .ps1 files.
+- Scope expansion: SKIP_APPS env-var support added to setup.sh + verify-install.sh (~10 lines) so Mac --skip-apps reports 0 warns. Mirrors WITH_CODEX pattern. Mac default still 30 ok / 0 warn.
+- Verified: actionlint clean; structural YAML correct; SKIP_APPS gating works locally.

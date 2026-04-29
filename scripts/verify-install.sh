@@ -32,6 +32,12 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # WARNed, since the user never asked for codex to be installed.
 WITH_CODEX="${WITH_CODEX:-0}"
 
+# SKIP_APPS=1 is exported by setup.sh when --skip-apps was passed (CI
+# without a human, headless verification, etc.). When set, the Mac GUI
+# app checks SKIP rather than WARN — the apps were never installed, so
+# missing them is by design.
+SKIP_APPS="${SKIP_APPS:-0}"
+
 PASS=0
 WARN=0
 
@@ -203,14 +209,17 @@ if [[ "$WITH_CODEX" != "1" ]]; then
   skip "codex on PATH (set WITH_CODEX=1 to include Codex CLI)"
 fi
 
-# GUI apps + Claude Desktop config — Mac-only. CLI-only Debian scope means
-# Antigravity / Gemini Desktop / Claude Desktop aren't installed; the
-# claude_desktop_config.json path is also never written by link-configs.sh.
-if [[ "$OS" == "macos" ]]; then
+# GUI apps + Claude Desktop config — Mac-only. Two skip cases:
+#  - Linux: CLI-only scope, GUI apps are out of scope by design.
+#  - SKIP_APPS=1 on Mac: --skip-apps was passed (CI / headless), the apps
+#    were never installed and missing them is intentional, not a defect.
+if [[ "$OS" == "macos" && "$SKIP_APPS" != "1" ]]; then
   check_app "Antigravity.app"
   check_app "Gemini.app"
   check_app "Claude.app"
   check_json "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+elif [[ "$OS" == "macos" ]]; then
+  skip "/Applications/*.app + Claude Desktop config (--skip-apps was set)"
 else
   skip "/Applications/*.app + Claude Desktop config (Linux: CLI-only scope)"
 fi
