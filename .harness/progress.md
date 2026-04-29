@@ -151,3 +151,10 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - Co-Authored-By kill-switch merge via ConvertFrom-Json/ConvertTo-Json roundtrip (no jq dep on Windows).
 - Strict-JSON validation via ConvertFrom-Json; JSONC for argv.json strips // comments via regex.
 - Antigravity argv.json placed at VSCode-convention path; empirical verification waits for task 8 CI.
+
+## /work — feat-windows-cli-support task 5 — 2026-04-29
+- scripts/verify-install.ps1: rewritten from stub. Mirror of verify-install.sh; PowerShell-native helpers (no jq dep).
+- Two tiers (global + harness, same as bash version). Codex skip-only on Windows; SKIP_APPS=1 consolidates GUI checks; symlink-or-copy both OK.
+- Test-WindowsApp: registry uninstall-key search across HKLM + HKLM/WOW6432Node + HKCU. Limitation: pure-MSIX installs may register elsewhere — flagged for follow-on.
+- PostToolUse hook check uses ConvertTo-Json -Compress + regex match for verify.sh, mirroring jq tostring/test pattern.
+- Local pwsh AST not run; CI AST step is the gate.
