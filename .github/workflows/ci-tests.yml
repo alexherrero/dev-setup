@@ -78,14 +78,23 @@ jobs:
           Write-Host "$($files.Count) .ps1 files parsed cleanly"
 
       - name: lychee — internal markdown link check
-        # Excludes external http(s) URLs to avoid flaky third-party
-        # rate-limits; v1 only gates internal cross-links between .md files
-        # in this repo. External-link verification stays a manual
-        # release-time concern. .harness/ is vendored from agentic-harness
-        # and excluded for the same reason as shellcheck/pwsh AST.
+        # Scans only the user-facing public docs: README.md, CHANGELOG.md,
+        # and docs/. Other markdown is excluded by scope:
+        # - AGENTS.md, CLAUDE.md: AI-agent meta-docs with known
+        #   upstream-pointing harness/ references (resolved at the
+        #   agentic-harness repo, not locally).
+        # - wiki/: own publication pipeline (wiki-sync.yml mirrors to
+        #   GitHub Wiki); uses GitHub-Wiki shortlinks (page-by-basename,
+        #   no .md extension) that lychee's filesystem checker can't
+        #   resolve.
+        # - .harness/, .agent/, .agents/, .codex/, .gemini/, .claude/:
+        #   vendored from agentic-harness; upstream's responsibility.
+        # External http(s) URLs excluded to avoid third-party rate-limit
+        # flakiness — verification of those stays a manual release-time
+        # concern.
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --exclude "^https?://" --exclude-path .harness "**/*.md"
+          args: --no-progress --exclude "^https?://" README.md CHANGELOG.md docs/
           fail: true
 
       - name: audit — secret-shaped + personal-data scan
