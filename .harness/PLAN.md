@@ -59,7 +59,7 @@ A user on a fresh Mac, Debian, or Windows host installs the full dev environment
   - secret-scan + personal-data scan from task 1 (so future PRs are gated)
   - `test -f LICENSE && test -s LICENSE`
 - **Verification:** **CI:** `actionlint` validates the new YAML; `static-analysis` job goes green on dispatch. Becomes the named gate that every other task references.
-- **Status:** [ ]
+- **Status:** [x] (2026-04-29: static-analysis job added with 6 steps — shellcheck (-x; .harness/ excluded as vendored), actionlint (self-hosted via download-actionlint.bash; no third-party action dep), pwsh AST parse (ubuntu-latest pwsh, .harness/ excluded), lychee (scope narrowed to README.md/CHANGELOG.md/docs/ — wiki and vendored adapters and AGENTS.md/CLAUDE.md upstream pointers all out of v1 scope), audit-regex scan (API-key shapes + non-noreply email + hardcoded /Users/alex/ paths; workflows/ + PLAN/progress/CHANGELOG narrative excluded to avoid self-match), LICENSE non-empty check. CI verified green on run 25150482876 — three iterations to land: (a) telemetry.sh SC2034 in vendored .harness/ → exclude .harness/; (b) lychee 39-error breadth → narrow to user-facing public docs; (c) actionlint clean throughout. The `static-analysis` job is now the named gate referenced by every remaining task.)
 
 ### 4. Visibility flip to public
 

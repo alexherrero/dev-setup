@@ -213,3 +213,10 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - README gained ## License section pointing at LICENSE.
 - CI gate (test -f / test -s) wires up in task 3 (static-analysis job).
 - Next: /work task 3 (static-analysis CI job).
+
+## /work — feat-curl-bash-installer task 3 — 2026-04-30T06:20:24Z (static-analysis CI green)
+- Static-analysis job added: shellcheck + actionlint + pwsh AST + lychee + audit regex + LICENSE check.
+- 3 dispatches to land green: (a) excluded .harness/ vendored from shellcheck/AST/lychee; (b) narrowed lychee scope to README/CHANGELOG/docs/ (skip wiki + AGENTS/CLAUDE meta-docs).
+- CI green on run 25150482876: static-analysis 12s + Mac 1m12s + Ubuntu 2m28s + Windows 2m48s.
+- The named gate every remaining task references is now in place.
+- Next: /work task 4 (visibility flip to public).
