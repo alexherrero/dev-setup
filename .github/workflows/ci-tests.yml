@@ -34,7 +34,10 @@ jobs:
           # -x follows `source` statements; every script that sources lib/os.sh
           # already has a `# shellcheck source=scripts/lib/os.sh` annotation,
           # so cross-file checks resolve without SC1091 noise.
-          find . -type f -name '*.sh' -not -path './.git/*' -print0 \
+          # .harness/ is vendored from agentic-harness — upstream's lint
+          # responsibility, not ours. We own setup.sh + scripts/*.sh.
+          find . -type f -name '*.sh' \
+            -not -path './.git/*' -not -path './.harness/*' -print0 \
             | xargs -0 shellcheck -x
 
       - name: actionlint — validate workflow YAML
@@ -47,7 +50,10 @@ jobs:
       - name: pwsh AST parse — validate all .ps1 files
         shell: pwsh
         run: |
-          $files = Get-ChildItem -Recurse -Filter *.ps1
+          # .harness/ is vendored from agentic-harness; upstream's lint
+          # responsibility. We own setup.ps1 + scripts/*.ps1.
+          $files = Get-ChildItem -Recurse -Filter *.ps1 |
+            Where-Object { $_.FullName -notmatch '[\\/]\.harness[\\/]' }
           if ($files.Count -eq 0) {
             Write-Error "no .ps1 files found"
             exit 1
@@ -75,10 +81,11 @@ jobs:
         # Excludes external http(s) URLs to avoid flaky third-party
         # rate-limits; v1 only gates internal cross-links between .md files
         # in this repo. External-link verification stays a manual
-        # release-time concern.
+        # release-time concern. .harness/ is vendored from agentic-harness
+        # and excluded for the same reason as shellcheck/pwsh AST.
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --exclude "^https?://" "**/*.md"
+          args: --no-progress --exclude "^https?://" --exclude-path .harness "**/*.md"
           fail: true
 
       - name: audit — secret-shaped + personal-data scan
