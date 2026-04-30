@@ -145,6 +145,39 @@ jobs:
           fi
           echo "OK: LICENSE present and non-empty"
 
+      - name: README shape — required sections + badge block
+        # Asserts README.md retains the converge-style structure: a
+        # centered title block, badge block, and the four canonical
+        # H2 sections (Install, Quick start, Documentation, License).
+        # Catches accidental section-header rename / removal in PRs.
+        run: |
+          set -e
+          fail=0
+          check() {
+            local label="$1" pattern="$2"
+            if grep -qE "$pattern" README.md; then
+              echo "OK: $label"
+            else
+              echo "FAIL: README.md missing $label (pattern: $pattern)"
+              fail=1
+            fi
+          }
+          check "centered title block (<div align=\"center\">)" '<div align="center">'
+          check "CI tests badge"                                'actions/workflows/ci-tests\.yml/badge\.svg'
+          check "License badge"                                 'License-MIT-yellow\.svg'
+          check "Latest release badge"                          'shields\.io/github/v/release'
+          check "## Install heading"                            '^## Install$'
+          check "## Quick start heading"                        '^## Quick start$'
+          check "## Documentation heading"                      '^## Documentation$'
+          check "## License heading"                            '^## License$'
+          check "curl|bash one-liner"                           'curl -fsSL .*install\.sh.*\| bash'
+          check "irm|iex one-liner"                             'iwr .*install\.ps1.*\| iex'
+          if [[ $fail -ne 0 ]]; then
+            echo "README shape check failed"
+            exit 1
+          fi
+          echo "OK: README shape check passes"
+
   # --- macOS: full Mac pipeline minus GUI apps -------------------------------
   #
   # GUI installer (install-gui-apps.sh) is browser-assisted and can't run in

@@ -1,137 +1,112 @@
-# dev-machine-setup <img src="https://img.shields.io/badge/Claude-D97757?logo=claude&logoColor=white&style=flat-square" alt="Claude" align="right"> <img src="https://img.shields.io/badge/Gemini-4285F4?logo=googlegemini&logoColor=white&style=flat-square" alt="Gemini" align="right"> <img src="https://img.shields.io/badge/Antigravity-1A73E8?logo=google&logoColor=white&style=flat-square" alt="Antigravity" align="right">
+<div align="center">
+  <h1>dev-machine-setup</h1>
+  <p><strong>One-line bootstrap for an AI-first dev environment.</strong> Mac, Debian/Ubuntu, Windows. Idempotent. Configuration captured as literal files. No <code>git</code> prereq on the target host.</p>
 
-[![CI tests](https://github.com/alexherrero/dev-machine-setup/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/alexherrero/dev-machine-setup/actions/workflows/ci-tests.yml)
+  <a href="https://github.com/alexherrero/dev-machine-setup/actions/workflows/ci-tests.yml"><img alt="CI tests" src="https://github.com/alexherrero/dev-machine-setup/actions/workflows/ci-tests.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
+  <a href="https://github.com/alexherrero/dev-machine-setup/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/alexherrero/dev-machine-setup"></a>
 
-Opinionated one-shot bootstrap for a Mac (full GUI + CLI) or Debian /
-Ubuntu (CLI-only) dev environment built around AI coding tools (Claude,
-Gemini, optionally OpenAI Codex; Antigravity Desktop on Mac).
-Configuration lives as literal files in `configs/` so the setup is
-diffable, auditable, and portable.
+  <br>
+
+  <img alt="Claude" src="https://img.shields.io/badge/Claude-D97757?logo=claude&logoColor=white&style=flat-square">
+  <img alt="Gemini" src="https://img.shields.io/badge/Gemini-4285F4?logo=googlegemini&logoColor=white&style=flat-square">
+  <img alt="Antigravity" src="https://img.shields.io/badge/Antigravity-1A73E8?logo=google&logoColor=white&style=flat-square">
+</div>
 
 ---
 
-## Quick install
+Opinionated bootstrap that takes a fresh Mac, Debian/Ubuntu host, or Windows machine from zero to a fully configured AI-coding dev environment in one command. Configuration lives as literal files in `configs/` so the setup is diffable, auditable, and portable. Re-running converges instead of reinstalling.
 
-One-line install per supported platform. Every stage is idempotent — re-running is safe.
+## Install
 
-### macOS
-
-```bash
-git clone git@github.com:alexherrero/dev-machine-setup.git && cd dev-machine-setup && ./setup.sh
-```
-
-### Debian / Ubuntu
+### macOS / Debian / Ubuntu
 
 ```bash
-git clone git@github.com:alexherrero/dev-machine-setup.git && cd dev-machine-setup && ./setup.sh
+curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh | bash
 ```
-
-CLI-only scope (Claude Code + Gemini CLI, optional Codex). No GUI apps —
-Antigravity Desktop is out of scope on Linux. See
-[docs/debian.md](docs/debian.md) for the supported-distro matrix and what's
-omitted vs Mac.
 
 ### Windows (PowerShell 7+)
 
 ```powershell
-git clone git@github.com:alexherrero/dev-machine-setup.git; cd dev-machine-setup; ./setup.ps1
+iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1 | iex
 ```
 
-Full GUI + CLI scope mirroring Mac (winget for toolchain + Claude Code +
-Antigravity Desktop + Claude Desktop, npm for Gemini). See
-[docs/windows.md](docs/windows.md).
+For flag-passing examples (`--with-codex`, `--skip-apps`, etc.) and the `inspect-before-run` form, see [How to install via the one-liner](wiki/how-to/Install-Via-One-Liner.md).
 
-After the script finishes, refresh your shell so new CLIs resolve and
-complete the auth checklist printed at the end of the run:
-
-- macOS / Debian-with-zsh: `source ~/.zshrc`
-- Debian-with-bash: `source ~/.bashrc`
-- Windows: `$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")`
-
-## Usage
+### Alternative: `git clone`
 
 ```bash
-./setup.sh --help               # prints the stage list
-./setup.sh                      # end-to-end bootstrap
-./setup.sh --with-codex         # also install Codex CLI (opt-in; skip-with-warn on Windows)
-./setup.sh --skip-apps          # CLI-only; skip GUI installs (CI / headless)
-./setup.sh --only <stage>       # run one stage (e.g. --only verify-install)
+git clone https://github.com/alexherrero/dev-machine-setup.git && cd dev-machine-setup && ./setup.sh
 ```
 
-Windows uses the equivalent PowerShell flags: `-Help`, `-WithCodex`,
-`-SkipApps`, `-Only`.
+## Quick start
 
-The orchestrator detects OS, runs each stage in order, and stops on the
-first failure. After the script finishes, it prints a manual auth
-checklist tailored to the platform and the flags used (`claude login`,
-`gh auth login`, `gemini`, optionally `codex login`, plus the Mac /
-Windows GUI sign-ins).
+1. **Run the one-liner above** for your platform.
+2. **Reload your shell** so newly-installed CLIs resolve. POSIX: `source ~/.zshrc` (or `~/.bashrc`). Windows: open a new PowerShell window.
+3. **Complete the auth checklist** printed at the end of the run (`claude login`, `gh auth login`, `gemini` first-run, GUI sign-ins on Mac/Windows). The full list is in [docs/first-run.md](docs/first-run.md).
 
-Per-platform first-run guides:
+## What gets installed
 
-- macOS — [docs/first-run.md](docs/first-run.md)
-- Debian / Ubuntu — [docs/debian.md](docs/debian.md)
-- Windows — [docs/windows.md](docs/windows.md)
+| Component | macOS | Debian/Ubuntu | Windows | Source |
+| --- | :-: | :-: | :-: | --- |
+| Claude Code CLI | ✓ | ✓ | ✓ | `claude.ai/install.sh` (POSIX) / `winget` (Win) |
+| Gemini CLI | ✓ | ✓ | ✓ | `npm` |
+| Codex CLI *(opt-in)* | ✓ | ✓ | skip-with-warn | `npm` |
+| Antigravity Desktop | ✓ | — | ✓ | DMG / `winget` |
+| Claude Desktop | ✓ | — | ✓ | DMG / `winget` |
+| Gemini Desktop | ✓ | — | — | DMG |
+| Toolchain (`node`, `gh`, `jq`, `ripgrep`, `shellcheck`, `shfmt`) | `brew` | `apt` + NodeSource | `winget` | per-platform |
 
-## Layout
+Codex is skip-with-warn on Windows because the `@openai/codex` npm package is currently broken on Windows ([openai/codex#18648](https://github.com/openai/codex/issues/18648)). See [docs/windows.md](docs/windows.md) for the full caveat.
 
-```
-.
-├── setup.sh              Top-level orchestrator (Mac + Debian/Ubuntu)
-├── setup.ps1             Windows entry point (full GUI + CLI)
-├── configs/              Literal captured app configs (claude, gemini, antigravity, …)
-├── scripts/              Per-concern install stages
-│   ├── lib/os.sh         OS detection helper (sets $OS = macos|debian)
-│   ├── install-brew.sh   Mac toolchain (Homebrew + formulae)
-│   ├── install-apt.sh    Debian toolchain (apt + NodeSource + gh repos)
-│   ├── install-clis.sh   Claude + Gemini (+ Codex when --with-codex)
-│   ├── install-gui-apps.sh  Mac-only GUI apps (browser-assisted)
-│   ├── link-configs.sh   Place captured configs at OS locations
-│   ├── verify-install.sh Warn-only post-setup health check
-│   └── auth-checklist.sh Print manual auth steps
-├── docs/                 First-run guide, Debian + Windows notes
-└── .harness/             agentic-harness state (PLAN.md, progress.md, hooks)
-```
+## Stages
 
-## Status
+Each platform's orchestrator runs an ordered, idempotent stage list. `--dry-run` (POSIX) / `-DryRun` (Windows) prints the plan without running anything.
 
-**Mac:** ready (full GUI + CLI install path).
-**Debian / Ubuntu:** ready (CLI-only). See [docs/debian.md](docs/debian.md)
-for the supported-distro matrix.
-**Windows:** ready (full GUI + CLI, mirrors Mac scope). winget for
-toolchain + Claude Code + Antigravity Desktop + Claude Desktop, npm for
-Gemini. Codex skip-with-warn (upstream npm broken on Windows). See
-[docs/windows.md](docs/windows.md).
+| Stage | Description |
+| --- | --- |
+| `brew` (Mac) / `apt` (Linux) / `tooling` (Win) | Install the package manager and toolchain |
+| `clis` | Install Claude Code, Gemini CLI, optionally Codex CLI |
+| `gui-apps` *(Mac/Win only)* | Install Antigravity Desktop, Claude Desktop, (Mac) Gemini Desktop |
+| `link-configs` | Place captured configs at OS-native paths with backup-on-replace |
+| `verify-install` | Warn-only post-setup health check (zero warns expected) |
+| `auth-checklist` | Print the manual auth steps |
+
+## Flags
+
+| POSIX | Windows | Effect |
+| --- | --- | --- |
+| `--help` | `-Help` | Print stage list + flag reference, exit 0 |
+| `--dry-run` | `-DryRun` | Print the planned stages and exit 0 |
+| `--with-codex` | `-WithCodex` | Also install Codex CLI (opt-in) |
+| `--skip-apps` | `-SkipApps` | Skip GUI installs (CI / headless) |
+| `--only <stage>` | `-Only <stage>` | Run a single stage |
+
+## Documentation
+
+| Doc | Description |
+| --- | --- |
+| [docs/first-run.md](docs/first-run.md) | Manual auth checklist (claude login, gh auth login, etc.) |
+| [docs/debian.md](docs/debian.md) | Debian/Ubuntu specifics — supported-distro matrix, toolchain detail |
+| [docs/windows.md](docs/windows.md) | Windows specifics — winget, MSIX redirect, Codex caveat |
+| [docs/architecture.md](docs/architecture.md) | OS-dispatch architecture, repo layout, agentic-harness pointer |
+| [How to install via the one-liner](wiki/how-to/Install-Via-One-Liner.md) | One-line bootstrap recipe with flag-passing examples |
+| [Public curl\|bash installer — design](wiki/explanation/Public-Curl-Bash-Installer.md) | Why the bootstrap looks the way it does, trust model |
+| [Scripts reference](wiki/reference/Scripts.md) | Entry-point table — flags, exit codes, files written |
+| [.harness/PLAN.md](.harness/PLAN.md) | Current plan and verification criteria |
 
 ## Testing
 
-CI is **manually dispatched** — no auto-runs on push or PR. The
-[`ci-tests.yml`](.github/workflows/ci-tests.yml) workflow runs the full
-install pipeline on three fresh runners: `macos-latest` (`--skip-apps`,
-since the Mac GUI installer needs a human), `ubuntu-latest` (full
-Debian path, no GUI apps in scope), and `windows-latest`
-(`-SkipApps`, full toolchain + CLIs + the Codex-skipped invariant).
-Each platform's job asserts `verify-install` reports zero warns and
-that a re-run produces no repo drift.
+CI is **manually dispatched** — no auto-runs on push or PR. The [`ci-tests.yml`](.github/workflows/ci-tests.yml) workflow runs four jobs in parallel:
 
-To dispatch:
+| Job | Runner | What it tests |
+| --- | --- | --- |
+| Static analysis | `ubuntu-latest` | `shellcheck`, `actionlint`, pwsh AST parse, `lychee` link check, secret-scan, LICENSE check |
+| macOS | `macos-latest` | Full Mac install (`--skip-apps`); bootstrap-from-curl |
+| Ubuntu | `ubuntu-latest` | Full Debian path; bootstrap-from-curl |
+| Windows | `windows-latest` | Full Win install (`-SkipApps`); bootstrap-from-iwr |
 
-1. Open the [Actions tab](https://github.com/alexherrero/dev-machine-setup/actions)
-   on GitHub.
-2. Pick **CI tests** in the left sidebar.
-3. Click **Run workflow** → **Run workflow** (default branch `main`).
-
-Concurrency is `cancel-in-progress`: dispatching again while a run is
-active supersedes the older one.
-
-## Development
-
-This repo uses the [agentic-harness](https://github.com/alexherrero/agentic-harness)
-phase-gated workflow. Work is organized around `/plan` → `/work` → `/review`
-→ `/release`. State lives under `.harness/`; documentation lives under
-`wiki/`. See [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md) for the
-agent entry points, and [.harness/verify.sh](.harness/verify.sh) for the
-per-file lint gate wired into `PostToolUse`.
+Each platform job asserts `verify-install` reports zero warns and a re-run produces no repo drift. To dispatch: [Actions tab](https://github.com/alexherrero/dev-machine-setup/actions) → **CI tests** → **Run workflow**. Concurrency is `cancel-in-progress`.
 
 ## License
 
