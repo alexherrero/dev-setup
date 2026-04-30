@@ -207,3 +207,9 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - Decisions: kept .gitconfig noreply email; kept PLAN.md "I" usages.
 - Audit-as-CI-step lands in task 3 (static-analysis job).
 - Next: /work task 2 (LICENSE).
+
+## /work — feat-curl-bash-installer task 2 — 2026-04-30T05:42:18Z (LICENSE)
+- LICENSE added at repo root: standard MIT text, Copyright (c) 2026 Alex Herrero.
+- README gained ## License section pointing at LICENSE.
+- CI gate (test -f / test -s) wires up in task 3 (static-analysis job).
+- Next: /work task 3 (static-analysis CI job).

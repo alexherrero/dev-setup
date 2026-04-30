@@ -132,3 +132,7 @@ phase-gated workflow. Work is organized around `/plan` → `/work` → `/review`
 `wiki/`. See [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md) for the
 agent entry points, and [.harness/verify.sh](.harness/verify.sh) for the
 per-file lint gate wired into `PostToolUse`.
+
+## License
+
+[MIT](LICENSE) — Copyright (c) 2026 Alex Herrero.

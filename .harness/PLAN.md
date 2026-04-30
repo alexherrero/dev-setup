@@ -47,7 +47,7 @@ A user on a fresh Mac, Debian, or Windows host installs the full dev environment
 
 - **What:** Add `LICENSE` (MIT, copyright "Alex Herrero"). Add a `## License` line to README pointing at it. No SECURITY.md / CONTRIBUTING.md / templates in v1.
 - **Verification:** **CI:** the `static-analysis` job (task 3) includes `test -f LICENSE && test -s LICENSE` as a step.
-- **Status:** [ ]
+- **Status:** [x] (2026-04-29: LICENSE added at repo root with standard MIT text — Copyright (c) 2026 Alex Herrero. README gained `## License` section pointing at LICENSE. CI gate (`test -f LICENSE && test -s LICENSE`) lands as a step inside task 3's `static-analysis` job; structural piece in place now, gate wires up next task.)
 
 ### 3. New `static-analysis` CI job
 
