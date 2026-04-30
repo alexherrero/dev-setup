@@ -357,6 +357,19 @@ jobs:
           }
           Write-Host "OK: codex correctly skipped on Windows even with -WithCodex"
 
+      - name: bootstrap from iwr — install.ps1 -DryRun
+        # Mirrors the Mac/Ubuntu bootstrap-from-curl steps. Downloads
+        # install.ps1 from main, runs it with -DryRun. Uses the temp-file
+        # pattern (download then run) since `iwr | iex` doesn't naturally
+        # accept named params — install.ps1 declares param([switch]$DryRun
+        # ...) and forwards via @PSBoundParameters splatting.
+        run: |
+          $tmp = Join-Path $env:TEMP 'install.ps1'
+          Invoke-WebRequest -UseBasicParsing `
+            -Uri 'https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1' `
+            -OutFile $tmp
+          & $tmp -DryRun
+
       - name: AST-parse all .ps1 files
         run: |
           $files = Get-ChildItem -Recurse -Filter *.ps1
