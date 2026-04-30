@@ -10,59 +10,75 @@ diffable, auditable, and portable.
 
 ---
 
-## Usage
+## Quick install
+
+One-line install per supported platform. Every stage is idempotent — re-running is safe.
 
 ### macOS
 
 ```bash
-git clone git@github.com:alexherrero/dev-machine-setup.git
-cd dev-machine-setup
-./setup.sh --help               # prints the stage list
-./setup.sh                      # end-to-end bootstrap
-./setup.sh --with-codex         # also install Codex CLI (opt-in)
-source ~/.zshrc                 # refresh PATH so newly-installed CLIs resolve
+git clone git@github.com:alexherrero/dev-machine-setup.git && cd dev-machine-setup && ./setup.sh
 ```
 
 ### Debian / Ubuntu
 
-CLI-only scope: Claude Code + Gemini CLI (+ optional Codex CLI), no GUI
-apps. Antigravity Desktop is GUI-only and out of scope on Linux. See
-[docs/debian.md](docs/debian.md) for the supported-distro matrix and
-what's omitted vs Mac.
-
 ```bash
-git clone git@github.com:alexherrero/dev-machine-setup.git
-cd dev-machine-setup
-./setup.sh --help               # prints the Debian-flavored stage list
-./setup.sh                      # end-to-end bootstrap (sudo prompts during apt)
-./setup.sh --with-codex         # also install Codex CLI (opt-in)
-source ~/.zshrc || source ~/.bashrc   # whichever rc file matches your $SHELL
+git clone git@github.com:alexherrero/dev-machine-setup.git && cd dev-machine-setup && ./setup.sh
 ```
 
-### Windows
+CLI-only scope (Claude Code + Gemini CLI, optional Codex). No GUI apps —
+Antigravity Desktop is out of scope on Linux. See
+[docs/debian.md](docs/debian.md) for the supported-distro matrix and what's
+omitted vs Mac.
+
+### Windows (PowerShell 7+)
 
 ```powershell
-git clone git@github.com:alexherrero/dev-machine-setup.git
-cd dev-machine-setup
-./setup.ps1 -Help    # prints the stage list
-./setup.ps1          # end-to-end bootstrap (currently a stub — see docs/windows.md)
-# Refresh PATH in the current session so new tools resolve:
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+git clone git@github.com:alexherrero/dev-machine-setup.git; cd dev-machine-setup; ./setup.ps1
 ```
 
+Full GUI + CLI scope mirroring Mac (winget for toolchain + Claude Code +
+Antigravity Desktop + Claude Desktop, npm for Gemini). See
+[docs/windows.md](docs/windows.md).
+
+After the script finishes, refresh your shell so new CLIs resolve and
+complete the auth checklist printed at the end of the run:
+
+- macOS / Debian-with-zsh: `source ~/.zshrc`
+- Debian-with-bash: `source ~/.bashrc`
+- Windows: `$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")`
+
+## Usage
+
+```bash
+./setup.sh --help               # prints the stage list
+./setup.sh                      # end-to-end bootstrap
+./setup.sh --with-codex         # also install Codex CLI (opt-in; skip-with-warn on Windows)
+./setup.sh --skip-apps          # CLI-only; skip GUI installs (CI / headless)
+./setup.sh --only <stage>       # run one stage (e.g. --only verify-install)
+```
+
+Windows uses the equivalent PowerShell flags: `-Help`, `-WithCodex`,
+`-SkipApps`, `-Only`.
+
 The orchestrator detects OS, runs each stage in order, and stops on the
-first failure. Every stage is idempotent — re-running the script does
-not reinstall or clobber. After the script finishes, it prints a manual
-auth checklist tailored to the platform and the flags used (`claude
-login`, `gh auth login`, `gemini`, optionally `codex login`, plus the
-Mac-only GUI sign-ins).
+first failure. After the script finishes, it prints a manual auth
+checklist tailored to the platform and the flags used (`claude login`,
+`gh auth login`, `gemini`, optionally `codex login`, plus the Mac /
+Windows GUI sign-ins).
+
+Per-platform first-run guides:
+
+- macOS — [docs/first-run.md](docs/first-run.md)
+- Debian / Ubuntu — [docs/debian.md](docs/debian.md)
+- Windows — [docs/windows.md](docs/windows.md)
 
 ## Layout
 
 ```
 .
 ├── setup.sh              Top-level orchestrator (Mac + Debian/Ubuntu)
-├── setup.ps1             Windows entry point (stubbed — see docs/windows.md)
+├── setup.ps1             Windows entry point (full GUI + CLI)
 ├── configs/              Literal captured app configs (claude, gemini, antigravity, …)
 ├── scripts/              Per-concern install stages
 │   ├── lib/os.sh         OS detection helper (sets $OS = macos|debian)

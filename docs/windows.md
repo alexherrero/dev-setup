@@ -9,6 +9,14 @@ winget). Configs are placed at Windows-native paths
 
 ## Quick start
 
+One-line install (PowerShell 7+):
+
+```powershell
+git clone git@github.com:alexherrero/dev-machine-setup.git; cd dev-machine-setup; ./setup.ps1
+```
+
+Or step-by-step with flag variants:
+
 ```powershell
 git clone git@github.com:alexherrero/dev-machine-setup.git
 cd dev-machine-setup

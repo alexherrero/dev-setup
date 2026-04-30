@@ -187,3 +187,23 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - features.json: feat-windows-cli-support.passes = true. All three features now pass.
 - PLAN.md plan-level Status: complete.
 - Next: v2.0.0 release.
+
+## compaction event — 2026-04-30T01:54:41Z
+- trigger: manual
+- branch: main
+- The session was compacted at this point. To re-anchor on the
+  in-flight task, read .harness/PLAN.md and the entries above
+  this marker. The compaction summary alone is not enough.
+
+## /plan — feat-curl-bash-installer — 2026-04-30T04:14:30Z
+- 10 tasks: deep audit, LICENSE, static-analysis CI, visibility flip, install.sh, install.ps1, README rewrite, wiki polish, bootstrap-from-curl CI, v3.0.0.
+- All verification gates moved to CI (new static-analysis job).
+- README style ref: TsekNet/converge.
+- Confirmed: MIT license; .harness/progress.md kept as-is; lychee only in v1, markdownlint as fast-follow.
+- Next: /work to start on task 1 (audit).
+
+## /work — feat-curl-bash-installer task 1 — 2026-04-30T04:52:20Z (audit complete)
+- 6-track pre-public audit run; 0 secrets in tree or history; 1 LEAK fixed (genericized /Users/alex/ path); 4 placeholder pages dropped; 3 stale wiki status lines bumped to v2.0.0.
+- Decisions: kept .gitconfig noreply email; kept PLAN.md "I" usages.
+- Audit-as-CI-step lands in task 3 (static-analysis job).
+- Next: /work task 2 (LICENSE).

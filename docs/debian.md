@@ -9,6 +9,14 @@ below.
 
 ## Quick start
 
+One-line install:
+
+```bash
+git clone git@github.com:alexherrero/dev-machine-setup.git && cd dev-machine-setup && ./setup.sh
+```
+
+Or step-by-step with flag variants:
+
 ```bash
 git clone git@github.com:alexherrero/dev-machine-setup.git
 cd dev-machine-setup

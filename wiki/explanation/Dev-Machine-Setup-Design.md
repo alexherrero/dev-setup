@@ -1,8 +1,8 @@
 # Dev-machine setup — design
 
 > [!NOTE]
-> **Status:** implemented — Mac stable at v0.1.0; Debian feature-complete at v0.6.0 (full pass pending verification on a real Debian VM).
-> **Plan:** [.harness/PLAN.md](../../.harness/PLAN.md) — features `feat-mac-one-shot-setup`, `feat-debian-cli-support`.
+> **Status:** implemented — Mac, Debian/Ubuntu, and Windows all CI-verified end-to-end at v2.0.0.
+> **Plan:** [.harness/PLAN.md](../../.harness/PLAN.md) — features `feat-mac-one-shot-setup`, `feat-debian-cli-support`, `feat-ci-verification`, `feat-windows-cli-support`.
 
 ## Intent
 
