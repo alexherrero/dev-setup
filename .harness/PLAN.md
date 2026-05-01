@@ -1,6 +1,6 @@
 # Plan: Public release with curl|bash installer (`feat-curl-bash-installer`)
 
-**Status:** planning
+**Status:** complete (2026-04-30 — all 10 tasks `[x]`; v3.0.0 shipped at <https://github.com/alexherrero/dev-machine-setup/releases/tag/v3.0.0>; CI-verified green on run 25201452372).
 **Created:** 2026-04-29
 **Brief:** Make the repo public, ship a `curl | bash` / `irm | iex` bootstrap that pulls the latest release tarball, polish README + wiki for public consumption, and move every verification gate into CI.
 
@@ -128,7 +128,7 @@ A user on a fresh Mac, Debian, or Windows host installs the full dev environment
 
 - **What:** Cut v3.0.0 (major bump — visibility flip + install model + README rewrite is a meaningful break in user expectations, even though all old paths still work). Release notes lead with: "Public!", "One-line install", "README rewrite", "All gates in CI". Update CHANGELOG.
 - **Verification:** **CI:** `gh release view v3.0.0 --json url -q .url` returns a URL; release notes contain the curl + irm one-liners; CI badge in README shows green for the release dispatch.
-- **Status:** [ ]
+- **Status:** [x] (2026-04-30: v3.0.0 cut. CHANGELOG.md `[v3.0.0] — 2026-04-30` section drafted with full Added / Changed / Fixed / Internal subsections covering all 10 tasks of the feature. Lead paragraph: "Public release with one-line install." `chore(release): v3.0.0` commit `b27b699` pushed. Tag v3.0.0 annotated and pushed. `gh release create v3.0.0 --notes-file ...` succeeded; release URL: https://github.com/alexherrero/dev-machine-setup/releases/tag/v3.0.0. Final CI dispatch on the release commit (run 25201452372) — all four jobs green: Static analysis, macOS, Ubuntu, Windows. CI badge in README reflects this dispatch. Plan-level Status flipped to complete. Deferred for post-v3.0.0: repo rename — tracked as GitHub Issue #1.)
 
 ## Risks / open questions
 

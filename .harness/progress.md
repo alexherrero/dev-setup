@@ -265,3 +265,12 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - features.json: feat-curl-bash-installer.passes false → true. Description refreshed with redirect-Location detail and run reference.
 - Deferred (post-v3.0.0): rename the repo. Added to PLAN.md follow-on work; GitHub Issue filed at end of session.
 - Next: /work task 10 (v3.0.0 release).
+
+## /work — feat-curl-bash-installer task 10 — 2026-05-01T04:00:07Z (v3.0.0 SHIPPED)
+- CHANGELOG.md [v3.0.0] section drafted: Added / Changed / Fixed / Internal covering all 10 tasks.
+- chore(release): v3.0.0 commit b27b699 pushed; tag v3.0.0 annotated + pushed; gh release created.
+- Release URL: https://github.com/alexherrero/dev-machine-setup/releases/tag/v3.0.0
+- Final CI dispatch (run 25201452372): all 4 jobs green incl. bootstrap-from-curl on all platforms.
+- Plan Status flipped to complete. All 10 tasks [x].
+- Deferred (post-v3.0.0): repo rename — GitHub Issue #1.
+- feat-curl-bash-installer: COMPLETE.
