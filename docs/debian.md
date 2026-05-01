@@ -12,18 +12,21 @@ below.
 One-line install:
 
 ```bash
-git clone git@github.com:alexherrero/dev-machine-setup.git && cd dev-machine-setup && ./setup.sh
+git clone https://github.com/alexherrero/dev-machine-setup.git && cd dev-machine-setup && ./setup.sh
 ```
 
 Or step-by-step with flag variants:
 
 ```bash
-git clone git@github.com:alexherrero/dev-machine-setup.git
+git clone https://github.com/alexherrero/dev-machine-setup.git
 cd dev-machine-setup
 ./setup.sh                            # Claude + Gemini
 ./setup.sh --with-codex               # also Codex CLI
 source ~/.zshrc || source ~/.bashrc   # whichever rc file matches your $SHELL
 ```
+
+The `curl | bash` one-liner from the [main README](../README.md#install)
+removes the `git` prereq entirely — recommended on a fresh host.
 
 Then complete the auth checklist printed at the end of the run, or read
 [first-run.md](first-run.md#debian--ubuntu).
@@ -130,14 +133,6 @@ itself may be installing in the same run).
 
 ## Future work
 
-- **CI verification** *(scheduled — `feat-ci-verification` plan in
-  flight)*. Replaces the original "reference Debian VM" idea: the
-  [`ci-tests.yml`](../.github/workflows/ci-tests.yml) workflow runs
-  `setup.sh` end-to-end on a fresh `ubuntu-latest` runner whenever
-  manually dispatched. When that job passes (alongside the macOS and
-  Windows-smoke jobs), `feat-debian-cli-support.passes` flips to
-  `true` and v1.0.0 ships. Until then this Debian path is "feature-
-  complete via static analysis but not VM-verified".
 - **Other Ubuntu / Debian releases.** CI runs on `ubuntu-latest` only
   (currently 24.04 Noble). The shfmt-from-GitHub-release fallback path
   (Debian 11 / Ubuntu 22.04) is not exercised in CI; would need a
@@ -151,10 +146,9 @@ itself may be installing in the same run).
 
 ## Reference
 
-- [first-run.md](first-run.md) — auth checklist for both platforms.
-- [windows.md](windows.md) — Windows deferral note.
-- [.harness/PLAN.md](../.harness/PLAN.md) — the plan that produced
-  Debian support (`feat-debian-cli-support`).
+- [first-run.md](first-run.md) — auth checklist for all platforms.
+- [windows.md](windows.md) — Windows specifics (winget, MSIX redirect, Codex caveat).
+- [architecture.md](architecture.md) — repo layout and OS-dispatch architecture.
 - [scripts/install-apt.sh](../scripts/install-apt.sh) — the apt
   install stage.
 - [scripts/lib/os.sh](../scripts/lib/os.sh) — OS detection helper +

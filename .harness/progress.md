@@ -249,3 +249,13 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - CI green on first dispatch (run 25170296627): 4/4 jobs.
 - Documenter flagged wiki/explanation/Dev-Machine-Setup-Design.md missing Windows row → deferred to task 8.
 - Next: /work task 8 (wiki + docs polish).
+
+## /work — feat-curl-bash-installer task 8 — 2026-05-01T03:34:38Z (wiki/docs polish)
+- wiki/explanation/Dev-Machine-Setup-Design.md: Windows row added to Shape + Component table; xcode dropped; Bootstrap row added; Trade-offs expanded.
+- wiki/how-to/Bootstrap-A-New-Mac.md + Bootstrap-A-New-Debian-Or-Ubuntu.md: SSH→HTTPS, dropped xcode + Windows-deferred stale claims, mentioned curl|bash, Related sections.
+- wiki/Home.md + _Sidebar.md: added Reference + Install-Via-One-Liner + Public-Curl-Bash-Installer entries.
+- docs/first-run.md: added Windows section (5 steps) + cross-platform "What setup leaves behind".
+- docs/debian.md + windows.md: SSH→HTTPS, dropped CI-scheduled bullet, updated Reference labels.
+- 2 CI dispatches both green (run 25200691273 + post-debian/windows fixes).
+- Documenter caught 4 real misses in docs/debian.md + docs/windows.md — resolved in scope.
+- Next: /work task 9 (bootstrap-from-curl end-to-end CI + features.json).
