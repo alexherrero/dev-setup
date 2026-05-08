@@ -2,17 +2,10 @@
 # install-clis.sh — install the CLI agents we use:
 #   - Claude Code CLI  (Anthropic's curl installer  → ~/.local/bin/claude)
 #   - Gemini CLI       (npm global, @google/gemini-cli)
-#   - Codex CLI        (npm global, @openai/codex) — OPT-IN via WITH_CODEX=1
 #
 # Cross-platform. Requires node + npm on PATH from install-brew.sh (Mac)
 # or install-apt.sh (Debian). Idempotent: re-running pulls each tool's
 # latest stable (no-op if already current).
-#
-# Codex is opt-in. By default this script installs Claude + Gemini only.
-# Pass --with-codex to setup.sh (which exports WITH_CODEX=1), or set the
-# env var directly: `WITH_CODEX=1 ./scripts/install-clis.sh`. The reasoning
-# is that not every user wants the extra dependency / login flow; making
-# it explicit keeps the default install minimal.
 #
 # PATH handling per platform:
 #   macOS  : ~/.local/bin marker appended to ~/.zshrc (captured shell).
@@ -34,7 +27,6 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 readonly CLAUDE_INSTALLER_URL="https://claude.ai/install.sh"
 readonly GEMINI_NPM_PACKAGE="@google/gemini-cli"
-readonly CODEX_NPM_PACKAGE="@openai/codex"
 
 # --- helpers ----------------------------------------------------------------
 
@@ -58,7 +50,7 @@ append_path_marker() {
 }
 
 # Debian: configure a user-local npm prefix so `npm install -g` doesn't
-# need sudo. Also resolves the chicken-and-egg of Gemini/Codex install
+# need sudo. Also resolves the chicken-and-egg of Gemini install
 # locations on systems where the system npm prefix is /usr.
 configure_npm_prefix_debian() {
   local prefix="$HOME/.npm-global"
@@ -149,26 +141,10 @@ fi
 # "up to date" when already latest.
 npm install -g "$GEMINI_NPM_PACKAGE"
 
-# --- 4. Codex CLI (opt-in via WITH_CODEX=1) ---------------------------------
-
-WITH_CODEX="${WITH_CODEX:-0}"
-if [[ "$WITH_CODEX" == "1" ]]; then
-  echo "==> Codex CLI ($CODEX_NPM_PACKAGE)"
-  if command -v codex >/dev/null 2>&1; then
-    echo "    currently: $(codex --version 2>&1 | head -1)"
-  fi
-  npm install -g "$CODEX_NPM_PACKAGE"
-else
-  echo "==> Codex CLI: skipped (pass --with-codex to setup.sh to include)"
-fi
-
-# --- 5. Post-check ----------------------------------------------------------
+# --- 4. Post-check ----------------------------------------------------------
 
 echo "==> verifying"
-# Build the expected-binaries list dynamically so we don't fail-mark `codex`
-# missing when it was never asked to be installed.
 expected=(claude gemini)
-[[ "$WITH_CODEX" == "1" ]] && expected+=(codex)
 
 missing=()
 for bin in "${expected[@]}"; do

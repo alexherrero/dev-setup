@@ -23,7 +23,7 @@
     Invoke-WebRequest -UseBasicParsing `
         -Uri 'https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1' `
         -OutFile $tmp
-    & $tmp -WithCodex
+    & $tmp -SkipApps
 
 .EXAMPLE
     # Simple form (no args, default install):
@@ -32,7 +32,6 @@
 
 [CmdletBinding()]
 param(
-    [switch]$WithCodex,
     [switch]$SkipApps,
     [switch]$DryRun,
     [switch]$Help,

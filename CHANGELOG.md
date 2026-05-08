@@ -4,6 +4,27 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v4.0.0] — 2026-05-01
+
+> **Codex CLI removed.** The OpenAI Codex CLI (`@openai/codex`) and its `--with-codex` / `-WithCodex` opt-in flag are gone from setup. Major bump because the public flag surface shrunk — anyone passing `--with-codex` will now get an `unknown argument` error and exit 2. The prior opt-in posture (Codex installed only on explicit request) made it harmless to default-include, but the cleaner contract is no Codex at all. Claude Code + Gemini CLI remain the supported CLIs; Mac and Linux orchestrators are now Claude + Gemini only, and Windows drops the entire skip-with-warn block since there's nothing to skip.
+
+### Removed
+
+- **`--with-codex` / `-WithCodex` flag** from `setup.sh` and `setup.ps1`. Passing it is now an `unknown argument` (POSIX exit 2; PowerShell `param()` binding error).
+- **`WITH_CODEX` env var** export from both orchestrators. Sub-stages no longer read it.
+- **`@openai/codex` install branch** in `scripts/install-clis.sh`. The script now installs only Claude Code (curl) and Gemini CLI (npm).
+- **Codex skip-with-warn block** in `scripts/install-clis.ps1`. The Windows path is now a clean Claude + Gemini install with no Codex-related branching.
+- **`codex` CLI checks** in `scripts/verify-install.sh` and `scripts/verify-install.ps1` — the `WITH_CODEX`-conditional bin-on-PATH and `--version` checks, the `[SKIP] codex …` lines, the Windows skip-with-warn invariant assertion.
+- **`codex login` step** in `scripts/auth-checklist.sh` and the Codex note in `scripts/auth-checklist.ps1`. The Mac/Linux checklist drops to 5 items max (instead of 6 with `--with-codex`); the Windows checklist stays at 5 with no Codex tail-note.
+- **Codex CI test steps** in `.github/workflows/ci-tests.yml`: `--with-codex installs Codex CLI` on macos/ubuntu jobs; `-WithCodex still exits 0 (Codex skip-with-warn on Windows)` on windows-test.
+- **README rows** — Codex line in "What gets installed" + `--with-codex` / `-WithCodex` row in "Flags"; Codex caveat paragraph.
+- **`docs/windows.md` "Codex on Windows" section** + Codex bullet in Future-work; `docs/first-run.md` codex-login steps in Mac and Debian sections + the entire "Codex on Windows" subsection; cross-references in `docs/debian.md` and `docs/architecture.md`.
+- **Wiki Codex content** — Codex row in `wiki/explanation/Dev-Machine-Setup-Design.md` Component table, the Codex opt-in trade-off bullet; `--with-codex` examples in `wiki/explanation/Public-Curl-Bash-Installer.md` Shape diagram; Codex-conditional auth-checklist mentions in both Bootstrap-A-New-* how-tos; the entire `--with-codex` / `-WithCodex` Variants in `wiki/how-to/Install-Via-One-Liner.md`; Codex flag rows in `wiki/reference/Scripts.md` flag tables.
+
+### Migration
+
+If you have an existing wrapper / cron / alias that calls `setup.sh --with-codex` (or `setup.ps1 -WithCodex`), drop the flag — the install will succeed without it. If you still want Codex CLI on your machine, install it manually: `npm install -g @openai/codex` (Mac/Linux); on Windows the upstream package was broken at the time of this release ([openai/codex#18648](https://github.com/openai/codex/issues/18648)) and may still be.
+
 ## [v3.0.0] — 2026-04-30
 
 > **Public release with one-line install.** The repo is now public; a fresh Mac, Debian/Ubuntu host, or Windows machine bootstraps to a fully configured AI-coding dev environment with one command — no `git` prereq, no SSH key, no clone. `feat-curl-bash-installer` complete with `passes: true` in `.harness/features.json`; all five features in the registry now CI-verified end-to-end on dispatch [run 25201071711](https://github.com/alexherrero/dev-machine-setup/actions/runs/25201071711). Major bump: install model is a meaningful break in user expectations. The `git clone` flow keeps working — old tags are untouched.
@@ -227,6 +248,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Initial project scaffold: bootstrapped with [agentic-harness](https://github.com/alexherrero/agentic-harness) v0.8.7 + hooks. Includes adapters for Claude Code, Antigravity, Codex, and Gemini plus `PostToolUse` / `PreCompact` / `SessionStart(compact)` hooks.
 
+[v4.0.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v4.0.0
 [v3.0.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v3.0.0
 [v2.0.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v2.0.0
 [v1.1.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v1.1.0

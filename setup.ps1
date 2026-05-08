@@ -9,7 +9,7 @@
 #
 # Stage list (Windows = Mac scope: full GUI + CLI):
 #   tooling         winget Git + Node LTS + gh + ripgrep
-#   clis            Claude Code (winget) + Gemini CLI (npm); Codex skip-with-warn
+#   clis            Claude Code (winget) + Gemini CLI (npm)
 #   gui-apps        Antigravity Desktop + Claude Desktop (winget)
 #   link-configs    Place captured configs at Windows OS locations
 #   verify-install  Warn-only post-setup health check
@@ -17,11 +17,6 @@
 #
 # Per-flag side effects on env vars exported to sub-stages:
 #   -SkipApps     -> SKIP_APPS=1, gui-apps stage filtered out
-#   -WithCodex    -> WITH_CODEX=1 (note: Codex on Windows is currently
-#                                  skip-with-warn regardless; the flag
-#                                  signals user intent and changes the
-#                                  message in install-clis / verify-install
-#                                  / auth-checklist)
 #
 # Force-debian-on-mac and inline OS detection are bash concepts —
 # Windows scripts are implicitly platform-locked and don't need them.
@@ -30,7 +25,6 @@
 param(
   [switch]$DryRun,
   [switch]$SkipApps,
-  [switch]$WithCodex,
   [string]$Only,
   [switch]$Help
 )
@@ -41,7 +35,7 @@ $RepoRoot = $PSScriptRoot
 
 $Stages = @(
   [pscustomobject]@{ Name = 'tooling';        Script = 'install-tooling.ps1';   Desc = 'Install winget toolchain (Git for Windows, Node LTS, gh, ripgrep)' }
-  [pscustomobject]@{ Name = 'clis';           Script = 'install-clis.ps1';      Desc = 'Install Claude Code CLI (winget) + Gemini CLI (npm); Codex skip-with-warn' }
+  [pscustomobject]@{ Name = 'clis';           Script = 'install-clis.ps1';      Desc = 'Install Claude Code CLI (winget) + Gemini CLI (npm)' }
   [pscustomobject]@{ Name = 'gui-apps';       Script = 'install-gui-apps.ps1';  Desc = 'Install Antigravity Desktop + Claude Desktop (winget)' }
   [pscustomobject]@{ Name = 'link-configs';   Script = 'link-configs.ps1';      Desc = 'Place captured configs from configs/ into their Windows locations' }
   [pscustomobject]@{ Name = 'verify-install'; Script = 'verify-install.ps1';    Desc = 'Health-check the install (warn-only — tools, configs, agents, skills)' }
@@ -49,7 +43,7 @@ $Stages = @(
 )
 
 function Show-Usage {
-  Write-Host 'Usage: ./setup.ps1 [-DryRun] [-SkipApps] [-WithCodex] [-Only <stage>] [-Help]'
+  Write-Host 'Usage: ./setup.ps1 [-DryRun] [-SkipApps] [-Only <stage>] [-Help]'
   Write-Host ''
   Write-Host 'Bootstrap a fresh Windows dev environment (full GUI + CLI scope, mirrors Mac).'
   Write-Host ''
@@ -61,8 +55,6 @@ function Show-Usage {
   Write-Host 'Options:'
   Write-Host '  -DryRun       Print the ordered stage list and exit (no scripts run)'
   Write-Host '  -SkipApps     Skip the gui-apps stage AND export SKIP_APPS=1 to sub-stages'
-  Write-Host '  -WithCodex    Export WITH_CODEX=1 (note: Codex is currently skip-with-warn on'
-  Write-Host '                Windows — install-clis.ps1 cites openai/codex#18648, #11744)'
   Write-Host '  -Only <s>     Run only the named stage'
   Write-Host '  -Help         Show this help'
   Write-Host ''
@@ -73,8 +65,7 @@ function Show-Usage {
 if ($Help) { Show-Usage; exit 0 }
 
 # Export per-flag env vars so sub-stage .ps1 scripts pick them up.
-# Mirrors setup.sh's `export WITH_CODEX` / `export SKIP_APPS`.
-if ($WithCodex) { $env:WITH_CODEX = '1' } else { $env:WITH_CODEX = '0' }
+# Mirrors setup.sh's `export SKIP_APPS`.
 if ($SkipApps)  { $env:SKIP_APPS  = '1' } else { $env:SKIP_APPS  = '0' }
 
 if ($Only) {

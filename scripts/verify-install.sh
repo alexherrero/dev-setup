@@ -7,10 +7,10 @@
 #
 #   global    — runs always. Tooling on PATH, captured configs at their
 #               OS locations, rc-file PATH marker, CLI smoke-tests
-#               (claude / gemini / codex-if-WITH_CODEX), global Claude
-#               sub-agents/skills directories. On Mac also checks
-#               /Applications/*.app + the Mac-only Claude Desktop config;
-#               on Debian those skip with one [SKIP] line each.
+#               (claude / gemini), global Claude sub-agents/skills
+#               directories. On Mac also checks /Applications/*.app +
+#               the Mac-only Claude Desktop config; on Debian those skip
+#               with one [SKIP] line each.
 #
 #   harness   — runs only when the current working dir contains .harness/
 #               (i.e. you're sitting inside an agentic-harness project).
@@ -26,11 +26,6 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=scripts/lib/os.sh
 . "$REPO_ROOT/scripts/lib/os.sh"
-
-# Codex install is opt-in via WITH_CODEX (matches install-clis.sh's gate).
-# Default off — when off, the codex PATH + version checks are SKIPped, not
-# WARNed, since the user never asked for codex to be installed.
-WITH_CODEX="${WITH_CODEX:-0}"
 
 # SKIP_APPS=1 is exported by setup.sh when --skip-apps was passed (CI
 # without a human, headless verification, etc.). When set, the Mac GUI
@@ -181,8 +176,7 @@ check_co_authored_by() {
 echo "==> verify-install (global tier — OS=$OS)"
 
 # PATH binaries. The package-manager binary is platform-specific (brew on
-# Mac, apt is always present on Debian and uninteresting to check). Codex
-# is opt-in — only checked when WITH_CODEX=1.
+# Mac, apt is always present on Debian and uninteresting to check).
 bins=()
 if [[ "$OS" == "macos" ]]; then
   bins+=("brew|Homebrew")
@@ -197,17 +191,11 @@ bins+=(
   "claude|Claude Code CLI"
   "gemini|Gemini CLI"
 )
-if [[ "$WITH_CODEX" == "1" ]]; then
-  bins+=("codex|Codex CLI")
-fi
 for entry in "${bins[@]}"; do
   bin="${entry%%|*}"
   desc="${entry##*|}"
   check_bin "$bin" "$desc"
 done
-if [[ "$WITH_CODEX" != "1" ]]; then
-  skip "codex on PATH (set WITH_CODEX=1 to include Codex CLI)"
-fi
 
 # GUI apps + Claude Desktop config — Mac-only. Two skip cases:
 #  - Linux: CLI-only scope, GUI apps are out of scope by design.
@@ -240,11 +228,6 @@ check_rc_marker
 # CLI smoke tests — confirm the binary actually runs, not just lives on PATH.
 check_cli_version claude
 check_cli_version gemini
-if [[ "$WITH_CODEX" == "1" ]]; then
-  check_cli_version codex
-else
-  skip "codex --version (set WITH_CODEX=1 to include Codex CLI)"
-fi
 
 # Global Claude Code agents/skills dirs. These are user-discretionary —
 # absence is expected when the user hasn't installed any. Report informationally.

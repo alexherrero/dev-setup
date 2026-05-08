@@ -17,13 +17,12 @@
 2. Run the orchestrator:
    ```bash
    ./setup.sh                  # Claude Code + Gemini CLI
-   ./setup.sh --with-codex     # also installs the OpenAI Codex CLI
    ```
 3. Reload your shell. The script appends to `~/.zshrc` if your `$SHELL` is zsh, otherwise to `~/.bashrc`:
    ```bash
    source ~/.zshrc || source ~/.bashrc
    ```
-4. Complete the auth checklist printed at the end (`claude login`, `gemini`, `gh auth login`, optionally `codex login`). See [docs/first-run.md](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/first-run.md#debian--ubuntu) for the full step-by-step.
+4. Complete the auth checklist printed at the end (`claude login`, `gemini`, `gh auth login`). See [docs/first-run.md](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/first-run.md#debian--ubuntu) for the full step-by-step.
 
 For the in-repo reference — supported-distro matrix, apt-key handling, npm-global prefix rationale, troubleshooting — see [`docs/debian.md`](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/debian.md). This how-to intentionally does not duplicate that content.
 
@@ -33,7 +32,7 @@ Antigravity Desktop, Claude Desktop, and Gemini Desktop are macOS / Windows bina
 
 ## Verify
 
-`scripts/verify-install.sh` runs as the penultimate stage. On Debian, GUI-app and macOS-only-JSON checks emit a single consolidated SKIP; the Codex check is conditional on `--with-codex`. Node must be ≥ 20 — the script hard-fails otherwise.
+`scripts/verify-install.sh` runs as the penultimate stage. On Debian, GUI-app and macOS-only-JSON checks emit a single consolidated SKIP. Node must be ≥ 20 — the script hard-fails otherwise.
 
 ## Troubleshooting
 

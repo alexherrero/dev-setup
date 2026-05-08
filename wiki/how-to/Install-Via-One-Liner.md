@@ -34,26 +34,26 @@ The bootstrap prints the extract dir on exit (e.g. `/tmp/dev-machine-setup.XXXXX
 
 ## Variants
 
-### macOS / Linux — with `--with-codex`
+### macOS / Linux — with flags
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh \
-  | bash -s -- --with-codex
+  | bash -s -- --skip-apps
 ```
 
 The `-s --` is the standard `bash` idiom for forwarding args to a script read from stdin. Other supported flags pass through the same way: `--skip-apps`, `--dry-run`, `--only <stage>`. See [Scripts reference](../reference/Scripts) for the full list.
 
-### Windows — with `-WithCodex` (recommended temp-file pattern)
+### Windows — with flags (recommended temp-file pattern)
 
 ```powershell
 $tmp = "$env:TEMP\install.ps1"
 Invoke-WebRequest -UseBasicParsing `
     -Uri 'https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1' `
     -OutFile $tmp
-& $tmp -WithCodex
+& $tmp -SkipApps
 ```
 
-The temp-file pattern is the only form that lets PowerShell bind named parameters correctly. Use this whenever you need flags (`-WithCodex`, `-SkipApps`, `-DryRun`, `-Only <stage>`).
+The temp-file pattern is the only form that lets PowerShell bind named parameters correctly. Use this whenever you need flags (`-SkipApps`, `-DryRun`, `-Only <stage>`).
 
 ### Windows — simple form (no args)
 
@@ -71,7 +71,7 @@ Don't pipe code from the internet straight to a shell unless you've read it. The
 # POSIX
 curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh -o /tmp/install.sh
 less /tmp/install.sh   # read it
-bash /tmp/install.sh --with-codex
+bash /tmp/install.sh --skip-apps
 ```
 
 ```powershell
@@ -79,7 +79,7 @@ bash /tmp/install.sh --with-codex
 $tmp = "$env:TEMP\install.ps1"
 Invoke-WebRequest -UseBasicParsing -Uri '…/install.ps1' -OutFile $tmp
 notepad $tmp           # read it
-& $tmp -WithCodex
+& $tmp -SkipApps
 ```
 
 Trust model details: see [Public curl|bash installer — design](../explanation/Public-Curl-Bash-Installer#trust-model).
@@ -109,7 +109,7 @@ See [Scripts reference](../reference/Scripts) for the canonical entry-point tabl
 | `install.sh: neither curl nor wget is on PATH — install one and retry` | The bootstrap exits early with this message on hosts where neither downloader is present (rare — both ship in default macOS and Debian/Ubuntu images). Install via your package manager (`apt-get install -y curl`) and retry. |
 | `install.sh: could not parse tag from /releases/latest redirect` | GitHub returned an unexpected response (network blocked, repo renamed, or no releases yet). Visit `https://github.com/alexherrero/dev-machine-setup/releases/latest` in a browser to confirm a release exists; if so, retry. |
 | Windows: `Expected 302 redirect from …/releases/latest` | Same root cause as the POSIX tag-parse failure — confirm a release exists and the redirect is reachable from your network. |
-| Windows: `iwr … \| iex` ignored my `-WithCodex` flag | Expected — `iex` doesn't forward params. Use the temp-file pattern under Variants → Windows recommended. |
+| Windows: `iwr … \| iex` ignored my `-SkipApps` flag | Expected — `iex` doesn't forward params. Use the temp-file pattern under Variants → Windows recommended. |
 | `setup.sh: unsupported OS` (exit 2) | The orchestrator only supports macOS (Darwin) and Debian-family Linux. Other distros: clone the repo and adapt the stage scripts manually. |
 | Re-running fails with permission errors on `/tmp/dev-machine-setup.XXXXXX/` | The OS reaped the tempdir between runs. Re-run the one-liner — the new tempdir has fresh permissions. |
 

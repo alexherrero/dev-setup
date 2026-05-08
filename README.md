@@ -31,7 +31,7 @@ curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/
 iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1 | iex
 ```
 
-For flag-passing examples (`--with-codex`, `--skip-apps`, etc.) and the `inspect-before-run` form, see [How to install via the one-liner](wiki/how-to/Install-Via-One-Liner.md).
+For flag-passing examples (`--skip-apps`, `--dry-run`, etc.) and the `inspect-before-run` form, see [How to install via the one-liner](wiki/how-to/Install-Via-One-Liner.md).
 
 ### Alternative: `git clone`
 
@@ -51,13 +51,10 @@ git clone https://github.com/alexherrero/dev-machine-setup.git && cd dev-machine
 | --- | :-: | :-: | :-: | --- |
 | Claude Code CLI | ✓ | ✓ | ✓ | `claude.ai/install.sh` (POSIX) / `winget` (Win) |
 | Gemini CLI | ✓ | ✓ | ✓ | `npm` |
-| Codex CLI *(opt-in)* | ✓ | ✓ | skip-with-warn | `npm` |
 | Antigravity Desktop | ✓ | — | ✓ | DMG / `winget` |
 | Claude Desktop | ✓ | — | ✓ | DMG / `winget` |
 | Gemini Desktop | ✓ | — | — | DMG |
 | Toolchain (`node`, `gh`, `jq`, `ripgrep`, `shellcheck`, `shfmt`) | `brew` | `apt` + NodeSource | `winget` | per-platform |
-
-Codex is skip-with-warn on Windows because the `@openai/codex` npm package is currently broken on Windows ([openai/codex#18648](https://github.com/openai/codex/issues/18648)). See [docs/windows.md](docs/windows.md) for the full caveat.
 
 ## Stages
 
@@ -66,7 +63,7 @@ Each platform's orchestrator runs an ordered, idempotent stage list. `--dry-run`
 | Stage | Description |
 | --- | --- |
 | `brew` (Mac) / `apt` (Linux) / `tooling` (Win) | Install the package manager and toolchain |
-| `clis` | Install Claude Code, Gemini CLI, optionally Codex CLI |
+| `clis` | Install Claude Code CLI + Gemini CLI |
 | `gui-apps` *(Mac/Win only)* | Install Antigravity Desktop, Claude Desktop, (Mac) Gemini Desktop |
 | `link-configs` | Place captured configs at OS-native paths with backup-on-replace |
 | `verify-install` | Warn-only post-setup health check (zero warns expected) |
@@ -78,7 +75,6 @@ Each platform's orchestrator runs an ordered, idempotent stage list. `--dry-run`
 | --- | --- | --- |
 | `--help` | `-Help` | Print stage list + flag reference, exit 0 |
 | `--dry-run` | `-DryRun` | Print the planned stages and exit 0 |
-| `--with-codex` | `-WithCodex` | Also install Codex CLI (opt-in) |
 | `--skip-apps` | `-SkipApps` | Skip GUI installs (CI / headless) |
 | `--only <stage>` | `-Only <stage>` | Run a single stage |
 
@@ -88,7 +84,7 @@ Each platform's orchestrator runs an ordered, idempotent stage list. `--dry-run`
 | --- | --- |
 | [docs/first-run.md](docs/first-run.md) | Manual auth checklist (claude login, gh auth login, etc.) |
 | [docs/debian.md](docs/debian.md) | Debian/Ubuntu specifics — supported-distro matrix, toolchain detail |
-| [docs/windows.md](docs/windows.md) | Windows specifics — winget, MSIX redirect, Codex caveat |
+| [docs/windows.md](docs/windows.md) | Windows specifics — winget, MSIX redirect |
 | [docs/architecture.md](docs/architecture.md) | OS-dispatch architecture, repo layout, agentic-harness pointer |
 | [How to install via the one-liner](wiki/how-to/Install-Via-One-Liner.md) | One-line bootstrap recipe with flag-passing examples |
 | [Public curl\|bash installer — design](wiki/explanation/Public-Curl-Bash-Installer.md) | Why the bootstrap looks the way it does, trust model |

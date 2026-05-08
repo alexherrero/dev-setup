@@ -7,7 +7,6 @@
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh | bash
-#   curl -fsSL .../install.sh | bash -s -- --with-codex
 #   curl -fsSL .../install.sh | bash -s -- --skip-apps --dry-run
 #
 # Trust model: same as Homebrew's install.sh — the trust boundary is

@@ -18,7 +18,7 @@ failure, or contributing.
 │   ├── install-brew.sh     Mac toolchain (Homebrew + formulae)
 │   ├── install-apt.sh      Debian toolchain (apt + NodeSource + gh repos)
 │   ├── install-tooling.ps1 Windows toolchain (winget: Git, Node LTS, gh, ripgrep)
-│   ├── install-clis.sh     Claude + Gemini (+ Codex when --with-codex)
+│   ├── install-clis.sh     Claude Code CLI + Gemini CLI
 │   ├── install-clis.ps1    Same for Windows (Claude via winget; Gemini via npm; Codex skip-with-warn)
 │   ├── install-gui-apps.sh Mac-only GUI apps (browser-assisted)
 │   ├── install-gui-apps.ps1 Windows GUI apps (winget Antigravity + Claude Desktop)

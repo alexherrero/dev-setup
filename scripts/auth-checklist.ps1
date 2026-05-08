@@ -4,18 +4,11 @@
 # Mirror of scripts/auth-checklist.sh. Always exits 0; informational
 # output only, not a gate. Windows = Mac scope (full GUI + CLI), so the
 # checklist includes the GUI sign-in steps that the Linux version drops.
-#
-# Codex on Windows is skip-only — install-clis.ps1 doesn't install it
-# (upstream npm package broken on this platform). Even when --with-codex
-# is passed, we omit `codex login` from the numbered list and instead
-# print a note explaining why.
 
 [CmdletBinding()]
 param()
 
 $ErrorActionPreference = 'Stop'
-
-$WithCodex = $env:WITH_CODEX -eq '1'
 
 # Build the steps list. PSCustomObject pairs (Cmd, Desc) — printed with
 # auto-numbering so additions / removals don't require renumbering.
@@ -61,22 +54,6 @@ foreach ($s in $steps) {
   $i++
 }
 
-# Codex note. Always-on note explaining why codex login isn't in the list,
-# regardless of WITH_CODEX, since the install behavior on Windows is the
-# same either way (skip-only). Different message based on whether the
-# user opted in.
-if ($WithCodex) {
-  Write-Host '  (Codex CLI step omitted — Codex was requested via --with-codex but is'
-  Write-Host '   not installed on Windows yet. The @openai/codex npm package is currently'
-  Write-Host '   broken on Windows: see openai/codex#18648 and #11744. Mac and Linux still'
-  Write-Host '   install it normally. Revisit when upstream fixes the package.)'
-}
-else {
-  Write-Host '  (Codex CLI step omitted — pass --with-codex to setup.ps1 to include it.'
-  Write-Host '   Note: Codex on Windows is skip-only at this time even with the flag set;'
-  Write-Host '   it works on Mac and Linux only. See PLAN.md for the rationale.)'
-}
-Write-Host ''
 Write-Host 'See docs/first-run.md for the same list with extra context.'
 
 exit 0

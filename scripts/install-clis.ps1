@@ -10,13 +10,6 @@
 #                    both — claude-code#31980 documents the dedupe footgun.
 #   - Gemini CLI   : npm install -g @google/gemini-cli (Node >= 20 from
 #                    install-tooling.ps1's OpenJS.NodeJS.LTS).
-#   - Codex CLI    : OPT-IN via $env:WITH_CODEX = '1'. On Windows, even
-#                    when opted in, this script SKIPS WITH WARN — the
-#                    @openai/codex npm package is currently broken on
-#                    Windows (issues #18648, #11744 — the win32-x64
-#                    optionalDependency isn't published as expected, npm
-#                    resolves stale binary). Mac and Linux install Codex
-#                    normally. Revisit when OpenAI fixes the npm package.
 #
 # Idempotent. Hard-fails if Node < 20 (Gemini requires it). Ensures
 # %APPDATA%\npm is on user PATH before npm install -g (the OpenJS Node
@@ -27,9 +20,6 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-
-# Same opt-in env-var pattern as setup.sh / install-clis.sh on Mac / Linux.
-$WithCodex = $env:WITH_CODEX -eq '1'
 
 # --- helpers ----------------------------------------------------------------
 
@@ -127,24 +117,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 Update-PathFromRegistry
 
-# --- 4. Codex CLI (skip-with-warn on Windows) ------------------------------
-
-if ($WithCodex) {
-  Write-Host "==> Codex CLI: requested via --with-codex but skipped"
-  Write-Host "    Codex's npm package is currently broken on Windows"
-  Write-Host "    (openai/codex#18648, #11744 — win32-x64 optionalDependency"
-  Write-Host "    not published as expected; npm resolves stale binary)."
-  Write-Host "    Mac and Linux install Codex normally. Revisit when fixed."
-}
-else {
-  Write-Host "==> Codex CLI: skipped (pass --with-codex to setup.ps1 to include)"
-}
-
-# --- 5. Post-check ----------------------------------------------------------
+# --- 4. Post-check ----------------------------------------------------------
 
 Write-Host "==> verifying"
-# Codex is intentionally not in this list on Windows — see the skip block
-# above. The expected set is just claude + gemini regardless of WITH_CODEX.
 $expected = @('claude', 'gemini')
 $missing = @()
 foreach ($bin in $expected) {

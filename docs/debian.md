@@ -1,10 +1,10 @@
 # Debian / Ubuntu setup
 
-CLI-only scope: `setup.sh` on a Debian or Ubuntu host installs Claude
-Code, Gemini CLI, and (optionally, via `--with-codex`) the OpenAI Codex
-CLI, plus the supporting toolchain (`node` 22 LTS via NodeSource, `gh`
-via GitHub's apt repo, `jq`, `ripgrep`, `shellcheck`, `shfmt`). No GUI
-apps — see [Why Antigravity isn't supported on Linux](#why-antigravity-isnt-supported-on-linux)
+CLI-only scope: `setup.sh` on a Debian or Ubuntu host installs the
+Claude Code CLI and the Gemini CLI plus the supporting toolchain
+(`node` 22 LTS via NodeSource, `gh` via GitHub's apt repo, `jq`,
+`ripgrep`, `shellcheck`, `shfmt`). No GUI apps — see
+[Why Antigravity isn't supported on Linux](#why-antigravity-isnt-supported-on-linux)
 below.
 
 ## Quick start
@@ -20,8 +20,7 @@ Or step-by-step with flag variants:
 ```bash
 git clone https://github.com/alexherrero/dev-machine-setup.git
 cd dev-machine-setup
-./setup.sh                            # Claude + Gemini
-./setup.sh --with-codex               # also Codex CLI
+./setup.sh                            # Claude Code + Gemini CLI
 source ~/.zshrc || source ~/.bashrc   # whichever rc file matches your $SHELL
 ```
 
@@ -121,7 +120,7 @@ right binaries.
 (via `npm config set prefix`) and idempotently appends a PATH marker
 to the rc file. This avoids `sudo npm install -g` (which has a long
 history of permission-related footguns) while still letting `gemini`
-and `codex` resolve as plain commands.
+resolve as a plain command.
 
 ### shfmt fallback
 

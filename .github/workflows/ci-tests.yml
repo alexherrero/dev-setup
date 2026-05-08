@@ -221,18 +221,11 @@ jobs:
           git status --porcelain
           [[ -z "$(git status --porcelain)" ]]
 
-      - name: --with-codex installs Codex CLI
-        run: |
-          ./setup.sh --skip-apps --with-codex
-          export PATH="$HOME/.local/bin:$PATH"
-          command -v codex
-          codex --version
-
       - name: bootstrap from curl|bash — install.sh --dry-run
         # Exercises the full curl|bash path: fetch latest release, extract,
         # run setup.sh --dry-run from the extracted tree. The released
         # setup.sh is what users actually get; this couples the in-tree
-        # install.sh to the latest release's setup.sh until v3.0.0 ships.
+        # install.sh to the latest release's setup.sh.
         run: |
           curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh \
             | bash -s -- --dry-run
@@ -273,13 +266,6 @@ jobs:
           git status --porcelain
           [[ -z "$(git status --porcelain)" ]]
 
-      - name: --with-codex installs Codex CLI
-        run: |
-          ./setup.sh --with-codex
-          export PATH="$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
-          command -v codex
-          codex --version
-
       - name: negative test — Mac-only paths not created on Linux
         run: |
           if [[ -e "$HOME/Library/Application Support/Claude" ]]; then
@@ -302,8 +288,8 @@ jobs:
   #
   # Real install verification, parallel to the Mac job (also -SkipApps —
   # GUI sign-ins need a human). winget for the toolchain + Claude Code,
-  # npm for Gemini, Codex skip-with-warn (upstream broken on Windows).
-  # AST-parse step preserved from the prior smoke job as a regression catch.
+  # npm for Gemini. AST-parse step preserved from the prior smoke job as
+  # a regression catch.
   windows-test:
     name: Windows (windows-latest)
     runs-on: windows-latest
@@ -376,19 +362,6 @@ jobs:
             git diff
             exit 1
           }
-
-      - name: -WithCodex still exits 0 (Codex skip-with-warn on Windows)
-        # Codex on Windows is currently skip-with-warn even when the user opts
-        # in (install-clis.ps1 cites openai/codex#18648 + #11744). The -WithCodex
-        # variant must therefore exit 0 cleanly, NOT install codex. The
-        # assertion is "exit code 0", not "codex resolves on PATH".
-        run: |
-          ./setup.ps1 -SkipApps -WithCodex
-          if (Get-Command codex -ErrorAction SilentlyContinue) {
-            Write-Error "FAIL: codex unexpectedly resolved on PATH — Windows path should skip-with-warn"
-            exit 1
-          }
-          Write-Host "OK: codex correctly skipped on Windows even with -WithCodex"
 
       - name: bootstrap from iwr — install.ps1 -DryRun
         # Mirrors the Mac/Ubuntu bootstrap-from-curl steps. Downloads

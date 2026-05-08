@@ -24,7 +24,7 @@ The canonical lookup surface for the repo-root entry-point scripts — the curl|
 | Invocation | Effect |
 |---|---|
 | `curl … \| bash` | Default install, latest release. |
-| `curl … \| bash -s -- --with-codex` | Install + Codex CLI. |
+| `curl … \| bash -s -- --skip-apps` | Skip GUI apps (CI / headless install). |
 | `curl … \| bash -s -- --skip-apps --dry-run` | Skip GUI apps, print the stage list without executing. |
 | `curl … \| bash -s -- --only verify-install` | Re-run only the verify stage. |
 
@@ -34,7 +34,6 @@ The canonical lookup surface for the repo-root entry-point scripts — the curl|
 
 | Flag | Effect |
 |---|---|
-| `-WithCodex` | Forwards to `setup.ps1 -WithCodex`. (Codex on Windows is currently skip-with-warn — the flag still flows through and changes downstream messages.) |
 | `-SkipApps` | Forwards to `setup.ps1 -SkipApps` — skips the `gui-apps` stage. |
 | `-DryRun` | Forwards to `setup.ps1 -DryRun` — print the stage list and exit. |
 | `-Only <stage>` | Forwards to `setup.ps1 -Only <stage>` — run only the named stage. |
@@ -46,7 +45,6 @@ Forwarding only works with the temp-file invocation pattern. `iwr … \| iex` ca
 
 | Flag | Effect |
 |---|---|
-| `--with-codex` | Also installs the OpenAI Codex CLI (`@openai/codex` via npm). Off by default. Exports `WITH_CODEX=1` to sub-stages. |
 | `--skip-apps` | Skips the `gui-apps` stage on macOS (no-op on Debian — no GUI stage). Exports `SKIP_APPS=1`. |
 | `--dry-run` | Prints the ordered stage list and exits — no scripts run. |
 | `--only <stage>` | Runs only the named stage. Valid: `brew` / `apt`, `clis`, `gui-apps` (macOS only), `link-configs`, `verify-install`, `auth-checklist`. |
@@ -58,7 +56,6 @@ Forwarding only works with the temp-file invocation pattern. `iwr … \| iex` ca
 
 | Flag | Effect |
 |---|---|
-| `-WithCodex` | Sets `$env:WITH_CODEX=1`. Codex on Windows is currently skip-with-warn (cites `openai/codex#18648`, `#11744`); the flag signals user intent and changes the downstream message. |
 | `-SkipApps` | Sets `$env:SKIP_APPS=1` and skips the `gui-apps` stage. |
 | `-DryRun` | Prints the ordered stage list and exits. |
 | `-Only <stage>` | Runs only the named stage. Valid: `tooling`, `clis`, `gui-apps`, `link-configs`, `verify-install`, `auth-checklist`. |

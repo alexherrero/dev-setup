@@ -7,12 +7,9 @@ order on a freshly-bootstrapped machine.
 
 This page has three sections — pick the one matching your platform:
 
-- [Mac](#mac) — 5 steps (or 6 with `--with-codex`)
-- [Debian / Ubuntu](#debian--ubuntu) — 3 steps (or 4 with `--with-codex`).
-  No GUI sign-ins; CLI-only scope.
-- [Windows](#windows) — 5 steps. Codex is currently not installed on
-  Windows even with `-WithCodex` (upstream npm package broken — see
-  `docs/windows.md`).
+- [Mac](#mac) — 5 steps
+- [Debian / Ubuntu](#debian--ubuntu) — 3 steps. No GUI sign-ins; CLI-only scope.
+- [Windows](#windows) — 5 steps.
 
 ---
 
@@ -46,17 +43,7 @@ a prompt and follow the redirect.
 Installed as an npm global (`@google/gemini-cli`) by
 [scripts/install-clis.sh](../scripts/install-clis.sh).
 
-### 4. `codex login` *(only if installed with `--with-codex`)*
-
-Signs you in to the OpenAI Codex CLI. Opens a browser for OpenAI oauth
-or accepts a pasted API key. Skip this step entirely if you didn't pass
-`--with-codex` to `setup.sh` (Codex is opt-in; default off).
-
-Installed as an npm global (`@openai/codex`) by
-[scripts/install-clis.sh](../scripts/install-clis.sh) when
-`WITH_CODEX=1`.
-
-### 5. `open -a Antigravity`
+### 4. `open -a Antigravity`
 
 Launches the Antigravity app and walks you through sign-in with the
 Google account you want it tied to. First launch also writes
@@ -68,7 +55,7 @@ Installed via the browser-assisted installer
 [scripts/install-gui-apps.sh](../scripts/install-gui-apps.sh) — you
 dragged the `.app` into `/Applications` yourself.
 
-### 6. `open -a Claude`
+### 5. `open -a Claude`
 
 Launches Claude Desktop for Anthropic account sign-in. Preferences
 persist under `~/Library/Application Support/Claude/`; MCP extensions
@@ -82,7 +69,7 @@ Installed via the browser-assisted installer
 ## Debian / Ubuntu
 
 CLI-only scope: no GUI apps (Antigravity, Claude Desktop, Gemini Desktop)
-are installed on Debian. The first-run list is the same as Mac steps 1–4
+are installed on Debian. The first-run list is the same as Mac steps 1–3
 minus the GUI sign-ins.
 
 ### 1. `claude login`
@@ -106,10 +93,6 @@ browser. Installed via the same `npm install -g @google/gemini-cli`
 path; the npm prefix on Debian is `~/.npm-global` (configured by
 [scripts/install-clis.sh](../scripts/install-clis.sh)).
 
-### 4. `codex login` *(only if installed with `--with-codex`)*
-
-Same as Mac. Opt-in via the `--with-codex` flag.
-
 ---
 
 ## Windows
@@ -117,9 +100,7 @@ Same as Mac. Opt-in via the `--with-codex` flag.
 Full GUI + CLI scope, mirroring Mac. `setup.ps1` installs Antigravity
 Desktop, Claude Desktop (via `winget`), the Claude Code / Gemini CLIs,
 and the captured config files; the steps below cover the manual auth
-that follows. Codex on Windows is currently skip-with-warn (the
-`@openai/codex` npm package is broken — see
-[`docs/windows.md`](windows.md#codex-on-windows)).
+that follows.
 
 ### 1. `claude login`
 
@@ -158,15 +139,6 @@ desktop app's UI, not via a hand-edited
 `claude_desktop_config.json` — see
 [`docs/windows.md`](windows.md#what-this-script-does-not-do) for the
 MSIX-redirect rationale.
-
-### Codex on Windows *(no checklist step)*
-
-Codex is **not** installed on Windows in this scope, even when
-`-WithCodex` is passed — the `@openai/codex` npm package is currently
-broken on Windows (cites
-[openai/codex#18648](https://github.com/openai/codex/issues/18648),
-[#11744](https://github.com/openai/codex/issues/11744)). Mac and Linux
-still install Codex normally. Revisit when upstream fixes the package.
 
 ---
 

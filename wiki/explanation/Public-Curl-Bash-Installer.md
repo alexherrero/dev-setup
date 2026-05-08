@@ -20,8 +20,8 @@ Two architectural choices anchor the design:
 ```
   user @ fresh box
         │
-        │  curl -fsSL …/install.sh | bash -s -- --with-codex
-        │  (or iwr -OutFile $tmp …/install.ps1 ; & $tmp -WithCodex)
+        │  curl -fsSL …/install.sh | bash -s -- --skip-apps
+        │  (or iwr -OutFile $tmp …/install.ps1 ; & $tmp -SkipApps)
         ▼
   ┌──────────────────────────────┐
   │ install.sh / install.ps1     │  served from main on raw.githubusercontent.com

@@ -6,9 +6,7 @@
 #
 #   global   : tools on PATH, captured configs at OS locations, GUI apps
 #              installed (Mac-scope on Windows; gated on $env:SKIP_APPS),
-#              CLI smoke tests. Codex on Windows is skip-only (install-
-#              clis.ps1 doesn't install it; the message differentiates
-#              WITH_CODEX-opted-in vs default).
+#              CLI smoke tests.
 #
 #   harness  : runs only when CWD has .harness\. Project-level Claude
 #              Code wiring + harness state.
@@ -24,7 +22,6 @@ $ErrorActionPreference = 'Stop'
 $script:Pass = 0
 $script:Warn = 0
 
-$WithCodex = $env:WITH_CODEX -eq '1'
 $SkipApps  = $env:SKIP_APPS  -eq '1'
 
 # --- helpers ----------------------------------------------------------------
@@ -219,9 +216,7 @@ function Test-DirNonEmpty {
 
 Write-Host "==> verify-install (global tier — OS=windows)"
 
-# PATH binaries. Codex is skip-only on Windows regardless of WITH_CODEX
-# (install-clis.ps1 doesn't install Codex on this platform — upstream
-# npm package is broken; see PLAN.md).
+# PATH binaries.
 $bins = @(
   @{ Bin = 'git';    Desc = 'Git for Windows' },
   @{ Bin = 'node';   Desc = 'Node' },
@@ -233,12 +228,6 @@ $bins = @(
 )
 foreach ($b in $bins) {
   Test-BinOnPath -Bin $b.Bin -Desc $b.Desc
-}
-if ($WithCodex) {
-  Write-Skip "codex on PATH (Codex CLI not supported on Windows yet — see openai/codex#18648)"
-}
-else {
-  Write-Skip "codex on PATH (set WITH_CODEX=1 + native install on Mac/Linux to include Codex CLI)"
 }
 
 # GUI apps. Mac scope on Windows. SKIP_APPS=1 (set by setup.ps1 -SkipApps,
@@ -270,12 +259,6 @@ Test-CoAuthoredBy (Join-Path $env:USERPROFILE '.claude\settings.json')
 # CLI smoke tests.
 Test-CliVersion 'claude'
 Test-CliVersion 'gemini'
-if ($WithCodex) {
-  Write-Skip "codex --version (Codex CLI not supported on Windows yet)"
-}
-else {
-  Write-Skip "codex --version (set WITH_CODEX=1 + Mac/Linux to include Codex CLI)"
-}
 
 # Global Claude agents/skills dirs (informational; users may have none).
 $claudeAgents = Join-Path $env:USERPROFILE '.claude\agents'

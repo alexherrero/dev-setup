@@ -23,7 +23,6 @@ cd dev-machine-setup
 ./setup.ps1 -Help                     # prints the 6-stage list
 ./setup.ps1                           # end-to-end (Antigravity + Claude Desktop install)
 ./setup.ps1 -SkipApps                 # CLI-only, no GUI installs (CI / headless)
-./setup.ps1 -WithCodex                # opt in to Codex CLI (note: skip-with-warn on Windows)
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 ```
 
@@ -52,26 +51,12 @@ the workflow is dispatched — see
 
 ```
 tooling          winget Git for Windows + Node LTS + gh + ripgrep
-clis             Claude Code (winget) + Gemini CLI (npm); Codex skip-with-warn
+clis             Claude Code (winget) + Gemini CLI (npm)
 gui-apps         Antigravity Desktop + Claude Desktop (winget)
 link-configs     Place captured configs at Windows OS locations
 verify-install   Warn-only post-setup health check
 auth-checklist   Print the manual auth steps
 ```
-
-## Codex on Windows
-
-OpenAI Codex CLI is **not installed on Windows in this scope**, even
-when `-WithCodex` is passed. The `@openai/codex` npm package is
-currently broken on Windows — the per-platform native binary (`@openai/codex-win32-x64`)
-isn't published as expected, so npm resolves a stale binary. See
-[openai/codex#18648](https://github.com/openai/codex/issues/18648) and
-[#11744](https://github.com/openai/codex/issues/11744). Mac and Linux
-still install Codex normally. Revisit when upstream fixes the package.
-
-`-WithCodex` is still honored as a signal of intent — the user-facing
-checklist and verifier produce different messages so users know whether
-they asked for Codex or not.
 
 ## Claude Code: winget vs native installer
 
@@ -145,9 +130,6 @@ scripts\auth-checklist.ps1   Print manual auth steps
   confirm `%APPDATA%\Antigravity\` for auth-tokens and Cache; if
   Antigravity uses a different argv.json path on Windows, the seeded
   file is a stray no-op. Empirical verification welcome.
-- **Codex CLI** when upstream fixes the npm package, or via the
-  GitHub-Release `codex-x86_64-pc-windows-msvc.tar.gz` fallback (out
-  of scope for v1).
 - **Claude Desktop config management** when the MSIX-redirect
   duality lands a documented stable path.
 - **Gemini Desktop** if Google ever ships a first-party standalone

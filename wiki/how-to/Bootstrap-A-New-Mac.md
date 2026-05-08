@@ -17,13 +17,12 @@
 2. Run the orchestrator:
    ```bash
    ./setup.sh                  # Claude + Gemini + Antigravity
-   ./setup.sh --with-codex     # also installs the OpenAI Codex CLI
    ```
 3. Reload your shell so PATH and rc-file additions take effect:
    ```bash
    source ~/.zshrc
    ```
-4. Complete the interactive auth checklist printed at the end of the run (`claude login`, `gemini`, `gh auth login`, GUI sign-ins for Antigravity / Claude Desktop / Gemini Desktop, optionally `codex login`). See [docs/first-run.md](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/first-run.md#mac) for the full step-by-step.
+4. Complete the interactive auth checklist printed at the end of the run (`claude login`, `gemini`, `gh auth login`, GUI sign-ins for Antigravity / Claude Desktop / Gemini Desktop). See [docs/first-run.md](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/first-run.md#mac) for the full step-by-step.
 
 ## Verify
 
@@ -35,7 +34,6 @@
 |---|---|
 | `command not found: claude` after install | `source ~/.zshrc` (the npm-global PATH addition is appended to the rc file but not exported into the parent shell). |
 | Gatekeeper blocks a freshly installed `.app` | Right-click the app in Finder → Open, or run `xattr -dr com.apple.quarantine /Applications/<App>.app`. |
-| `verify-install.sh` reports a missing CLI you didn't ask for | Codex is opt-in. Re-run with `./setup.sh --with-codex` if you want it; otherwise the SKIP is expected. |
 
 ## Related
 
