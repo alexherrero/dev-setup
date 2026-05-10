@@ -9,7 +9,7 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 2026-04-23 06:48 /work — completed task 3: "Write the Homebrew install script" (4 files, 0 tests added)
 2026-04-23 07:03 /work — completed task 4: "Write the CLI-install script" (3 files, 0 tests added)
 2026-04-24 01:55 /work — completed task 5: "Write the GUI-apps install script" (1 file, 0 tests added) — browser-assisted (direct-URL curl infeasible: CF JS challenge on Claude, no canonical URL for Antigravity/Gemini)
-2026-04-24 02:07 /work — completed task 6: "Write the config-link script" (1 file, 0 tests added) — confirmed Claude Code + Claude Desktop rewrite their JSONs in place; used copy-if-absent for all app-owned JSON, symlink for CLAUDE.md only, append-with-marker for zshrc, git config --global merge for user info. Backup under ~/.dev-setup-backup/<utc>/, lazy-created.
+2026-04-24 02:07 /work — completed task 6: "Write the config-link script" (1 file, 0 tests added) — confirmed Claude Code + Claude Desktop rewrite their JSONs in place; used copy-if-absent for all app-owned JSON, symlink for CLAUDE.md only, append-with-marker for zshrc, git config --global merge for user info. Backup under ~/.development-setup-backup/<utc>/, lazy-created.
 2026-04-24 02:20 /work — completed task 7: "Wire the top-level orchestrator" (1 file, 0 tests added) — setup.sh with --dry-run / --skip-apps / --only <stage> / --help; missing stage scripts warn+skip (supports in-progress plan); all flag paths verified including real --only link-configs run. First commit using conventional-commit `feat:` prefix per ship-release skill classification rules (calibration noted earlier in session).
 2026-04-24 02:30 /work — completed task 8: "Post-setup auth checklist" (2 files, 0 tests added) — scripts/auth-checklist.sh prints the 5 manual steps; docs/first-run.md documents each with provisioning-source references. Orchestrator now finds the script (no longer warn-skipped).
 2026-04-24 02:45 /work — completed task 9: "Windows stubs" (7 files, 0 tests added) — setup.ps1 mirrors setup.sh shape (same stages, same flags); five per-stage .ps1 stubs print banner + TODO + exit 0; docs/windows.md covers deferral rationale + per-stage remaining-work table. verify.sh no-ops cleanly on .ps1 without pwsh (AST check deferred to Windows reference VM). All 9 PLAN tasks now complete.
@@ -78,7 +78,7 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 ## /work — feat-debian-cli-support task 8 — 2026-04-28 (CLOSE-OUT)
 - features.json: valid (jq empty), feat-debian-cli-support entry well-formed, passes:false (per plan — flips at /release-gate after Debian VM exercise).
 - All 8 tasks marked [x] in PLAN.md; plan-level Status: "complete pending VM verification".
-- documenter sub-agent dispatched: 1 new wiki page (Bootstrap-A-New-Debian-Or-Ubuntu) + 4 edits (Bootstrap-A-New-Mac flipped pending->implemented, Dev-Machine-Setup-Design rewritten for cross-platform OS-dispatch architecture, Home + _Sidebar index updates).
+- documenter sub-agent dispatched: 1 new wiki page (Bootstrap-A-New-Debian-Or-Ubuntu) + 4 edits (Bootstrap-A-New-Mac flipped pending->implemented, Development-Setup-Design rewritten for cross-platform OS-dispatch architecture, Home + _Sidebar index updates).
 - 9 flat-namespace wiki links all resolve to .md files. Antigravity-GUI-only callout grep-matches in two wiki pages.
 - Remaining work for /release: Debian VM run; flip features.passes=true; final v1.0.0 release.
 
@@ -247,11 +247,11 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 - docs/architecture.md added (cut content: Layout tree, OS-dispatch arch, trade-offs, agentic-harness pointer).
 - New readme-shape CI step (10 grep checks) catches accidental section-rename / badge-removal in PRs.
 - CI green on first dispatch (run 25170296627): 4/4 jobs.
-- Documenter flagged wiki/explanation/Dev-Machine-Setup-Design.md missing Windows row → deferred to task 8.
+- Documenter flagged wiki/explanation/Development-Setup-Design.md missing Windows row → deferred to task 8.
 - Next: /work task 8 (wiki + docs polish).
 
 ## /work — feat-curl-bash-installer task 8 — 2026-05-01T03:34:38Z (wiki/docs polish)
-- wiki/explanation/Dev-Machine-Setup-Design.md: Windows row added to Shape + Component table; xcode dropped; Bootstrap row added; Trade-offs expanded.
+- wiki/explanation/Development-Setup-Design.md: Windows row added to Shape + Component table; xcode dropped; Bootstrap row added; Trade-offs expanded.
 - wiki/how-to/Bootstrap-A-New-Mac.md + Bootstrap-A-New-Debian-Or-Ubuntu.md: SSH→HTTPS, dropped xcode + Windows-deferred stale claims, mentioned curl|bash, Related sections.
 - wiki/Home.md + _Sidebar.md: added Reference + Install-Via-One-Liner + Public-Curl-Bash-Installer entries.
 - docs/first-run.md: added Windows section (5 steps) + cross-platform "What setup leaves behind".

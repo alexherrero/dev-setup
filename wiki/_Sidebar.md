@@ -12,6 +12,6 @@
 
 ### 💡 Explanation
 
-- [Dev-machine setup — design](Dev-Machine-Setup-Design)
+- [Development setup — design](Development-Setup-Design)
 - [Public curl|bash installer — design](Public-Curl-Bash-Installer)
 - [Architecture decisions](Decisions)

@@ -39,5 +39,5 @@
 
 - [Install via the one-liner](Install-Via-One-Liner) — the curl|bash bootstrap flow (no `git` prereq).
 - [Bootstrap a new Debian or Ubuntu host](Bootstrap-A-New-Debian-Or-Ubuntu) — the CLI-only Linux counterpart.
-- [Dev-machine setup — design](../explanation/Dev-Machine-Setup-Design) — why the OS-dispatch architecture looks the way it does.
+- [Development setup — design](../explanation/Development-Setup-Design) — why the OS-dispatch architecture looks the way it does.
 - [Scripts reference](../reference/Scripts) — flags, exit codes, files written.

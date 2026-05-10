@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — one-line bootstrap for dev-setup.
+# install.sh — one-line bootstrap for development-setup.
 #
 # Fetches the latest tagged release from GitHub, extracts the source
 # tarball to a temp dir, and exec's setup.sh from there with all

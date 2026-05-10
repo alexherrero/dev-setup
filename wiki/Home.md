@@ -1,6 +1,6 @@
 # Project Wiki
 
-Welcome to the dev-setup wiki — human-and-agent-readable documentation for this codebase. The sections below follow the Diátaxis convention ([ADR 0004](https://github.com/alexherrero/agentic-harness/blob/main/wiki/architecture/decisions/0004-diataxis-documentation-spec.md)): each page is written for a single reader intent — doing, looking up, or understanding — and never mixes modes.
+Welcome to the development-setup wiki — human-and-agent-readable documentation for this codebase. The sections below follow the Diátaxis convention ([ADR 0004](https://github.com/alexherrero/agentic-harness/blob/main/wiki/architecture/decisions/0004-diataxis-documentation-spec.md)): each page is written for a single reader intent — doing, looking up, or understanding — and never mixes modes.
 
 > [!NOTE]
 > This page is maintained by the `documenter` sub-agent at phase boundaries. Humans may edit it directly; the sub-agent preserves human edits.
@@ -23,7 +23,7 @@ Canonical lookup surface — tables of commands, flags, exit codes, paths.
 
 Intent, rationale, and trade-offs — the *why*, not the *how*.
 
-- [Dev-machine setup — design](Dev-Machine-Setup-Design) — intent, shape, and trade-offs of the OS-dispatch orchestrator architecture.
+- [Development setup — design](Development-Setup-Design) — intent, shape, and trade-offs of the OS-dispatch orchestrator architecture.
 - [Public curl|bash installer — design](Public-Curl-Bash-Installer) — bootstrap layer's intent, trust model, and why the redirect-Location parse beats the JSON Releases API.
 - [Architecture decisions](Decisions) — ADRs for non-obvious choices.
 

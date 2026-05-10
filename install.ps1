@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    One-line bootstrap for dev-setup on Windows.
+    One-line bootstrap for development-setup on Windows.
 
 .DESCRIPTION
     Fetches the latest tagged release from GitHub, extracts the source

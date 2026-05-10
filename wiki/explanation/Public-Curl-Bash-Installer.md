@@ -58,5 +58,5 @@ Forks, mirrors, and cached copies of `install.sh` / `install.ps1` after the visi
 
 - [Install via one-liner](../how-to/Install-Via-One-Liner) — the user-facing recipe.
 - [Scripts reference](../reference/Scripts) — flags, exit codes, file layout.
-- [Dev-machine setup — design](Dev-Machine-Setup-Design) — the orchestrator that the bootstrap hands off to.
+- [Development setup — design](Development-Setup-Design) — the orchestrator that the bootstrap hands off to.
 - [.harness/PLAN.md](../../.harness/PLAN.md) — full task list, constraints, and verification strategy.

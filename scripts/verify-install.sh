@@ -105,15 +105,15 @@ check_rc_marker() {
   # Debian-with-zsh; ~/.bashrc on Debian-with-bash.
   local rc
   rc="$(rc_file)"
-  local marker='# dev-setup PATH additions (link-configs.sh)'
+  local marker='# development-setup PATH additions (link-configs.sh)'
   if [[ ! -f "$rc" ]]; then
     warn "$rc missing"
     return
   fi
   if grep -Fq "$marker" "$rc"; then
-    ok "$rc has dev-setup PATH marker"
+    ok "$rc has development-setup PATH marker"
   else
-    warn "$rc missing dev-setup PATH marker"
+    warn "$rc missing development-setup PATH marker"
   fi
 }
 

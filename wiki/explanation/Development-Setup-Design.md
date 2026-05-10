@@ -1,4 +1,4 @@
-# Dev-machine setup — design
+# Development setup — design
 
 > [!NOTE]
 > **Status:** implemented — Mac, Debian/Ubuntu, and Windows all CI-verified end-to-end at v2.0.0.

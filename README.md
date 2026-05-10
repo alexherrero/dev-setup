@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>dev-setup</h1>
+  <h1>development-setup</h1>
   <p><strong>One-line bootstrap for an AI-first dev environment.</strong> Mac, Debian/Ubuntu, Windows. Idempotent. Configuration captured as literal files. No <code>git</code> prereq on the target host.</p>
 
   <a href="https://github.com/alexherrero/dev-setup/actions/workflows/ci-tests.yml"><img alt="CI tests" src="https://github.com/alexherrero/dev-setup/actions/workflows/ci-tests.yml/badge.svg"></a>

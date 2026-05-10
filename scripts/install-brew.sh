@@ -31,7 +31,7 @@ if ! command -v brew >/dev/null 2>&1; then
   # effectively a no-op.
   if [[ -x /opt/homebrew/bin/brew ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
-    marker='# brew shellenv (dev-setup)'
+    marker='# brew shellenv (development-setup)'
     if ! grep -Fq "$marker" "$HOME/.zprofile" 2>/dev/null; then
       {
         echo ""
