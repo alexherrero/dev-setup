@@ -9,7 +9,7 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 2026-04-23 06:48 /work — completed task 3: "Write the Homebrew install script" (4 files, 0 tests added)
 2026-04-23 07:03 /work — completed task 4: "Write the CLI-install script" (3 files, 0 tests added)
 2026-04-24 01:55 /work — completed task 5: "Write the GUI-apps install script" (1 file, 0 tests added) — browser-assisted (direct-URL curl infeasible: CF JS challenge on Claude, no canonical URL for Antigravity/Gemini)
-2026-04-24 02:07 /work — completed task 6: "Write the config-link script" (1 file, 0 tests added) — confirmed Claude Code + Claude Desktop rewrite their JSONs in place; used copy-if-absent for all app-owned JSON, symlink for CLAUDE.md only, append-with-marker for zshrc, git config --global merge for user info. Backup under ~/.dev-machine-setup-backup/<utc>/, lazy-created.
+2026-04-24 02:07 /work — completed task 6: "Write the config-link script" (1 file, 0 tests added) — confirmed Claude Code + Claude Desktop rewrite their JSONs in place; used copy-if-absent for all app-owned JSON, symlink for CLAUDE.md only, append-with-marker for zshrc, git config --global merge for user info. Backup under ~/.dev-setup-backup/<utc>/, lazy-created.
 2026-04-24 02:20 /work — completed task 7: "Wire the top-level orchestrator" (1 file, 0 tests added) — setup.sh with --dry-run / --skip-apps / --only <stage> / --help; missing stage scripts warn+skip (supports in-progress plan); all flag paths verified including real --only link-configs run. First commit using conventional-commit `feat:` prefix per ship-release skill classification rules (calibration noted earlier in session).
 2026-04-24 02:30 /work — completed task 8: "Post-setup auth checklist" (2 files, 0 tests added) — scripts/auth-checklist.sh prints the 5 manual steps; docs/first-run.md documents each with provisioning-source references. Orchestrator now finds the script (no longer warn-skipped).
 2026-04-24 02:45 /work — completed task 9: "Windows stubs" (7 files, 0 tests added) — setup.ps1 mirrors setup.sh shape (same stages, same flags); five per-stage .ps1 stubs print banner + TODO + exit 0; docs/windows.md covers deferral rationale + per-stage remaining-work table. verify.sh no-ops cleanly on .ps1 without pwsh (AST check deferred to Windows reference VM). All 9 PLAN tasks now complete.
@@ -269,7 +269,7 @@ Append-only log. Newest entries at the bottom. Format: `<YYYY-MM-DD HH:MM> /<pha
 ## /work — feat-curl-bash-installer task 10 — 2026-05-01T04:00:07Z (v3.0.0 SHIPPED)
 - CHANGELOG.md [v3.0.0] section drafted: Added / Changed / Fixed / Internal covering all 10 tasks.
 - chore(release): v3.0.0 commit b27b699 pushed; tag v3.0.0 annotated + pushed; gh release created.
-- Release URL: https://github.com/alexherrero/dev-machine-setup/releases/tag/v3.0.0
+- Release URL: https://github.com/alexherrero/dev-setup/releases/tag/v3.0.0
 - Final CI dispatch (run 25201452372): all 4 jobs green incl. bootstrap-from-curl on all platforms.
 - Plan Status flipped to complete. All 10 tasks [x].
 - Deferred (post-v3.0.0): repo rename — GitHub Issue #1.

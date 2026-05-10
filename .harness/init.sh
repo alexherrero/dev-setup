@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# init.sh — boot the dev environment for dev-machine-setup.
+# init.sh — boot the dev environment for dev-setup.
 #
 # This repo is a collection of configs and scripts for provisioning a dev
 # machine, so there's nothing to "run" — init instead verifies the tools

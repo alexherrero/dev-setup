@@ -47,6 +47,6 @@ setup.sh / setup.ps1
 - [Bootstrap a new Mac](../how-to/Bootstrap-A-New-Mac) — Mac recipe via `git clone`.
 - [Bootstrap a new Debian or Ubuntu host](../how-to/Bootstrap-A-New-Debian-Or-Ubuntu) — Linux recipe via `git clone`.
 - [Scripts reference](../reference/Scripts) — flags, exit codes, files written.
-- [`docs/architecture.md`](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/architecture.md) — in-repo architecture overview (full repo layout tree).
-- [`docs/debian.md`](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/debian.md) — Debian reference (supported-distro matrix, toolchain detail).
-- [`docs/windows.md`](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/windows.md) — Windows reference (winget, MSIX redirect, Codex caveat).
+- [`docs/architecture.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/architecture.md) — in-repo architecture overview (full repo layout tree).
+- [`docs/debian.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/debian.md) — Debian reference (supported-distro matrix, toolchain detail).
+- [`docs/windows.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/windows.md) — Windows reference (winget, MSIX redirect, Codex caveat).

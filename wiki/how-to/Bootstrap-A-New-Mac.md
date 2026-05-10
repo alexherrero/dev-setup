@@ -11,8 +11,8 @@
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/alexherrero/dev-machine-setup.git
-   cd dev-machine-setup
+   git clone https://github.com/alexherrero/dev-setup.git
+   cd dev-setup
    ```
 2. Run the orchestrator:
    ```bash
@@ -22,7 +22,7 @@
    ```bash
    source ~/.zshrc
    ```
-4. Complete the interactive auth checklist printed at the end of the run (`claude login`, `gemini`, `gh auth login`, GUI sign-ins for Antigravity / Claude Desktop / Gemini Desktop). See [docs/first-run.md](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/first-run.md#mac) for the full step-by-step.
+4. Complete the interactive auth checklist printed at the end of the run (`claude login`, `gemini`, `gh auth login`, GUI sign-ins for Antigravity / Claude Desktop / Gemini Desktop). See [docs/first-run.md](https://github.com/alexherrero/dev-setup/blob/main/docs/first-run.md#mac) for the full step-by-step.
 
 ## Verify
 

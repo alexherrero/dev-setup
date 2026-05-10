@@ -3,7 +3,7 @@
 > [!NOTE]
 > **Status:** implemented (v2.0.0) — CI-verified end-to-end on `ubuntu-latest`.
 > **Goal:** Take a fresh Debian or Ubuntu host from zero to a working CLI-only AI dev environment — Claude Code, Gemini CLI, optionally OpenAI Codex CLI, plus the `node` / `gh` / `jq` / `ripgrep` / `shellcheck` / `shfmt` toolchain.
-> **Prereqs:** `sudo` on the target host; internet access; a supported distro (see the matrix in [`docs/debian.md`](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/debian.md#supported-distros)). The `git clone` flow needs `git` installed; the curl|bash one-liner does not.
+> **Prereqs:** `sudo` on the target host; internet access; a supported distro (see the matrix in [`docs/debian.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/debian.md#supported-distros)). The `git clone` flow needs `git` installed; the curl|bash one-liner does not.
 
 `setup.sh` detects Linux via `scripts/lib/os.sh` and runs a CLI-only plan: `apt → clis → link-configs → verify-install → auth-checklist`. There is no `gui-apps` stage — see [why](#why-no-gui-apps-on-linux) below. The curl|bash one-liner is the recommended path on a fresh host because it removes the `git` prereq — see [Install via the one-liner](Install-Via-One-Liner).
 
@@ -11,8 +11,8 @@
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/alexherrero/dev-machine-setup.git
-   cd dev-machine-setup
+   git clone https://github.com/alexherrero/dev-setup.git
+   cd dev-setup
    ```
 2. Run the orchestrator:
    ```bash
@@ -22,9 +22,9 @@
    ```bash
    source ~/.zshrc || source ~/.bashrc
    ```
-4. Complete the auth checklist printed at the end (`claude login`, `gemini`, `gh auth login`). See [docs/first-run.md](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/first-run.md#debian--ubuntu) for the full step-by-step.
+4. Complete the auth checklist printed at the end (`claude login`, `gemini`, `gh auth login`). See [docs/first-run.md](https://github.com/alexherrero/dev-setup/blob/main/docs/first-run.md#debian--ubuntu) for the full step-by-step.
 
-For the in-repo reference — supported-distro matrix, apt-key handling, npm-global prefix rationale, troubleshooting — see [`docs/debian.md`](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/debian.md). This how-to intentionally does not duplicate that content.
+For the in-repo reference — supported-distro matrix, apt-key handling, npm-global prefix rationale, troubleshooting — see [`docs/debian.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/debian.md). This how-to intentionally does not duplicate that content.
 
 ## Why no GUI apps on Linux
 
@@ -39,9 +39,9 @@ Antigravity Desktop, Claude Desktop, and Gemini Desktop are macOS / Windows bina
 | Symptom | Fix |
 |---|---|
 | `npm install -g …` fails with `EACCES` | `install-clis.sh` configures `~/.npm-global` as the npm prefix on Debian to avoid sudo-for-globals. If you ran `npm` as root before this script, re-own `~/.npm` and `~/.npm-global` to your user. |
-| `node --version` reports < 20 after `install-apt.sh` | The NodeSource repo install failed silently or your distro is older than the supported matrix. See [`docs/debian.md`](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/debian.md). |
+| `node --version` reports < 20 after `install-apt.sh` | The NodeSource repo install failed silently or your distro is older than the supported matrix. See [`docs/debian.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/debian.md). |
 | `shfmt: command not found` after install | The apt package is missing on your distro; `install-apt.sh` falls back to the GitHub-release binary, but the fallback may have failed. Install manually from <https://github.com/mvdan/sh/releases>. |
-| `setup.sh` exits 2 with `unsupported OS` | Your platform isn't macOS or Debian-family. For Windows use `setup.ps1` (see [`docs/windows.md`](https://github.com/alexherrero/dev-machine-setup/blob/main/docs/windows.md)); other distros aren't on the roadmap. |
+| `setup.sh` exits 2 with `unsupported OS` | Your platform isn't macOS or Debian-family. For Windows use `setup.ps1` (see [`docs/windows.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/windows.md)); other distros aren't on the roadmap. |
 
 ## Related
 

@@ -1,6 +1,6 @@
 # Architecture
 
-How `dev-machine-setup` is laid out, what each piece does, and where the
+How `dev-setup` is laid out, what each piece does, and where the
 plumbing lives. Read this if you're adapting the repo, debugging a stage
 failure, or contributing.
 
@@ -70,7 +70,7 @@ Linux build. See [docs/debian.md](debian.md#why-antigravity-isnt-supported-on-li
   back into the repo.
 - **Idempotent everywhere.** Every stage detects already-applied state
   and skips. Pre-existing destination files are moved to
-  `~/.dev-machine-setup-backup/<utc>/` before being replaced.
+  `~/.dev-setup-backup/<utc>/` before being replaced.
 - **Codex opt-in.** Codex is the only CLI a user might actively *not*
   want (paid OpenAI account, separate auth). Default-off keeps the
   baseline run frictionless.

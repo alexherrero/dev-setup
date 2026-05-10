@@ -37,7 +37,7 @@
 #     - configs/git/.gitconfig → ~/.gitconfig (user.name, user.email)
 #
 # Any pre-existing non-matching file at a destination is moved to
-# ~/.dev-machine-setup-backup/<utc-timestamp>/ before being replaced.
+# ~/.dev-setup-backup/<utc-timestamp>/ before being replaced.
 # Backup dir is lazy-created so a fully-idempotent re-run leaves no trace.
 
 set -euo pipefail
@@ -45,7 +45,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=scripts/lib/os.sh
 . "$REPO_ROOT/scripts/lib/os.sh"
-BACKUP_ROOT="$HOME/.dev-machine-setup-backup"
+BACKUP_ROOT="$HOME/.dev-setup-backup"
 TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 BACKUP_DIR="$BACKUP_ROOT/$TIMESTAMP"
 BACKED_UP=0
@@ -109,7 +109,7 @@ append_shell_additions() {
   local src="$REPO_ROOT/configs/zsh/.zshrc-additions"
   local dest
   dest="$(rc_file)"
-  local marker='# dev-machine-setup PATH additions (link-configs.sh)'
+  local marker='# dev-setup PATH additions (link-configs.sh)'
   [[ -f "$src" ]] || return 0
   touch "$dest"
   if grep -Fq "$marker" "$dest"; then

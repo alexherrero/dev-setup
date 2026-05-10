@@ -1,6 +1,6 @@
 # Plan: Public release with curl|bash installer (`feat-curl-bash-installer`)
 
-**Status:** complete (2026-04-30 — all 10 tasks `[x]`; v3.0.0 shipped at <https://github.com/alexherrero/dev-machine-setup/releases/tag/v3.0.0>; CI-verified green on run 25201452372).
+**Status:** complete (2026-04-30 — all 10 tasks `[x]`; v3.0.0 shipped at <https://github.com/alexherrero/dev-setup/releases/tag/v3.0.0>; CI-verified green on run 25201452372).
 **Created:** 2026-04-29
 **Brief:** Make the repo public, ship a `curl | bash` / `irm | iex` bootstrap that pulls the latest release tarball, polish README + wiki for public consumption, and move every verification gate into CI.
 
@@ -63,21 +63,21 @@ A user on a fresh Mac, Debian, or Windows host installs the full dev environment
 
 ### 4. Visibility flip to public
 
-- **What:** Pure ceremony. Tasks 1–3 must be `[x]`. I show user the audit summary + the post-task-3 CI dispatch URL; user confirms; I run `gh repo edit alexherrero/dev-machine-setup --visibility public --accept-visibility-change-consequences`. CHANGELOG entry added.
-- **Verification:** **CI:** existing `static-analysis` + matrix jobs all green post-flip on a re-dispatch. Plus a one-time check: `curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/README.md` succeeds without auth headers.
-- **Status:** [x] (2026-04-30: flipped via `gh repo edit alexherrero/dev-machine-setup --visibility public --accept-visibility-change-consequences`. `gh repo view --json visibility` returns `PUBLIC`. Three unauthenticated checks all pass: (1) `raw.githubusercontent.com` README.md fetch returns the file body, (2) `api.github.com/repos/.../releases/latest` returns v2.0.0 metadata, (3) source tarball download `archive/refs/tags/v2.0.0.tar.gz` returns 200 + 130KB. CHANGELOG.md `[Unreleased]` section added covering the visibility flip + LICENSE + static-analysis. Post-flip CI re-dispatch confirms all four jobs still green.)
+- **What:** Pure ceremony. Tasks 1–3 must be `[x]`. I show user the audit summary + the post-task-3 CI dispatch URL; user confirms; I run `gh repo edit alexherrero/dev-setup --visibility public --accept-visibility-change-consequences`. CHANGELOG entry added.
+- **Verification:** **CI:** existing `static-analysis` + matrix jobs all green post-flip on a re-dispatch. Plus a one-time check: `curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-setup/main/README.md` succeeds without auth headers.
+- **Status:** [x] (2026-04-30: flipped via `gh repo edit alexherrero/dev-setup --visibility public --accept-visibility-change-consequences`. `gh repo view --json visibility` returns `PUBLIC`. Three unauthenticated checks all pass: (1) `raw.githubusercontent.com` README.md fetch returns the file body, (2) `api.github.com/repos/.../releases/latest` returns v2.0.0 metadata, (3) source tarball download `archive/refs/tags/v2.0.0.tar.gz` returns 200 + 130KB. CHANGELOG.md `[Unreleased]` section added covering the visibility flip + LICENSE + static-analysis. Post-flip CI re-dispatch confirms all four jobs still green.)
 
 ### 5. `install.sh` — POSIX bootstrap
 
 - **What:** Repo-root bootstrap script:
   - Detects `curl` (preferred) or `wget` (fallback).
-  - Fetches `https://api.github.com/repos/alexherrero/dev-machine-setup/releases/latest`; parses `.tag_name` via grep/sed (no jq dep — same approach as the shfmt fallback in `install-apt.sh`).
-  - Downloads `https://github.com/alexherrero/dev-machine-setup/archive/refs/tags/<tag>.tar.gz` to `$(mktemp -d)`, extracts in place.
-  - Cd's into the extracted `dev-machine-setup-<version>` dir (GitHub strips the leading `v`).
+  - Fetches `https://api.github.com/repos/alexherrero/dev-setup/releases/latest`; parses `.tag_name` via grep/sed (no jq dep — same approach as the shfmt fallback in `install-apt.sh`).
+  - Downloads `https://github.com/alexherrero/dev-setup/archive/refs/tags/<tag>.tar.gz` to `$(mktemp -d)`, extracts in place.
+  - Cd's into the extracted `dev-setup-<version>` dir (GitHub strips the leading `v`).
   - Execs `./setup.sh "$@"`, forwarding all args.
   - Prints the extract dir on exit so the user can re-run / clean up.
   - `set -euo pipefail`; clear error message on any failure.
-- **Verification:** **CI:** `static-analysis` job's `shellcheck install.sh` step. Each matrix job (`macos-test`, `ubuntu-test`) gains a step: `curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh | bash -s -- --dry-run` exits 0 and prints the stage list.
+- **Verification:** **CI:** `static-analysis` job's `shellcheck install.sh` step. Each matrix job (`macos-test`, `ubuntu-test`) gains a step: `curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh | bash -s -- --dry-run` exits 0 and prints the stage list.
 - **Status:** [x] (2026-04-30: install.sh added at repo root. Two iterations to land green: (1) initial JSON-API approach hit HTTP 403 on macos-latest from the unauth rate limit (60/hr per IP shared across runner pool — exactly the case flagged as plan open question 2); (2) switched to the `/releases/latest` HTML-redirect Location-header parse (no rate limit; same pattern as install-apt.sh's shfmt fallback). curl uses `-fsSI`, wget uses `-S --max-redirect=0 --spider`. CI verified green on run 25169301931 — bootstrap-from-curl steps in macos-test and ubuntu-test both exit 0 with v2.0.0's setup.sh stage list. install.sh@main → setup.sh@v2.0.0 coupling resolves when v3.0.0 ships in task 10. Documenter dispatched: confirmed all three pending wiki pages stay pending until task 6 (install.ps1) lands — flipping after only half the bootstrap pair would mislead readers.)
 
 ### 6. `install.ps1` — Windows bootstrap
@@ -85,10 +85,10 @@ A user on a fresh Mac, Debian, or Windows host installs the full dev environment
 - **What:** PowerShell mirror of `install.sh`:
   - `Invoke-RestMethod` against the releases-latest API (PowerShell auto-parses JSON).
   - Downloads source `.zip` (GitHub serves both `.tar.gz` and `.zip` for source archives).
-  - `Expand-Archive` to `$env:TEMP\dev-machine-setup-<tag>`.
+  - `Expand-Archive` to `$env:TEMP\dev-setup-<tag>`.
   - Cd's in, execs `& ./setup.ps1 @args` with splatted args.
   - `$ErrorActionPreference = 'Stop'`; print extract dir on exit.
-- **Verification:** **CI:** `static-analysis` job's pwsh-AST-parse step. `windows-test` job gains: `iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1 | iex` followed by `setup.ps1 -Help` from the extract dir, exit 0.
+- **Verification:** **CI:** `static-analysis` job's pwsh-AST-parse step. `windows-test` job gains: `iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.ps1 | iex` followed by `setup.ps1 -Help` from the extract dir, exit 0.
 - **Status:** [x] (2026-04-30: install.ps1 added at repo root. Pre-applied task 5's lesson: uses /releases/latest HTML redirect Location header rather than the JSON API (no rate limit). [System.Net]-style 302 handling via try/catch on Invoke-WebRequest -MaximumRedirection 0. param() block declares -WithCodex / -SkipApps / -DryRun / -Help / -Only; forwards via @PSBoundParameters splatting. windows-test CI step uses temp-file pattern (download + run -DryRun) since `iwr | iex` doesn't naturally accept named params; both forms documented in install.ps1's .EXAMPLE blocks. CI green on first dispatch — run 25169710091, all four jobs. Documenter dispatched: flipped all three pending wiki pages (Public-Curl-Bash-Installer.md, Install-Via-One-Liner.md, Scripts.md) to Status: implemented; populated Steps / Variants / Verify / Troubleshooting / Reference tables with concrete one-liners and bootstrap details. Both halves of the bootstrap pair are now live.)
 
 ### 7. README rewrite (converge style)
@@ -128,7 +128,7 @@ A user on a fresh Mac, Debian, or Windows host installs the full dev environment
 
 - **What:** Cut v3.0.0 (major bump — visibility flip + install model + README rewrite is a meaningful break in user expectations, even though all old paths still work). Release notes lead with: "Public!", "One-line install", "README rewrite", "All gates in CI". Update CHANGELOG.
 - **Verification:** **CI:** `gh release view v3.0.0 --json url -q .url` returns a URL; release notes contain the curl + irm one-liners; CI badge in README shows green for the release dispatch.
-- **Status:** [x] (2026-04-30: v3.0.0 cut. CHANGELOG.md `[v3.0.0] — 2026-04-30` section drafted with full Added / Changed / Fixed / Internal subsections covering all 10 tasks of the feature. Lead paragraph: "Public release with one-line install." `chore(release): v3.0.0` commit `b27b699` pushed. Tag v3.0.0 annotated and pushed. `gh release create v3.0.0 --notes-file ...` succeeded; release URL: https://github.com/alexherrero/dev-machine-setup/releases/tag/v3.0.0. Final CI dispatch on the release commit (run 25201452372) — all four jobs green: Static analysis, macOS, Ubuntu, Windows. CI badge in README reflects this dispatch. Plan-level Status flipped to complete. Deferred for post-v3.0.0: repo rename — tracked as GitHub Issue #1.)
+- **Status:** [x] (2026-04-30: v3.0.0 cut. CHANGELOG.md `[v3.0.0] — 2026-04-30` section drafted with full Added / Changed / Fixed / Internal subsections covering all 10 tasks of the feature. Lead paragraph: "Public release with one-line install." `chore(release): v3.0.0` commit `b27b699` pushed. Tag v3.0.0 annotated and pushed. `gh release create v3.0.0 --notes-file ...` succeeded; release URL: https://github.com/alexherrero/dev-setup/releases/tag/v3.0.0. Final CI dispatch on the release commit (run 25201452372) — all four jobs green: Static analysis, macOS, Ubuntu, Windows. CI badge in README reflects this dispatch. Plan-level Status flipped to complete. Deferred for post-v3.0.0: repo rename — tracked as GitHub Issue #1.)
 
 ## Risks / open questions
 
@@ -144,9 +144,9 @@ Every per-task gate is a CI job — see "Verification:" lines above. **Whole-pla
 
 ## Follow-on work (not in this plan)
 
-- **Rename the repo** (post-v3.0.0). New name TBD — current `dev-machine-setup` is generic; a more memorable / brandable name is on the table. Rename via `gh repo rename <new-name>` triggers a permanent redirect from the old name (raw URLs in the curl|bash one-liner keep working until eventually broken by GitHub). Will need to update install.sh / install.ps1 baked-in REPO constant, all README badge URLs, all wiki cross-links to `https://github.com/alexherrero/dev-machine-setup/...`, and CHANGELOG history references. Tracked: GitHub issue (filed at task 9 close-out).
+- **Rename the repo** (post-v3.0.0). New name TBD — current `dev-setup` is generic; a more memorable / brandable name is on the table. Rename via `gh repo rename <new-name>` triggers a permanent redirect from the old name (raw URLs in the curl|bash one-liner keep working until eventually broken by GitHub). Will need to update install.sh / install.ps1 baked-in REPO constant, all README badge URLs, all wiki cross-links to `https://github.com/alexherrero/dev-setup/...`, and CHANGELOG history references. Tracked: GitHub issue (filed at task 9 close-out).
 - **`markdownlint` CI job** — fast-follow after v1 if prose drift becomes a problem.
-- **Homebrew tap** for `brew install alexherrero/dev-machine-setup`.
+- **Homebrew tap** for `brew install alexherrero/dev-setup`.
 - **Self-update mechanism** so existing installs can pull the latest release without re-running curl|bash.
 - **Version-pin flag** (`--version vX.Y.Z`) for rollback / specific-release testing.
 - **CONTRIBUTING.md / SECURITY.md / issue templates** if external contributors arrive.

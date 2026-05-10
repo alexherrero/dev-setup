@@ -1,10 +1,10 @@
 <div align="center">
-  <h1>dev-machine-setup</h1>
+  <h1>dev-setup</h1>
   <p><strong>One-line bootstrap for an AI-first dev environment.</strong> Mac, Debian/Ubuntu, Windows. Idempotent. Configuration captured as literal files. No <code>git</code> prereq on the target host.</p>
 
-  <a href="https://github.com/alexherrero/dev-machine-setup/actions/workflows/ci-tests.yml"><img alt="CI tests" src="https://github.com/alexherrero/dev-machine-setup/actions/workflows/ci-tests.yml/badge.svg"></a>
+  <a href="https://github.com/alexherrero/dev-setup/actions/workflows/ci-tests.yml"><img alt="CI tests" src="https://github.com/alexherrero/dev-setup/actions/workflows/ci-tests.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
-  <a href="https://github.com/alexherrero/dev-machine-setup/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/alexherrero/dev-machine-setup"></a>
+  <a href="https://github.com/alexherrero/dev-setup/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/alexherrero/dev-setup"></a>
 
   <br>
 
@@ -22,13 +22,13 @@ Opinionated bootstrap that takes a fresh Mac, Debian/Ubuntu host, or Windows mac
 ### macOS / Debian / Ubuntu
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh | bash
 ```
 
 ### Windows (PowerShell 7+)
 
 ```powershell
-iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1 | iex
+iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.ps1 | iex
 ```
 
 For flag-passing examples (`--skip-apps`, `--dry-run`, etc.) and the `inspect-before-run` form, see [How to install via the one-liner](wiki/how-to/Install-Via-One-Liner.md).
@@ -36,7 +36,7 @@ For flag-passing examples (`--skip-apps`, `--dry-run`, etc.) and the `inspect-be
 ### Alternative: `git clone`
 
 ```bash
-git clone https://github.com/alexherrero/dev-machine-setup.git && cd dev-machine-setup && ./setup.sh
+git clone https://github.com/alexherrero/dev-setup.git && cd dev-setup && ./setup.sh
 ```
 
 ## Quick start
@@ -102,7 +102,7 @@ CI is **manually dispatched** — no auto-runs on push or PR. The [`ci-tests.yml
 | Ubuntu | `ubuntu-latest` | Full Debian path; bootstrap-from-curl |
 | Windows | `windows-latest` | Full Win install (`-SkipApps`); bootstrap-from-iwr |
 
-Each platform job asserts `verify-install` reports zero warns and a re-run produces no repo drift. To dispatch: [Actions tab](https://github.com/alexherrero/dev-machine-setup/actions) → **CI tests** → **Run workflow**. Concurrency is `cancel-in-progress`.
+Each platform job asserts `verify-install` reports zero warns and a re-run produces no repo drift. To dispatch: [Actions tab](https://github.com/alexherrero/dev-setup/actions) → **CI tests** → **Run workflow**. Concurrency is `cancel-in-progress`.
 
 ## License
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    One-line bootstrap for dev-machine-setup on Windows.
+    One-line bootstrap for dev-setup on Windows.
 
 .DESCRIPTION
     Fetches the latest tagged release from GitHub, extracts the source
@@ -21,13 +21,13 @@
     # PowerShell bind named params correctly:
     $tmp = "$env:TEMP\install.ps1"
     Invoke-WebRequest -UseBasicParsing `
-        -Uri 'https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1' `
+        -Uri 'https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.ps1' `
         -OutFile $tmp
     & $tmp -SkipApps
 
 .EXAMPLE
     # Simple form (no args, default install):
-    iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1 | iex
+    iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.ps1 | iex
 #>
 
 [CmdletBinding()]
@@ -40,7 +40,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$Repo = 'alexherrero/dev-machine-setup'
+$Repo = 'alexherrero/dev-setup'
 $LatestUrl = "https://github.com/$Repo/releases/latest"
 
 # Resolve latest release tag via /releases/latest HTML redirect Location
@@ -70,7 +70,7 @@ catch {
 Write-Host "==> Latest release: $Tag"
 
 # GitHub strips the leading 'v' from the tarball/zip top-level dir name:
-# tag v3.0.0 expands to 'dev-machine-setup-3.0.0/' inside the archive.
+# tag v3.0.0 expands to 'dev-setup-3.0.0/' inside the archive.
 $Version = $Tag -replace '^v', ''
 
 $ArchiveUrl = "https://github.com/$Repo/archive/refs/tags/$Tag.zip"
@@ -78,7 +78,7 @@ $ArchiveUrl = "https://github.com/$Repo/archive/refs/tags/$Tag.zip"
 # Stage everything under a fresh per-invocation tempdir. New-TemporaryFile
 # gives us a unique sentinel; we use its base name to seed a sibling dir
 # so $env:TEMP contains the dir directly (Expand-Archive destination).
-$WorkDir = Join-Path $env:TEMP ("dev-machine-setup-bootstrap-{0}" -f ([guid]::NewGuid().ToString('N').Substring(0, 8)))
+$WorkDir = Join-Path $env:TEMP ("dev-setup-bootstrap-{0}" -f ([guid]::NewGuid().ToString('N').Substring(0, 8)))
 New-Item -ItemType Directory -Path $WorkDir -Force | Out-Null
 $ZipFile = Join-Path $WorkDir "$Tag.zip"
 
@@ -88,7 +88,7 @@ Invoke-WebRequest -Uri $ArchiveUrl -OutFile $ZipFile -UseBasicParsing
 Write-Host "==> Extracting to $WorkDir"
 Expand-Archive -Path $ZipFile -DestinationPath $WorkDir -Force
 
-$Extracted = Join-Path $WorkDir "dev-machine-setup-$Version"
+$Extracted = Join-Path $WorkDir "dev-setup-$Version"
 if (-not (Test-Path -Path $Extracted -PathType Container)) {
     throw "Expected extract dir not found: $Extracted"
 }

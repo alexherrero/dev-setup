@@ -74,16 +74,16 @@ Forwarding only works with the temp-file invocation pattern. `iwr … \| iex` ca
 
 | Path | When | Purpose |
 |---|---|---|
-| `$(mktemp -d -t dev-machine-setup.XXXXXX)/` | `install.sh` run | Per-invocation tempdir. Holds `<tag>.tar.gz` + extracted `dev-machine-setup-<version>/` source tree. Not auto-cleaned — re-run `setup.sh` from there to skip the download. The OS reaps `/tmp` on next reboot. |
-| `$env:TEMP\dev-machine-setup-bootstrap-<id>\` | `install.ps1` run | Per-invocation tempdir. Holds `<tag>.zip` + extracted `dev-machine-setup-<version>\` source tree. Not auto-cleaned. `<id>` is an 8-char GUID prefix. |
+| `$(mktemp -d -t dev-setup.XXXXXX)/` | `install.sh` run | Per-invocation tempdir. Holds `<tag>.tar.gz` + extracted `dev-setup-<version>/` source tree. Not auto-cleaned — re-run `setup.sh` from there to skip the download. The OS reaps `/tmp` on next reboot. |
+| `$env:TEMP\dev-setup-bootstrap-<id>\` | `install.ps1` run | Per-invocation tempdir. Holds `<tag>.zip` + extracted `dev-setup-<version>\` source tree. Not auto-cleaned. `<id>` is an 8-char GUID prefix. |
 | `~/.config/...`, `~/Library/Application Support/...`, `%APPDATA%\...` | `link-configs` stage | Captured configs from `configs/` placed at OS-specific config paths. See `scripts/link-configs.{sh,ps1}` for the exact mapping. |
 
 ## Source layout
 
 | Path | Purpose |
 |---|---|
-| `install.sh` | POSIX bootstrap — repo-root, served via `raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh`. |
-| `install.ps1` | Windows bootstrap — repo-root, served via `raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1`. |
+| `install.sh` | POSIX bootstrap — repo-root, served via `raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh`. |
+| `install.ps1` | Windows bootstrap — repo-root, served via `raw.githubusercontent.com/alexherrero/dev-setup/main/install.ps1`. |
 | `setup.sh` | OS-dispatching orchestrator. |
 | `setup.ps1` | Windows orchestrator. |
 | `scripts/lib/os.sh` | `detect_os()` — single source of truth for `macos` / `debian` / unsupported. |

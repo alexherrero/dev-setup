@@ -12,14 +12,14 @@ below.
 One-line install:
 
 ```bash
-git clone https://github.com/alexherrero/dev-machine-setup.git && cd dev-machine-setup && ./setup.sh
+git clone https://github.com/alexherrero/dev-setup.git && cd dev-setup && ./setup.sh
 ```
 
 Or step-by-step with flag variants:
 
 ```bash
-git clone https://github.com/alexherrero/dev-machine-setup.git
-cd dev-machine-setup
+git clone https://github.com/alexherrero/dev-setup.git
+cd dev-setup
 ./setup.sh                            # Claude Code + Gemini CLI
 source ~/.zshrc || source ~/.bashrc   # whichever rc file matches your $SHELL
 ```

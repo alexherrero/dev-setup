@@ -174,7 +174,7 @@ After the checklist is done:
 - **`~/.gitconfig`** → `user.name` + `user.email` set via
   `git config --global`. Other gitconfig state (includes, credential
   helpers, signing config) is untouched.
-- **Backup directory** → `~/.dev-machine-setup-backup/<utc-timestamp>/`
-  (Mac/Linux) or `%USERPROFILE%\.dev-machine-setup-backup\<utc>\`
+- **Backup directory** → `~/.dev-setup-backup/<utc-timestamp>/`
+  (Mac/Linux) or `%USERPROFILE%\.dev-setup-backup\<utc>\`
   (Windows) holds any pre-existing config files that `link-configs`
   displaced. Safe to delete once you've confirmed nothing was lost.

@@ -69,7 +69,7 @@ configure_npm_prefix_debian() {
   # shellcheck disable=SC2016
   append_path_marker \
     "$rc" \
-    '# ~/.npm-global/bin (dev-machine-setup — npm globals)' \
+    '# ~/.npm-global/bin (dev-setup — npm globals)' \
     'export PATH="$HOME/.npm-global/bin:$PATH"'
   # Make resolvable in this shell for the post-check.
   export PATH="$prefix/bin:$PATH"
@@ -110,7 +110,7 @@ touch "$RC_FILE"
 # shellcheck disable=SC2016
 append_path_marker \
   "$RC_FILE" \
-  '# ~/.local/bin (dev-machine-setup — Claude Code CLI)' \
+  '# ~/.local/bin (dev-setup — Claude Code CLI)' \
   'export PATH="$HOME/.local/bin:$PATH"'
 # Resolve in this shell too, for the post-check.
 export PATH="$HOME/.local/bin:$PATH"

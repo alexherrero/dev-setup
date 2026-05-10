@@ -44,7 +44,7 @@
 #                                       the value is already false.
 #
 # Backup: any pre-existing non-matching file at a destination is moved to
-# %USERPROFILE%\.dev-machine-setup-backup\<utc>\ before being replaced.
+# %USERPROFILE%\.dev-setup-backup\<utc>\ before being replaced.
 # Backup dir is lazy-created so a converged re-run leaves no trace.
 
 [CmdletBinding()]
@@ -53,7 +53,7 @@ param()
 $ErrorActionPreference = 'Stop'
 
 $RepoRoot   = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$BackupRoot = Join-Path $env:USERPROFILE '.dev-machine-setup-backup'
+$BackupRoot = Join-Path $env:USERPROFILE '.dev-setup-backup'
 $Timestamp  = (Get-Date -AsUTC -Format 'yyyyMMddTHHmmssZ')
 $BackupDir  = Join-Path $BackupRoot $Timestamp
 $script:BackedUp = $false

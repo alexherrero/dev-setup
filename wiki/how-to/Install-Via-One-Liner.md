@@ -13,7 +13,7 @@ The one-liner pulls the latest tagged release, extracts it to a tempdir, and exe
 1. **Run the one-liner for your platform.** macOS / Debian / Ubuntu:
 
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh | bash
    ```
 
    Windows (recommended — supports flags):
@@ -21,7 +21,7 @@ The one-liner pulls the latest tagged release, extracts it to a tempdir, and exe
    ```powershell
    $tmp = "$env:TEMP\install.ps1"
    Invoke-WebRequest -UseBasicParsing `
-       -Uri 'https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1' `
+       -Uri 'https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.ps1' `
        -OutFile $tmp
    & $tmp
    ```
@@ -30,14 +30,14 @@ The one-liner pulls the latest tagged release, extracts it to a tempdir, and exe
 
 3. **Complete the auth checklist** printed at the end of the run (`claude login`, `gh auth login`, etc.). The orchestrator's `auth-checklist` stage is the last thing it prints before exiting.
 
-The bootstrap prints the extract dir on exit (e.g. `/tmp/dev-machine-setup.XXXXXX/dev-machine-setup-3.0.0/` or `%TEMP%\dev-machine-setup-bootstrap-<id>\dev-machine-setup-3.0.0\`). Re-running `setup.sh` / `setup.ps1` from that dir skips the download.
+The bootstrap prints the extract dir on exit (e.g. `/tmp/dev-setup.XXXXXX/dev-setup-3.0.0/` or `%TEMP%\dev-setup-bootstrap-<id>\dev-setup-3.0.0\`). Re-running `setup.sh` / `setup.ps1` from that dir skips the download.
 
 ## Variants
 
 ### macOS / Linux — with flags
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh \
+curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh \
   | bash -s -- --skip-apps
 ```
 
@@ -48,7 +48,7 @@ The `-s --` is the standard `bash` idiom for forwarding args to a script read fr
 ```powershell
 $tmp = "$env:TEMP\install.ps1"
 Invoke-WebRequest -UseBasicParsing `
-    -Uri 'https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1' `
+    -Uri 'https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.ps1' `
     -OutFile $tmp
 & $tmp -SkipApps
 ```
@@ -58,7 +58,7 @@ The temp-file pattern is the only form that lets PowerShell bind named parameter
 ### Windows — simple form (no args)
 
 ```powershell
-iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1 | iex
+iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.ps1 | iex
 ```
 
 `iwr | iex` works for default installs but cannot forward flags — PowerShell parses params from the script's own command line, which `iex` doesn't expose. Reach for the temp-file pattern as soon as you need any flag.
@@ -69,7 +69,7 @@ Don't pipe code from the internet straight to a shell unless you've read it. The
 
 ```bash
 # POSIX
-curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh -o /tmp/install.sh
+curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh -o /tmp/install.sh
 less /tmp/install.sh   # read it
 bash /tmp/install.sh --skip-apps
 ```
@@ -91,12 +91,12 @@ The bootstrap prints the extract dir on exit and execs the orchestrator. The orc
 To re-run verification later without redoing the install:
 
 ```bash
-cd /tmp/dev-machine-setup.XXXXXX/dev-machine-setup-3.0.0   # path printed by install.sh
+cd /tmp/dev-setup.XXXXXX/dev-setup-3.0.0   # path printed by install.sh
 ./scripts/verify-install.sh
 ```
 
 ```powershell
-cd $env:TEMP\dev-machine-setup-bootstrap-<id>\dev-machine-setup-3.0.0
+cd $env:TEMP\dev-setup-bootstrap-<id>\dev-setup-3.0.0
 .\scripts\verify-install.ps1
 ```
 
@@ -107,11 +107,11 @@ See [Scripts reference](../reference/Scripts) for the canonical entry-point tabl
 | Symptom | Fix |
 |---|---|
 | `install.sh: neither curl nor wget is on PATH — install one and retry` | The bootstrap exits early with this message on hosts where neither downloader is present (rare — both ship in default macOS and Debian/Ubuntu images). Install via your package manager (`apt-get install -y curl`) and retry. |
-| `install.sh: could not parse tag from /releases/latest redirect` | GitHub returned an unexpected response (network blocked, repo renamed, or no releases yet). Visit `https://github.com/alexherrero/dev-machine-setup/releases/latest` in a browser to confirm a release exists; if so, retry. |
+| `install.sh: could not parse tag from /releases/latest redirect` | GitHub returned an unexpected response (network blocked, repo renamed, or no releases yet). Visit `https://github.com/alexherrero/dev-setup/releases/latest` in a browser to confirm a release exists; if so, retry. |
 | Windows: `Expected 302 redirect from …/releases/latest` | Same root cause as the POSIX tag-parse failure — confirm a release exists and the redirect is reachable from your network. |
 | Windows: `iwr … \| iex` ignored my `-SkipApps` flag | Expected — `iex` doesn't forward params. Use the temp-file pattern under Variants → Windows recommended. |
 | `setup.sh: unsupported OS` (exit 2) | The orchestrator only supports macOS (Darwin) and Debian-family Linux. Other distros: clone the repo and adapt the stage scripts manually. |
-| Re-running fails with permission errors on `/tmp/dev-machine-setup.XXXXXX/` | The OS reaped the tempdir between runs. Re-run the one-liner — the new tempdir has fresh permissions. |
+| Re-running fails with permission errors on `/tmp/dev-setup.XXXXXX/` | The OS reaped the tempdir between runs. Re-run the one-liner — the new tempdir has fresh permissions. |
 
 ## Related
 

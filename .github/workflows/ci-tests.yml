@@ -227,7 +227,7 @@ jobs:
         # setup.sh is what users actually get; this couples the in-tree
         # install.sh to the latest release's setup.sh.
         run: |
-          curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh \
+          curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh \
             | bash -s -- --dry-run
 
   # --- Ubuntu: full Debian pipeline -----------------------------------------
@@ -281,7 +281,7 @@ jobs:
         # the latest release tarball and execs setup.sh --dry-run. This
         # validates the curl|bash path works on Linux without git.
         run: |
-          curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh \
+          curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh \
             | bash -s -- --dry-run
 
   # --- Windows: full install pipeline ----------------------------------------
@@ -372,7 +372,7 @@ jobs:
         run: |
           $tmp = Join-Path $env:TEMP 'install.ps1'
           Invoke-WebRequest -UseBasicParsing `
-            -Uri 'https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1' `
+            -Uri 'https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.ps1' `
             -OutFile $tmp
           & $tmp -DryRun
 

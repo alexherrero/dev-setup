@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# install.sh — one-line bootstrap for dev-machine-setup.
+# install.sh — one-line bootstrap for dev-setup.
 #
 # Fetches the latest tagged release from GitHub, extracts the source
 # tarball to a temp dir, and exec's setup.sh from there with all
 # user-supplied args forwarded. No git prereq on the host.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh | bash
 #   curl -fsSL .../install.sh | bash -s -- --skip-apps --dry-run
 #
 # Trust model: same as Homebrew's install.sh — the trust boundary is
@@ -16,7 +16,7 @@
 
 set -euo pipefail
 
-REPO="alexherrero/dev-machine-setup"
+REPO="alexherrero/dev-setup"
 LATEST_URL="https://github.com/${REPO}/releases/latest"
 
 die() {
@@ -68,7 +68,7 @@ TAG="$(
 echo "==> Latest release: ${TAG}"
 
 # GitHub strips the leading 'v' from tag in the tarball directory name:
-# tag v3.0.0 expands to 'dev-machine-setup-3.0.0/' inside the archive.
+# tag v3.0.0 expands to 'dev-setup-3.0.0/' inside the archive.
 VERSION="${TAG#v}"
 TARBALL_URL="https://github.com/${REPO}/archive/refs/tags/${TAG}.tar.gz"
 
@@ -76,7 +76,7 @@ TARBALL_URL="https://github.com/${REPO}/archive/refs/tags/${TAG}.tar.gz"
 # TMPDIR; mktemp -d gives us a per-invocation scratch space. We don't
 # auto-clean — leaving the dir lets users re-run setup.sh without
 # re-downloading, and the OS will reap it on next reboot.
-WORK_DIR="$(mktemp -d -t dev-machine-setup.XXXXXX)"
+WORK_DIR="$(mktemp -d -t dev-setup.XXXXXX)"
 TARBALL="${WORK_DIR}/${TAG}.tar.gz"
 
 echo "==> Downloading ${TARBALL_URL}"
@@ -85,7 +85,7 @@ fetch_to "$TARBALL_URL" "$TARBALL"
 echo "==> Extracting to ${WORK_DIR}"
 tar -xzf "$TARBALL" -C "$WORK_DIR"
 
-EXTRACTED="${WORK_DIR}/dev-machine-setup-${VERSION}"
+EXTRACTED="${WORK_DIR}/dev-setup-${VERSION}"
 [[ -d "${EXTRACTED}" ]] || die "expected extract dir not found: ${EXTRACTED}"
 [[ -x "${EXTRACTED}/setup.sh" ]] || die "setup.sh not found or not executable in ${EXTRACTED}"
 

@@ -12,14 +12,14 @@ winget). Configs are placed at Windows-native paths
 One-line install (PowerShell 7+):
 
 ```powershell
-git clone https://github.com/alexherrero/dev-machine-setup.git; cd dev-machine-setup; ./setup.ps1
+git clone https://github.com/alexherrero/dev-setup.git; cd dev-setup; ./setup.ps1
 ```
 
 Or step-by-step with flag variants:
 
 ```powershell
-git clone https://github.com/alexherrero/dev-machine-setup.git
-cd dev-machine-setup
+git clone https://github.com/alexherrero/dev-setup.git
+cd dev-setup
 ./setup.ps1 -Help                     # prints the 6-stage list
 ./setup.ps1                           # end-to-end (Antigravity + Claude Desktop install)
 ./setup.ps1 -SkipApps                 # CLI-only, no GUI installs (CI / headless)

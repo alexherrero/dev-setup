@@ -3,7 +3,7 @@
 # Called by the Claude Code PostToolUse hook after every Write|Edit with the
 # path of the file that was just written or edited as $1.
 #
-# dev-machine-setup is a shell-and-config repo, so we lint the file types we
+# dev-setup is a shell-and-config repo, so we lint the file types we
 # actually edit: shell, PowerShell, and JSON. Each check is single-file and
 # fast. Optional linters (shellcheck, pwsh) are used when present and
 # silently skipped when not — verify.sh must not fail just because a dev

@@ -27,14 +27,14 @@ If you have an existing wrapper / cron / alias that calls `setup.sh --with-codex
 
 ## [v3.0.0] — 2026-04-30
 
-> **Public release with one-line install.** The repo is now public; a fresh Mac, Debian/Ubuntu host, or Windows machine bootstraps to a fully configured AI-coding dev environment with one command — no `git` prereq, no SSH key, no clone. `feat-curl-bash-installer` complete with `passes: true` in `.harness/features.json`; all five features in the registry now CI-verified end-to-end on dispatch [run 25201071711](https://github.com/alexherrero/dev-machine-setup/actions/runs/25201071711). Major bump: install model is a meaningful break in user expectations. The `git clone` flow keeps working — old tags are untouched.
+> **Public release with one-line install.** The repo is now public; a fresh Mac, Debian/Ubuntu host, or Windows machine bootstraps to a fully configured AI-coding dev environment with one command — no `git` prereq, no SSH key, no clone. `feat-curl-bash-installer` complete with `passes: true` in `.harness/features.json`; all five features in the registry now CI-verified end-to-end on dispatch [run 25201071711](https://github.com/alexherrero/dev-setup/actions/runs/25201071711). Major bump: install model is a meaningful break in user expectations. The `git clone` flow keeps working — old tags are untouched.
 
 ### Added
 
-- **`install.sh`** at repo root — POSIX bootstrap. `curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.sh | bash`. Detects curl (preferred) or wget (fallback); resolves the latest release tag from the `/releases/latest` HTML redirect Location header (no JSON Releases API rate-limit — same pattern as `install-apt.sh`'s shfmt fallback); downloads source tarball to `mktemp -d`; exec's `setup.sh "$@"` forwarding all args. `set -euo pipefail`; clear error message on any failure. Args forward via `bash -s -- --with-codex` etc.
-- **`install.ps1`** at repo root — Windows bootstrap. `iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-machine-setup/main/install.ps1 | iex` (default install) or temp-file pattern with named flags. Same redirect-Location parse via try/catch on `Invoke-WebRequest -MaximumRedirection 0`; downloads `.zip`, `Expand-Archive` to `$env:TEMP`, exec's `setup.ps1 @PSBoundParameters`. PowerShell 7+ recommended. The temp-file pattern is the only form that lets PowerShell bind named parameters correctly — documented inline in the script's `.EXAMPLE` blocks.
+- **`install.sh`** at repo root — POSIX bootstrap. `curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh | bash`. Detects curl (preferred) or wget (fallback); resolves the latest release tag from the `/releases/latest` HTML redirect Location header (no JSON Releases API rate-limit — same pattern as `install-apt.sh`'s shfmt fallback); downloads source tarball to `mktemp -d`; exec's `setup.sh "$@"` forwarding all args. `set -euo pipefail`; clear error message on any failure. Args forward via `bash -s -- --with-codex` etc.
+- **`install.ps1`** at repo root — Windows bootstrap. `iwr -UseBasicParsing https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.ps1 | iex` (default install) or temp-file pattern with named flags. Same redirect-Location parse via try/catch on `Invoke-WebRequest -MaximumRedirection 0`; downloads `.zip`, `Expand-Archive` to `$env:TEMP`, exec's `setup.ps1 @PSBoundParameters`. PowerShell 7+ recommended. The temp-file pattern is the only form that lets PowerShell bind named parameters correctly — documented inline in the script's `.EXAMPLE` blocks.
 - **`LICENSE`** at repo root — MIT, Copyright (c) 2026 Alex Herrero. README gained `## License` section.
-- **`static-analysis` CI job** in `.github/workflows/ci-tests.yml` — parallel to mac/ubuntu/windows-test on ubuntu-latest. Six steps: `shellcheck`, `actionlint`, pwsh AST parse, `lychee` link check on user-facing docs, secret-shape + personal-data regex audit, LICENSE non-empty check. ~12 sec runtime. The named gate every other task in `feat-curl-bash-installer` references. First end-to-end green on [run 25150482876](https://github.com/alexherrero/dev-machine-setup/actions/runs/25150482876).
+- **`static-analysis` CI job** in `.github/workflows/ci-tests.yml` — parallel to mac/ubuntu/windows-test on ubuntu-latest. Six steps: `shellcheck`, `actionlint`, pwsh AST parse, `lychee` link check on user-facing docs, secret-shape + personal-data regex audit, LICENSE non-empty check. ~12 sec runtime. The named gate every other task in `feat-curl-bash-installer` references. First end-to-end green on [run 25150482876](https://github.com/alexherrero/dev-setup/actions/runs/25150482876).
 - **`readme-shape` CI step** inside `static-analysis` — 10 grep checks for required README sections (centered title, badge block, `## Install`, `## Quick start`, `## Documentation`, `## License`) and the curl|bash + irm|iex one-liner forms. Catches accidental section-rename / badge-removal in PRs.
 - **Bootstrap-from-curl CI steps** in mac/ubuntu/windows-test jobs — exercise the full curl|bash / iwr|iex path on every dispatch. Couples `install.sh@main` / `install.ps1@main` to the latest release's `setup.sh` / `setup.ps1` until the next tag ships.
 - **`docs/architecture.md`** — repo layout ASCII tree (with `install.sh` / `install.ps1` / `setup.ps1` rows added), OS-dispatch architecture diagram including a Windows row, "Why this shape" rationale, agentic-harness `Development` pointer. Cut from `README.md` to keep it install-first.
@@ -67,7 +67,7 @@ If you have an existing wrapper / cron / alias that calls `setup.sh --with-codex
 
 ## [v2.0.0] — 2026-04-29
 
-> **Windows is now real.** `feat-windows-cli-support` is complete with `passes: true` in `.harness/features.json`. All three features (Mac, Debian/Ubuntu, Windows) are CI-verified end-to-end on a single dispatch — [run 25142962483](https://github.com/alexherrero/dev-machine-setup/actions/runs/25142962483). Major bump: Windows users on v1.x hit the stub-only path (printed TODO + exited 0); on v2.0.0 they hit the real installer that actually does work. No API surface changed, but user expectations did.
+> **Windows is now real.** `feat-windows-cli-support` is complete with `passes: true` in `.harness/features.json`. All three features (Mac, Debian/Ubuntu, Windows) are CI-verified end-to-end on a single dispatch — [run 25142962483](https://github.com/alexherrero/dev-setup/actions/runs/25142962483). Major bump: Windows users on v1.x hit the stub-only path (printed TODO + exited 0); on v2.0.0 they hit the real installer that actually does work. No API surface changed, but user expectations did.
 
 ### Added
 - **`scripts/install-tooling.ps1`** — winget toolchain installer. Git for Windows (required by Claude Code — shells out to Git Bash), Node LTS, gh, ripgrep. Idempotent skip-if-on-PATH; PATH refresh from registry into running shell. Shipped at v1.1.0; finalized here.
@@ -95,7 +95,7 @@ If you have an existing wrapper / cron / alias that calls `setup.sh --with-codex
 - `feat-windows-cli-support.passes` → `true`.
 - All three features now pass; the project's stated cross-platform contract is fully realized.
 
-**Full diff:** https://github.com/alexherrero/dev-machine-setup/compare/v1.1.0...v2.0.0
+**Full diff:** https://github.com/alexherrero/dev-setup/compare/v1.1.0...v2.0.0
 
 ## [v1.1.0] — 2026-04-29
 
@@ -112,11 +112,11 @@ If you have an existing wrapper / cron / alias that calls `setup.sh --with-codex
 ### Plan
 - New feature `feat-windows-cli-support` in `.harness/features.json` (`passes: false` until CI green). Three open questions surfaced and resolved during planning: (1) Codex Windows → skip-with-warn; (2) Claude Code install → winget (override of original native-installer recommendation, per user preference for system-managed installs); (3) Antigravity `argv.json` path → verify empirically with skip-the-file fallback.
 
-**Full diff:** https://github.com/alexherrero/dev-machine-setup/compare/v1.0.0...v1.1.0
+**Full diff:** https://github.com/alexherrero/dev-setup/compare/v1.0.0...v1.1.0
 
 ## [v1.0.0] — 2026-04-29
 
-> **First stable release.** Both `feat-debian-cli-support` and `feat-ci-verification` are complete with `passes: true` in `.harness/features.json`. The Mac and Debian/Ubuntu paths are end-to-end CI-verified on a single dispatch — [run 25087515129](https://github.com/alexherrero/dev-machine-setup/actions/runs/25087515129) (macOS 1m34s, Ubuntu 1m20s, Windows-smoke 0m25s, all `success`). Windows is **smoke-only** (orchestrator + AST parse); real Windows install verification is the next plan, `feat-windows-cli-support`.
+> **First stable release.** Both `feat-debian-cli-support` and `feat-ci-verification` are complete with `passes: true` in `.harness/features.json`. The Mac and Debian/Ubuntu paths are end-to-end CI-verified on a single dispatch — [run 25087515129](https://github.com/alexherrero/dev-setup/actions/runs/25087515129) (macOS 1m34s, Ubuntu 1m20s, Windows-smoke 0m25s, all `success`). Windows is **smoke-only** (orchestrator + AST parse); real Windows install verification is the next plan, `feat-windows-cli-support`.
 
 ### Added
 - **`.github/workflows/ci-tests.yml`** — manually-dispatched CI workflow with three parallel jobs:
@@ -130,7 +130,7 @@ If you have an existing wrapper / cron / alias that calls `setup.sh --with-codex
 - **NodeSource apt key signature failure on Debian.** `install-apt.sh::install_keyring` was writing the upstream URL's response verbatim via `tee`. NodeSource serves the key ASCII-armored at `.gpg.key` while modern apt with `signed-by=/etc/apt/keyrings/...gpg` expects the file to be **dearmored binary**, so `apt update` failed with `NO_PUBKEY 2F59B5F99B1BE0B4`. Helper now takes an `armored` flag; NodeSource pipes through `gpg --dearmor` before write. GitHub CLI's URL serves binary already → unchanged.
 - **`includeCoAuthoredBy` kill-switch missing on fresh Macs.** On a fresh-install Mac, the Claude Code installer (or its first `claude --version` invocation in `install-clis.sh`'s post-check) writes a default `~/.claude/settings.json` *before* `link-configs.sh` runs. `link_copy_if_absent` then preserves the default file and our captured kill-switch from `configs/claude/settings.json` never lands. New `link-configs.sh::ensure_claude_co_authored_by_disabled()` merges `includeCoAuthoredBy=false` into whatever's on disk via a `jq`-driven temp-file rename. Idempotent: already-false is a no-op print.
 
-**Full diff:** https://github.com/alexherrero/dev-machine-setup/compare/v0.6.1...v1.0.0
+**Full diff:** https://github.com/alexherrero/dev-setup/compare/v0.6.1...v1.0.0
 
 ## [v0.6.1] — 2026-04-28
 
@@ -140,7 +140,7 @@ If you have an existing wrapper / cron / alias that calls `setup.sh --with-codex
 
 > No code changes vs v0.6.0. The Debian path is feature-complete via static verification but **still has not been exercised on a real Debian/Ubuntu host**. Same "should work but unverified" caveat as v0.6.0 applies. Mac users on v0.2.0+ are unaffected.
 
-**Full diff:** https://github.com/alexherrero/dev-machine-setup/compare/v0.6.0...v0.6.1
+**Full diff:** https://github.com/alexherrero/dev-setup/compare/v0.6.0...v0.6.1
 
 ## [v0.6.0] — 2026-04-28
 
@@ -155,7 +155,7 @@ If you have an existing wrapper / cron / alias that calls `setup.sh --with-codex
 ### Added
 - **`docs/debian.md`** — supported-distro matrix (Debian 11/12/13 Bullseye/Bookworm/Trixie; Ubuntu 20.04/22.04/24.04 LTS) with per-release `shfmt`-source column (apt vs GitHub-release fallback); amd64 + arm64 both supported. Debian-flavored stage list, "What's omitted vs Mac" comparison, the explicit "Why Antigravity isn't supported on Linux" callout citing Google's own `antigravity.google/docs/command` docs (`agy` is a desktop-IDE launcher, not a headless agent), toolchain detail (NodeSource node 22 LTS, GitHub CLI apt repo, npm-globals-without-sudo via `~/.npm-global` prefix, shfmt fallback), and a future-work section.
 
-**Full diff:** https://github.com/alexherrero/dev-machine-setup/compare/v0.5.0...v0.6.0
+**Full diff:** https://github.com/alexherrero/dev-setup/compare/v0.5.0...v0.6.0
 
 ## [v0.5.0] — 2026-04-27
 
@@ -166,7 +166,7 @@ If you have an existing wrapper / cron / alias that calls `setup.sh --with-codex
 - **`scripts/install-clis.sh`** uses the shared `rc_file()` instead of its own local copy from v0.4.0.
 - **`scripts/link-configs.sh`** sources `os.sh`. The Mac-only Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`) is now gated on `OS==macos` — on Debian the entry prints `skip ... (Mac-only — Claude Desktop)` and the path is never created. Post-check JSON validation drops the Library path on Debian too. `append_zshrc_additions` renamed to `append_shell_additions` since the destination is now `rc_file()`-driven (the old name was misleading on Debian-with-bash, where the additions go to `~/.bashrc`). All other strategies (CLAUDE.md symlink, Claude / Gemini / Antigravity JSONs, `git config --global` user.name/email merge) are platform-portable as-is and behave identically on both platforms.
 
-**Full diff:** https://github.com/alexherrero/dev-machine-setup/compare/v0.4.0...v0.5.0
+**Full diff:** https://github.com/alexherrero/dev-setup/compare/v0.4.0...v0.5.0
 
 ## [v0.4.0] — 2026-04-27
 
@@ -201,7 +201,7 @@ If you have an existing wrapper / cron / alias that calls `setup.sh --with-codex
 
 ### Added
 - `setup.sh` orchestrator — runs install stages in order with `--dry-run`, `--skip-apps`, `--only <stage>`, and `--help`. Missing stage scripts warn+skip (supports in-progress plans); `set -euo pipefail` + direct invocation halts on first real failure.
-- `scripts/link-configs.sh` — places captured configs at OS locations via four per-file strategies: symlink for user-authored files (`CLAUDE.md` only); copy-if-absent for app-owned JSON (Claude Code and Claude Desktop both confirmed to rewrite in place); append-idempotent under a marker for `~/.zshrc`; `git config --global` merge for `user.name`/`user.email` (preserves existing includes, credential helpers, signing config). Pre-existing files move to `~/.dev-machine-setup-backup/<utc>/`; backup dir is lazy-created so converged reruns leave no trace. JSONC-aware validation for `argv.json`.
+- `scripts/link-configs.sh` — places captured configs at OS locations via four per-file strategies: symlink for user-authored files (`CLAUDE.md` only); copy-if-absent for app-owned JSON (Claude Code and Claude Desktop both confirmed to rewrite in place); append-idempotent under a marker for `~/.zshrc`; `git config --global` merge for `user.name`/`user.email` (preserves existing includes, credential helpers, signing config). Pre-existing files move to `~/.dev-setup-backup/<utc>/`; backup dir is lazy-created so converged reruns leave no trace. JSONC-aware validation for `argv.json`.
 - `scripts/auth-checklist.sh` + `docs/first-run.md` — post-setup checklist of the 5 manual steps (`claude login`, `gh auth login`, `gemini` first-run oauth, Antigravity sign-in, Claude Desktop sign-in) + a doc that traces each command to the install stage that provisioned it.
 - `setup.ps1` + `scripts/install-*.ps1` + `docs/windows.md` — Windows orchestrator skeleton matching the Mac flag shape, five per-stage stubs, and a deferral doc with per-stage remaining-work table. AST validation deferred to a Windows reference VM.
 
@@ -248,20 +248,20 @@ If you have an existing wrapper / cron / alias that calls `setup.sh --with-codex
 ### Added
 - Initial project scaffold: bootstrapped with [agentic-harness](https://github.com/alexherrero/agentic-harness) v0.8.7 + hooks. Includes adapters for Claude Code, Antigravity, Codex, and Gemini plus `PostToolUse` / `PreCompact` / `SessionStart(compact)` hooks.
 
-[v4.0.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v4.0.0
-[v3.0.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v3.0.0
-[v2.0.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v2.0.0
-[v1.1.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v1.1.0
-[v1.0.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v1.0.0
-[v0.6.1]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.6.1
-[v0.6.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.6.0
-[v0.5.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.5.0
-[v0.4.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.4.0
-[v0.3.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.3.0
-[v0.2.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.2.0
-[v0.1.0]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.1.0
-[v0.0.5]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.0.5
-[v0.0.4]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.0.4
-[v0.0.3]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.0.3
-[v0.0.2]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.0.2
-[v0.0.1]: https://github.com/alexherrero/dev-machine-setup/releases/tag/v0.0.1
+[v4.0.0]: https://github.com/alexherrero/dev-setup/releases/tag/v4.0.0
+[v3.0.0]: https://github.com/alexherrero/dev-setup/releases/tag/v3.0.0
+[v2.0.0]: https://github.com/alexherrero/dev-setup/releases/tag/v2.0.0
+[v1.1.0]: https://github.com/alexherrero/dev-setup/releases/tag/v1.1.0
+[v1.0.0]: https://github.com/alexherrero/dev-setup/releases/tag/v1.0.0
+[v0.6.1]: https://github.com/alexherrero/dev-setup/releases/tag/v0.6.1
+[v0.6.0]: https://github.com/alexherrero/dev-setup/releases/tag/v0.6.0
+[v0.5.0]: https://github.com/alexherrero/dev-setup/releases/tag/v0.5.0
+[v0.4.0]: https://github.com/alexherrero/dev-setup/releases/tag/v0.4.0
+[v0.3.0]: https://github.com/alexherrero/dev-setup/releases/tag/v0.3.0
+[v0.2.0]: https://github.com/alexherrero/dev-setup/releases/tag/v0.2.0
+[v0.1.0]: https://github.com/alexherrero/dev-setup/releases/tag/v0.1.0
+[v0.0.5]: https://github.com/alexherrero/dev-setup/releases/tag/v0.0.5
+[v0.0.4]: https://github.com/alexherrero/dev-setup/releases/tag/v0.0.4
+[v0.0.3]: https://github.com/alexherrero/dev-setup/releases/tag/v0.0.3
+[v0.0.2]: https://github.com/alexherrero/dev-setup/releases/tag/v0.0.2
+[v0.0.1]: https://github.com/alexherrero/dev-setup/releases/tag/v0.0.1
