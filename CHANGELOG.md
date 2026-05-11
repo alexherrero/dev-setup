@@ -4,9 +4,13 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v4.0.0] — 2026-05-01
+## [v4.0.0] — 2026-05-10
 
-> **Codex CLI removed.** The OpenAI Codex CLI (`@openai/codex`) and its `--with-codex` / `-WithCodex` opt-in flag are gone from setup. Major bump because the public flag surface shrunk — anyone passing `--with-codex` will now get an `unknown argument` error and exit 2. The prior opt-in posture (Codex installed only on explicit request) made it harmless to default-include, but the cleaner contract is no Codex at all. Claude Code + Gemini CLI remain the supported CLIs; Mac and Linux orchestrators are now Claude + Gemini only, and Windows drops the entire skip-with-warn block since there's nothing to skip.
+> **Codex CLI removed; repo renamed to `dev-setup`.** The OpenAI Codex CLI (`@openai/codex`) and its `--with-codex` / `-WithCodex` opt-in flag are gone from setup. Major bump because the public flag surface shrunk — anyone passing `--with-codex` will now get an `unknown argument` error and exit 2. The prior opt-in posture (Codex installed only on explicit request) made it harmless to default-include, but the cleaner contract is no Codex at all. Claude Code + Gemini CLI remain the supported CLIs; Mac and Linux orchestrators are now Claude + Gemini only, and Windows drops the entire skip-with-warn block since there's nothing to skip. Repo slug renamed `dev-machine-setup` → `dev-setup` (display name "development-setup"); old curl|bash URLs continue to work via GitHub's permanent redirect, but the canonical install URL is now `raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh`.
+
+### Changed
+
+- **Repo renamed** `alexherrero/dev-machine-setup` → `alexherrero/dev-setup`. GitHub serves a permanent redirect from the old slug, so existing curl|bash / iwr|iex one-liners and `git clone` URLs keep working — but the new slug is canonical. README, docs, wiki, workflows, harness manifests, `install.sh` `REPO=` constant, and `install.ps1` `$Repo` constant all switched over. Project display name set to "development-setup" (slug stays `dev-setup`).
 
 ### Removed
 
