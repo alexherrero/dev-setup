@@ -37,7 +37,7 @@
 #     - configs/git/.gitconfig → ~/.gitconfig (user.name, user.email)
 #
 # Any pre-existing non-matching file at a destination is moved to
-# ~/.development-setup-backup/<utc-timestamp>/ before being replaced.
+# ~/.dev-setup-backup/<utc-timestamp>/ before being replaced.
 # Backup dir is lazy-created so a fully-idempotent re-run leaves no trace.
 
 set -euo pipefail
@@ -45,7 +45,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=scripts/lib/os.sh
 . "$REPO_ROOT/scripts/lib/os.sh"
-BACKUP_ROOT="$HOME/.development-setup-backup"
+BACKUP_ROOT="$HOME/.dev-setup-backup"
 TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 BACKUP_DIR="$BACKUP_ROOT/$TIMESTAMP"
 BACKED_UP=0
@@ -244,6 +244,22 @@ fi
 if [[ -L "$HOME/.claude/CLAUDE.md" ]]; then
   printf '    readlink  ~/.claude/CLAUDE.md -> %s\n' "$(readlink "$HOME/.claude/CLAUDE.md")"
 fi
+
+# Sibling-repo verification: the device-global CLAUDE.md uses @-imports
+# to pull in conventions from agentic-harness + agent-toolkit at the
+# canonical sibling-clone location. If a sibling isn't installed, the
+# @-import silently no-ops and only personal style applies — warn so the
+# user knows what's missing.
+sibling_dir="$(dirname "$REPO_ROOT")"
+for sibling_name in agentic-harness agent-toolkit; do
+  sibling_path="$sibling_dir/$sibling_name/AGENTS.md"
+  if [[ -f "$sibling_path" ]]; then
+    printf '    sibling   %-55s (@-import will resolve)\n' "$sibling_path"
+  else
+    printf '    WARN      %-55s (not installed — @-import will no-op)\n' "$sibling_path" >&2
+    printf '              Clone with: gh repo clone alexherrero/%s %s\n' "$sibling_name" "$sibling_dir/$sibling_name" >&2
+  fi
+done
 
 if ((BACKED_UP == 1)); then
   echo "    backups:  $BACKUP_DIR"
