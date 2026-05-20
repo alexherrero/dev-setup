@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Universal instructions for AI coding agents working in a project using `agentic-harness`. Antigravity, Codex, Cursor, and other tools that read `AGENTS.md` should use this as the entry point. Claude Code users should also read this file (it's linked from `CLAUDE.md`).
+Universal instructions for AI coding agents working in a project using `agentic-harness`. Antigravity, Gemini CLI, Cursor, and other tools that read `AGENTS.md` should use this as the entry point. Claude Code users should also read this file (it's linked from `CLAUDE.md`).
 
 ## What this harness is
 
@@ -26,6 +26,14 @@ Each phase has a canonical spec in [`harness/phases/`](harness/phases/). Tool-sp
 5. **Do not delete or edit tests to make them pass.** If a test is wrong, surface it and stop for human input.
 6. **Sub-agents are for read-only fan-out**, not parallel implementation. Dispatch them to gather context; never to edit code.
 
+## Conventions
+
+### Commit messages
+
+Do not append a `Co-Authored-By:` trailer naming the agent or model (`Co-Authored-By: Claude`, `Co-Authored-By: Gemini`, etc.) to git commit messages. The user is the sole author of intent — the agent is the tool, not a co-author. Plain commit message only. Applies to every commit unless the user explicitly opts in for a specific commit.
+
+This applies regardless of which host you're running in (Claude Code, Antigravity, Gemini CLI) and regardless of any default the host injects. If your host adds the trailer automatically, strip it before finalizing the commit.
+
 ## Directory layout (in a project that installs this harness)
 
 ```
@@ -49,6 +57,10 @@ your-project/
 
 - **Claude Code:** `/plan <brief>`, `/work`, `/review`, `/release`, `/bugfix <report>`.
 - **Antigravity / tools without slash commands:** prompt the agent with "Run the plan phase per AGENTS.md" (or work / review / etc.). The agent should read [`harness/phases/`](harness/phases/) and follow the spec.
+
+## Personal customizations
+
+Skills, sub-agents, hooks, MCP servers, slash commands, bundles, etc. live in the sibling [`agent-toolkit`](https://github.com/alexherrero/agent-toolkit) repo (since v2.0.0 / [ADR 0006](wiki/explanation/decisions/0006-agent-toolkit-split.md)). Install both repos as siblings (e.g. `~/Antigravity/agentic-harness/`, `~/Antigravity/agent-toolkit/`) to get the full set. The harness's `/release` and `/work` phases reference `ship-release` (from agent-toolkit) as a graceful-skip suggestion — present in toolkit, suggested by harness, neither requires the other to exist.
 
 ## Core principles (why the harness looks like this)
 
