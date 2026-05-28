@@ -13,7 +13,7 @@
 #               with one [SKIP] line each.
 #
 #   harness   — runs only when the current working dir contains .harness/
-#               (i.e. you're sitting inside an agentic-harness project).
+#               (i.e. you're sitting inside an agentm project).
 #               Checks the project-level Claude Code wiring: sub-agents,
 #               skills, slash commands, PostToolUse hook → .harness/verify.sh,
 #               and the Co-Authored-By kill-switch (includeCoAuthoredBy:false).

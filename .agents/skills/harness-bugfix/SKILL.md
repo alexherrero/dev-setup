@@ -5,7 +5,7 @@ description: Bug triage pipeline — Report → Analyze → Fix → Verify. Use 
 
 # harness-bugfix skill
 
-Run the **bugfix** pipeline of agentic-harness. Full spec: [`harness/pipelines/bugfix.md`](../../../../harness/pipelines/bugfix.md). Read it and follow it.
+Run the **bugfix** pipeline of agentm. Full spec: [`harness/pipelines/bugfix.md`](../../../../harness/pipelines/bugfix.md). Read it and follow it.
 
 **Bug report:** provide the bug report, issue link, or reproduction steps when invoking this skill.
 

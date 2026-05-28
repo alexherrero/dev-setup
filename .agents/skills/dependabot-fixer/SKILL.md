@@ -3,7 +3,7 @@ name: dependabot-fixer
 description: Fix breakage on a Dependabot PR. Trigger when (a) the current branch matches `dependabot/*` and CI is red, (b) the user asks to "fix the dependabot PR" / "make this dependency update pass". Reads failing CI logs and upstream CHANGELOG, applies a bounded fix loop, pushes commits to the Dependabot branch, comments residual risks on the PR. Never merges. Aborts honestly when the fix needs human judgment.
 ---
 
-You are running the `dependabot-fixer` skill. Full canonical spec: `harness/skills/dependabot-fixer.md` in the agentic-harness repo. The summary below is the operational version.
+You are running the `dependabot-fixer` skill. Full canonical spec: `harness/skills/dependabot-fixer.md` in the agentm repo. The summary below is the operational version.
 
 ## Preconditions (check first, abort if not met)
 

@@ -85,7 +85,7 @@ Each platform's orchestrator runs an ordered, idempotent stage list. `--dry-run`
 | [docs/first-run.md](docs/first-run.md) | Manual auth checklist (claude login, gh auth login, etc.) |
 | [docs/debian.md](docs/debian.md) | Debian/Ubuntu specifics — supported-distro matrix, toolchain detail |
 | [docs/windows.md](docs/windows.md) | Windows specifics — winget, MSIX redirect |
-| [docs/architecture.md](docs/architecture.md) | OS-dispatch architecture, repo layout, agentic-harness pointer |
+| [docs/architecture.md](docs/architecture.md) | OS-dispatch architecture, repo layout, agentm pointer |
 | [How to install via the one-liner](wiki/how-to/Install-Via-One-Liner.md) | One-line bootstrap recipe with flag-passing examples |
 | [Public curl\|bash installer — design](wiki/explanation/Public-Curl-Bash-Installer.md) | Why the bootstrap looks the way it does, trust model |
 | [Scripts reference](wiki/reference/Scripts.md) | Entry-point table — flags, exit codes, files written |

@@ -11,9 +11,22 @@ Never create git worktrees automatically. Always work directly on the current br
 
 Do not append a `Co-Authored-By: Claude …` trailer to git commit messages. The user is the sole author of intent — Claude is the tool, not a co-author. Plain commit message only. Applies to every repo and every commit unless the user explicitly opts in for a specific commit.
 
+## Push and confirmation
+
+Standard `git push` is a green-light operation — do not pre-confirm in conversation. The `~/.claude/settings.json` allowlist already encodes which push variants are auto-allowed (`git push`, `git push origin`, `git push -u:*`, `git push --set-upstream:*`, `git push origin HEAD:*`) and which route through `ask` (force / delete / branch-delete refspecs). Adding extra "is this OK?" ceremony on top of the harness gate is redundant.
+
+**Pre-announce + let the harness gate** (don't ask permission in conversation, but state what's about to happen so the gate prompt isn't surprising) for any push that semantically destroys or rewrites remote state:
+
+- `git push --force`, `git push -f`, `git push --force-with-lease`
+- `git push --delete <branch>`, `git push origin --delete <branch>`
+- `git push origin :<branch>` (refspec-deletion form)
+- `git push --tags` when it would overwrite published tags
+
+When in doubt, push. The operator can always reset or force-push back. Forcing them to micromanage routine pushes is the bigger cost. Applies to every repo on this device.
+
 ## GitHub `claude` contributor chip
 
-The user has accepted the residual `claude` entry in `mentionableUsers` / contributor sidebar on `alexherrero/agentic-harness` and `alexherrero/sherwood` (the former from cache lag after a history rewrite, the latter anchored to immutable closed PR #23). Do not propose a GitHub Support ticket, PR deletion, or any further cleanup for this. If the topic comes up again, treat it as resolved unless the user explicitly reopens it.
+The user has accepted the residual `claude` entry in `mentionableUsers` / contributor sidebar on `alexherrero/agentm` and `alexherrero/sherwood` (the former from cache lag after a history rewrite, the latter anchored to immutable closed PR #23). Do not propose a GitHub Support ticket, PR deletion, or any further cleanup for this. If the topic comes up again, treat it as resolved unless the user explicitly reopens it.
 
 ## Development flow conventions
 
@@ -56,10 +69,10 @@ When `check-wiki.py --strict` reports a soft length warning ("how-to page is N w
 
 ## Harness + toolkit conventions (auto-applied via sibling-repo imports)
 
-The following imports pull in conventions from sibling repos at the canonical clone location (`~/Antigravity/agentic-harness/`, `~/Antigravity/agent-toolkit/`). If a sibling repo isn't installed, the import is silently skipped — only the personal style above applies in that case.
+The following imports pull in conventions from sibling repos at the canonical clone location (`~/Antigravity/agentm/`, `~/Antigravity/crickets/`). If a sibling repo isn't installed, the import is silently skipped — only the personal style above applies in that case.
 
-When working in a project that has its own `agentic-harness` install (its own project-level `AGENTS.md` + `CLAUDE.md`), these device-global imports may duplicate the project-level instructions. That's harmless — the agent sees the same rules twice.
+When working in a project that has its own `agentm` install (its own project-level `AGENTS.md` + `CLAUDE.md`), these device-global imports may duplicate the project-level instructions. That's harmless — the agent sees the same rules twice.
 
-@~/Antigravity/agentic-harness/AGENTS.md
+@~/Antigravity/agentm/AGENTS.md
 
-@~/Antigravity/agent-toolkit/AGENTS.md
+@~/Antigravity/crickets/AGENTS.md

@@ -246,12 +246,12 @@ if [[ -L "$HOME/.claude/CLAUDE.md" ]]; then
 fi
 
 # Sibling-repo verification: the device-global CLAUDE.md uses @-imports
-# to pull in conventions from agentic-harness + agent-toolkit at the
+# to pull in conventions from agentm + crickets at the
 # canonical sibling-clone location. If a sibling isn't installed, the
 # @-import silently no-ops and only personal style applies — warn so the
 # user knows what's missing.
 sibling_dir="$(dirname "$REPO_ROOT")"
-for sibling_name in agentic-harness agent-toolkit; do
+for sibling_name in agentm crickets; do
   sibling_path="$sibling_dir/$sibling_name/AGENTS.md"
   if [[ -f "$sibling_path" ]]; then
     printf '    sibling   %-55s (@-import will resolve)\n' "$sibling_path"

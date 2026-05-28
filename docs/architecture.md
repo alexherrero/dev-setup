@@ -30,7 +30,7 @@ failure, or contributing.
 │   └── auth-checklist.ps1  Same for Windows
 ├── docs/                   First-run guide, Debian + Windows notes, this file
 ├── wiki/                   Diátaxis-shaped wiki (mirrored to GitHub Wiki on push)
-└── .harness/               agentic-harness state (PLAN.md, progress.md, hooks)
+└── .harness/               agentm state (PLAN.md, progress.md, hooks)
 ```
 
 ## OS-dispatch architecture
@@ -82,7 +82,7 @@ Linux build. See [docs/debian.md](debian.md#why-antigravity-isnt-supported-on-li
 
 ## Development
 
-This repo uses the [agentic-harness](https://github.com/alexherrero/agentic-harness)
+This repo uses the [agentm](https://github.com/alexherrero/agentm)
 phase-gated workflow. Work is organized around `/plan` → `/work` →
 `/review` → `/release`. State lives under `.harness/`; documentation
 lives under `wiki/`. See [CLAUDE.md](../CLAUDE.md) and

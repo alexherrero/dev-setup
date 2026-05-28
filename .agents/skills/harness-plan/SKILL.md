@@ -5,7 +5,7 @@ description: Turn a brief into .harness/PLAN.md with per-task verification crite
 
 # harness-plan skill
 
-Run the **plan** phase of agentic-harness. Full spec: [`harness/phases/02-plan.md`](../../../../harness/phases/02-plan.md). Read it and follow it.
+Run the **plan** phase of agentm. Full spec: [`harness/phases/02-plan.md`](../../../../harness/phases/02-plan.md). Read it and follow it.
 
 **Brief:** provide the brief when invoking this skill (free text, ticket link, or reference to a document).
 

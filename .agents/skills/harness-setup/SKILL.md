@@ -1,11 +1,11 @@
 ---
 name: harness-setup
-description: First-time project scaffold for agentic-harness. Populates init.sh with real commands, verifies it boots, seeds AGENTS.md, features.json, and the wiki/ scaffold. Run once per project. Prefixed harness- to avoid collision with Codex built-ins. Does not plan — planning is the harness-plan skill.
+description: First-time project scaffold for agentm. Populates init.sh with real commands, verifies it boots, seeds AGENTS.md, features.json, and the wiki/ scaffold. Run once per project. Prefixed harness- to avoid collision with Codex built-ins. Does not plan — planning is the harness-plan skill.
 ---
 
 # harness-setup skill
 
-Run the **setup** phase of agentic-harness. Full spec: [`harness/phases/01-setup.md`](../../../../harness/phases/01-setup.md). Read it and follow it.
+Run the **setup** phase of agentm. Full spec: [`harness/phases/01-setup.md`](../../../../harness/phases/01-setup.md). Read it and follow it.
 
 ## Non-negotiable constraints
 

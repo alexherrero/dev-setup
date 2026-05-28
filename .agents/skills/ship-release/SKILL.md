@@ -3,7 +3,7 @@ name: ship-release
 description: Cut a tagged GitHub release from the default branch. Trigger when the user says "ship a release", "cut a release", "tag a release". Auto-sizes the semver bump from conventional-commit prefixes in the commit range since the last tag — patch / minor / major — and respects an explicit size hint (`patch|minor|major`) or exact version (`vX.Y.Z`). Writes CHANGELOG.md, tags, pushes, creates the GitHub release. Aborts if the tree is dirty, the default branch isn't pushed, or the tag already exists.
 ---
 
-You are running the `ship-release` skill. Full canonical spec: `harness/skills/ship-release.md` in the agentic-harness repo. The summary below is the operational version.
+You are running the `ship-release` skill. Full canonical spec: `harness/skills/ship-release.md` in the agentm repo. The summary below is the operational version.
 
 ## Preconditions (check first, abort if not met)
 

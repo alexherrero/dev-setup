@@ -5,7 +5,7 @@ description: Implement exactly one task from .harness/PLAN.md. Stop after one. R
 
 # harness-work skill
 
-Run the **work** phase of agentic-harness. Full spec: [`harness/phases/03-work.md`](../../../../harness/phases/03-work.md). Read it and follow it.
+Run the **work** phase of agentm. Full spec: [`harness/phases/03-work.md`](../../../../harness/phases/03-work.md). Read it and follow it.
 
 **Argument (optional):** a specific task number (e.g. "task 3") instead of the next unchecked one.
 

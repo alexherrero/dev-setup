@@ -34,7 +34,7 @@ jobs:
           # -x follows `source` statements; every script that sources lib/os.sh
           # already has a `# shellcheck source=scripts/lib/os.sh` annotation,
           # so cross-file checks resolve without SC1091 noise.
-          # .harness/ is vendored from agentic-harness — upstream's lint
+          # .harness/ is vendored from agentm — upstream's lint
           # responsibility, not ours. We own setup.sh + scripts/*.sh.
           find . -type f -name '*.sh' \
             -not -path './.git/*' -not -path './.harness/*' -print0 \
@@ -50,7 +50,7 @@ jobs:
       - name: pwsh AST parse — validate all .ps1 files
         shell: pwsh
         run: |
-          # .harness/ is vendored from agentic-harness; upstream's lint
+          # .harness/ is vendored from agentm; upstream's lint
           # responsibility. We own setup.ps1 + scripts/*.ps1.
           $files = Get-ChildItem -Recurse -Filter *.ps1 |
             Where-Object { $_.FullName -notmatch '[\\/]\.harness[\\/]' }
@@ -82,13 +82,13 @@ jobs:
         # and docs/. Other markdown is excluded by scope:
         # - AGENTS.md, CLAUDE.md: AI-agent meta-docs with known
         #   upstream-pointing harness/ references (resolved at the
-        #   agentic-harness repo, not locally).
+        #   agentm repo, not locally).
         # - wiki/: own publication pipeline (wiki-sync.yml mirrors to
         #   GitHub Wiki); uses GitHub-Wiki shortlinks (page-by-basename,
         #   no .md extension) that lychee's filesystem checker can't
         #   resolve.
         # - .harness/, .agent/, .agents/, .codex/, .gemini/, .claude/:
-        #   vendored from agentic-harness; upstream's responsibility.
+        #   vendored from agentm; upstream's responsibility.
         # External http(s) URLs excluded to avoid third-party rate-limit
         # flakiness — verification of those stays a manual release-time
         # concern.
