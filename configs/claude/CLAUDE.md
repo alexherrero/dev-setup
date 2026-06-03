@@ -44,7 +44,7 @@ Apply by default in any project that uses a plan-driven workflow (signal: `.harn
 
 - **Locked design calls section** at the bottom of every plan — capture the resolutions to open design questions so they don't drift mid-plan.
 - **Task `Status: [x]` annotations** include a paragraph-long narrative of what shipped, not just the checkmark. The next session's context is whatever this captures.
-- **When a plan completes** (last task `[x]`): flip plan-level `Status: done`, append end-of-plan summary to `progress.md`, move the corresponding ROADMAP item to Completed with a full narrative (release links + scope + what shipped + what's deferred), archive the active `PLAN.md` to `PLAN.archive.YYYYMMDD-<slug>.md` when the next plan starts.
+- **When a plan completes** (last task `[x]`), run the close-out in order as the final steps of the plan: flip plan-level `Status: done`, append end-of-plan summary to `progress.md`, move the corresponding ROADMAP item to Completed with a full narrative (release links + scope + what shipped + what's deferred), and **archive the active `PLAN.md` to `PLAN.archive.YYYYMMDD-<slug>.md` right then — as the final close-out step, not when the next plan starts.** (This matches the agentm harness's own `05-release.md`, which archives the completed plan at release time.)
 
 ### CHANGELOG + ADR shapes
 
