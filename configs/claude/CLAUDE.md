@@ -28,6 +28,16 @@ When in doubt, push. The operator can always reset or force-push back. Forcing t
 
 The user has accepted the residual `claude` entry in `mentionableUsers` / contributor sidebar on `alexherrero/agentm` and `alexherrero/sherwood` (the former from cache lag after a history rewrite, the latter anchored to immutable closed PR #23). Do not propose a GitHub Support ticket, PR deletion, or any further cleanup for this. If the topic comes up again, treat it as resolved unless the user explicitly reopens it.
 
+## Token discipline
+
+Token budget is a hard daily constraint — the standing goal is all-day-autonomous coding on a smaller Claude plan, so treat tokens as scarce in every session. Defaults:
+
+- **`Edit`, not `Write`, for existing files.** Output is billed ~5× input, and `Write` re-emits the whole file as output tokens while `Edit` emits only the changed strings. Reserve `Write` for new files or a near-total rewrite.
+- **Stay silent between tool calls.** Don't narrate each step — surface a line only when you find something load-bearing, change direction, or hit a blocker. (This trims inter-tool chatter only; it does *not* shrink the detailed end-of-task status report the dev-flow convention below asks for.)
+- **`/clear`, not `/compact`, at phase boundaries.** State is on disk (`PLAN.md` / `progress.md`); a compaction summary is redundant work that also re-bills on every later turn. `/clear` after `progress.md` is written — never mid-task.
+- **Stagger agents; don't multiply them.** Time-shift the per-repo sessions so their growing contexts don't co-exist in one 5-hour window, and `/clear` idle ones. Use subagents (prefer the cheap-floor `Explore`) to keep a session's own context small — but spinning up many parallel full sessions for throughput multiplies the per-agent floor (~15×).
+- **Route the model to the work.** `opusplan` (Opus plans, Sonnet executes the long phase) for token-heavy build sessions; keep full Opus for planning and audit. Set it per session with `/model opusplan`, and flag it if you notice an expensive model doing cheap work.
+
 ## Development flow conventions
 
 Apply by default in any project that uses a plan-driven workflow (signal: `.harness/PLAN.md` or `.harness/ROADMAP.md` present). The user will say so if a particular session wants a leaner style.
@@ -67,12 +77,6 @@ Don't mark tasks `[x]` speculatively. Push → schedule a ~90s wake → close ou
 
 When `check-wiki.py --strict` reports a soft length warning ("how-to page is N words, soft ceiling 600; consider splitting") and the content is genuinely load-bearing (worked scenarios, troubleshooting), it's acceptable to keep the page intact. Explicitly note the trade-off in the commit message / CHANGELOG.
 
-## Harness + toolkit conventions (auto-applied via sibling-repo imports)
+## Harness + toolkit conventions (loaded per-project, not globally)
 
-The following imports pull in conventions from sibling repos at the canonical clone location (`~/Antigravity/agentm/`, `~/Antigravity/crickets/`). If a sibling repo isn't installed, the import is silently skipped — only the personal style above applies in that case.
-
-When working in a project that has its own `agentm` install (its own project-level `AGENTS.md` + `CLAUDE.md`), these device-global imports may duplicate the project-level instructions. That's harmless — the agent sees the same rules twice.
-
-@~/Antigravity/agentm/AGENTS.md
-
-@~/Antigravity/crickets/AGENTS.md
+The `agentm` and `crickets` conventions are imported by each repo's own `CLAUDE.md`, not here: `@AGENTS.md` in `~/Antigravity/agentm/CLAUDE.md`, and `@AGENTS.md` + `@~/Antigravity/agentm/AGENTS.md` in `~/Antigravity/crickets/CLAUDE.md` (crickets runs on the agentm phase harness, so it loads both). This is the token-efficiency floor-trim (2026-06-13): a project that isn't agentm/crickets no longer re-reads either `AGENTS.md` on every tool call × every agent, and an agentm session no longer carries the crickets-only conventions. Do not re-add the global imports — that re-inflates the per-call floor for every project on the machine.
