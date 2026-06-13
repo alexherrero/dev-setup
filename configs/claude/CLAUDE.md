@@ -5,7 +5,7 @@
 
 ## Worktrees
 
-Never create git worktrees automatically. Always work directly on the current branch (typically `main`). Do not call `EnterWorktree` unless the user explicitly asks for a worktree session.
+Git worktrees are a first-class workflow, but always **operator-initiated** — never spawn one autonomously (not as cleanup, not as a convenience for another task, not as a side effect). Creating a worktree is the operator's act: they run the sanctioned command (e.g. `/spawn-worker`, where their invocation *is* the initiation) or explicitly ask. Absent that, work directly on the current branch (typically `main`), and do not call `EnterWorktree` on your own initiative. The line is initiation, not the worktree itself.
 
 ## Commit messages
 
