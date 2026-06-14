@@ -13,16 +13,18 @@ Do not append a `Co-Authored-By: Claude …` trailer to git commit messages. The
 
 ## Push and confirmation
 
-Standard `git push` is a green-light operation — do not pre-confirm in conversation. The `~/.claude/settings.json` allowlist already encodes which push variants are auto-allowed (`git push`, `git push origin`, `git push -u:*`, `git push --set-upstream:*`, `git push origin HEAD:*`) and which route through `ask` (force / delete / branch-delete refspecs). Adding extra "is this OK?" ceremony on top of the harness gate is redundant.
+The stop-gate on a push is **recoverability, not destructiveness or blast-radius** — the same doctrine the developer-workflows execution commands (`/work`, `/bugfix`, `/release`) inline verbatim. A recoverable push proceeds (announced); only a genuinely unrecoverable one stops for confirmation. The `~/.claude/settings.json` allowlist encodes the mechanical floor: `git push`, `git push origin`, `git push -u:*`, `git push --set-upstream:*`, `git push origin HEAD:*` are auto-allowed; force / delete / branch-delete refspecs route through `ask`. Adding extra "is this OK?" ceremony in conversation on top of that gate is redundant.
 
-**Pre-announce + let the harness gate** (don't ask permission in conversation, but state what's about to happen so the gate prompt isn't surprising) for any push that semantically destroys or rewrites remote state:
+**Recoverable → announce + proceed** (no confirmation wait, no conversational pre-confirm): standard `git push` / `-u` / `HEAD:`; create + push a tag; force-push to your **own un-shared** branch (you can force-push back); delete a branch whose tip is still reachable.
 
-- `git push --force`, `git push -f`, `git push --force-with-lease`
-- `git push --delete <branch>`, `git push origin --delete <branch>`
-- `git push origin :<branch>` (refspec-deletion form)
-- `git push --tags` when it would overwrite published tags
+**Unrecoverable → pre-announce + let the harness gate stop you** (state what's about to happen so the `ask` prompt isn't surprising; don't ask permission in conversation, but don't slip it past either):
 
-When in doubt, push. The operator can always reset or force-push back. Forcing them to micromanage routine pushes is the bigger cost. Applies to every repo on this device.
+- `git push --force` / `-f` / `--force-with-lease` that **rewrites published, shared** history
+- sole-ref delete of unmerged work — `git push --delete <branch>`, `git push origin --delete <branch>`, or `git push origin :<branch>` (refspec-deletion form) — when the tip is no longer reachable
+- `git push --tags` that would **overwrite a published tag**
+- any immutable publish / deploy / migration reached through a push
+
+When in doubt about a **routine** push, push — the operator can always reset or force-push back, and forcing them to micromanage routine pushes is the bigger cost. When uncertain whether a **destructive** push is recoverable, treat it as unrecoverable (the conservative default the doctrine names). Applies to every repo on this device.
 
 ## GitHub `claude` contributor chip
 
