@@ -5,7 +5,7 @@
 
 ## Worktrees
 
-Git worktrees are a first-class workflow, but always **operator-initiated** — never spawn one autonomously (not as cleanup, not as a convenience for another task, not as a side effect). Creating a worktree is the operator's act: they run the sanctioned command (e.g. `/spawn-worker`, where their invocation *is* the initiation) or explicitly ask. Absent that, work directly on the current branch (typically `main`), and do not call `EnterWorktree` on your own initiative. The line is initiation, not the worktree itself.
+Git worktrees are a first-class workflow, but **operator authority is required** — never spawn one without it. Authority = an explicit operator command (e.g. `/spawn-worker`, where the invocation *is* the initiation) OR a durable `isolation.mode: worktree-per-plan` config opt-in in `.harness/project.json`. Silent authority-free auto-spawn stays forbidden (not as cleanup, not as a convenience for another task, not as a side effect). Absent operator authority, work directly on the current branch (typically `main`), and do not call `EnterWorktree` on your own initiative. The line is authority, not the worktree itself. (ADR 0028, 2026-06-14, refines ADR 0022.)
 
 ## Commit messages
 
