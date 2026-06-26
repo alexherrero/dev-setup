@@ -1,8 +1,8 @@
 # How to bootstrap a new Debian or Ubuntu host
 
 > [!NOTE]
-> **Status:** implemented (v2.0.0) — CI-verified end-to-end on `ubuntu-latest`.
-> **Goal:** Take a fresh Debian or Ubuntu host from zero to a working CLI-only AI dev environment — Claude Code, Gemini CLI, optionally OpenAI Codex CLI, plus the `node` / `gh` / `jq` / `ripgrep` / `shellcheck` / `shfmt` toolchain.
+> **Status:** implemented (v4.0.0) — CI-verified end-to-end on `ubuntu-latest`.
+> **Goal:** Take a fresh Debian or Ubuntu host from zero to a working CLI-only AI dev environment — Claude Code, Gemini CLI, plus the `node` / `gh` / `jq` / `ripgrep` / `shellcheck` / `shfmt` toolchain.
 > **Prereqs:** `sudo` on the target host; internet access; a supported distro (see the matrix in [`docs/debian.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/debian.md#supported-distros)). The `git clone` flow needs `git` installed; the curl|bash one-liner does not.
 
 `setup.sh` detects Linux via `scripts/lib/os.sh` and runs a CLI-only plan: `apt → clis → link-configs → verify-install → auth-checklist`. There is no `gui-apps` stage — see [why](#why-no-gui-apps-on-linux) below. The curl|bash one-liner is the recommended path on a fresh host because it removes the `git` prereq — see [Install via the one-liner](Install-Via-One-Liner).

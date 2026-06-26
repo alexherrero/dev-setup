@@ -1,8 +1,7 @@
 # How to install via the one-liner bootstrap
 
 > [!NOTE]
-> **Status:** implemented
-> **Plan:** [.harness/PLAN.md](../../.harness/PLAN.md) — `feat-curl-bash-installer`, tasks 5–6.
+> **Status:** implemented — shipped in v3.0.0 (`feat-curl-bash-installer`).
 > **Goal:** Bootstrap a fresh Mac, Debian/Ubuntu host, or Windows machine from zero to a fully configured AI-first dev environment with a single command — no `git clone` required.
 > **Prereqs:** `curl` (or `wget`) on POSIX; PowerShell 7+ recommended on Windows (5.1 likely works for the bootstrap itself but isn't routinely tested); admin / sudo on the target host; internet access.
 

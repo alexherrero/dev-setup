@@ -89,7 +89,7 @@ Each platform's orchestrator runs an ordered, idempotent stage list. `--dry-run`
 | [How to install via the one-liner](wiki/how-to/Install-Via-One-Liner.md) | One-line bootstrap recipe with flag-passing examples |
 | [Public curl\|bash installer — design](wiki/explanation/Public-Curl-Bash-Installer.md) | Why the bootstrap looks the way it does, trust model |
 | [Scripts reference](wiki/reference/Scripts.md) | Entry-point table — flags, exit codes, files written |
-| [.harness/PLAN.md](.harness/PLAN.md) | Current plan and verification criteria |
+| [CHANGELOG.md](CHANGELOG.md) | Release history (Keep a Changelog) |
 
 ## Testing
 

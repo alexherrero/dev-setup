@@ -1,8 +1,7 @@
 # Scripts reference
 
 > [!NOTE]
-> **Status:** implemented
-> **Plan:** [.harness/PLAN.md](../../.harness/PLAN.md) — `feat-curl-bash-installer`, tasks 5–6.
+> **Status:** implemented — shipped in v3.0.0 (`feat-curl-bash-installer`).
 
 The canonical lookup surface for the repo-root entry-point scripts — the curl|bash bootstrap (`install.sh` / `install.ps1`) and the orchestrators they hand off to (`setup.sh` / `setup.ps1`). Per-stage scripts under `scripts/` are documented inline in the source; this page only covers the public entry points users invoke directly.
 

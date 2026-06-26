@@ -57,7 +57,7 @@ error. You can force the Debian path on a Mac for testing with
 
 ```
 apt              Install apt formulae (NodeSource node 22, gh, jq, ripgrep, shellcheck, shfmt)
-clis             Install Claude Code CLI (curl) + Gemini CLI + Codex CLI (npm globals)
+clis             Install Claude Code CLI (curl) + Gemini CLI (npm global)
 link-configs     Place captured configs from configs/ into their OS locations
 verify-install   Health-check the install (warn-only — tools, configs, agents, skills)
 auth-checklist   Print the manual auth steps (claude login, gh auth login, etc.)
@@ -146,7 +146,7 @@ itself may be installing in the same run).
 ## Reference
 
 - [first-run.md](first-run.md) — auth checklist for all platforms.
-- [windows.md](windows.md) — Windows specifics (winget, MSIX redirect, Codex caveat).
+- [windows.md](windows.md) — Windows specifics (winget, MSIX redirect).
 - [architecture.md](architecture.md) — repo layout and OS-dispatch architecture.
 - [scripts/install-apt.sh](../scripts/install-apt.sh) — the apt
   install stage.

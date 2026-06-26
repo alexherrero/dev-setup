@@ -19,7 +19,7 @@ failure, or contributing.
 │   ├── install-apt.sh      Debian toolchain (apt + NodeSource + gh repos)
 │   ├── install-tooling.ps1 Windows toolchain (winget: Git, Node LTS, gh, ripgrep)
 │   ├── install-clis.sh     Claude Code CLI + Gemini CLI
-│   ├── install-clis.ps1    Same for Windows (Claude via winget; Gemini via npm; Codex skip-with-warn)
+│   ├── install-clis.ps1    Same for Windows (Claude via winget; Gemini via npm)
 │   ├── install-gui-apps.sh Mac-only GUI apps (browser-assisted)
 │   ├── install-gui-apps.ps1 Windows GUI apps (winget Antigravity + Claude Desktop)
 │   ├── link-configs.sh     Place captured configs at OS-native paths
@@ -30,7 +30,7 @@ failure, or contributing.
 │   └── auth-checklist.ps1  Same for Windows
 ├── docs/                   First-run guide, Debian + Windows notes, this file
 ├── wiki/                   Diátaxis-shaped wiki (mirrored to GitHub Wiki on push)
-└── .harness/               agentm state (PLAN.md, progress.md, hooks)
+└── .harness/               agentm harness — tracked hooks + scripts (durable plan/progress/roadmap live in the vault, not here)
 ```
 
 ## OS-dispatch architecture
@@ -71,9 +71,6 @@ Linux build. See [docs/debian.md](debian.md#why-antigravity-isnt-supported-on-li
 - **Idempotent everywhere.** Every stage detects already-applied state
   and skips. Pre-existing destination files are moved to
   `~/.development-setup-backup/<utc>/` before being replaced.
-- **Codex opt-in.** Codex is the only CLI a user might actively *not*
-  want (paid OpenAI account, separate auth). Default-off keeps the
-  baseline run frictionless.
 - **No `git` prereq via `install.sh` / `install.ps1`.** The bootstrap
   fetches the latest tagged release source archive over plain HTTPS,
   which is universally available. The trust boundary is GitHub's TLS
@@ -87,7 +84,7 @@ phase-gated workflow. Work is organized around `/plan` → `/work` →
 `/review` → `/release`. State lives under `.harness/`; documentation
 lives under `wiki/`. See [CLAUDE.md](../CLAUDE.md) and
 [AGENTS.md](../AGENTS.md) for the agent entry points, and
-[.harness/verify.sh](../.harness/verify.sh) for the per-file lint gate
+`.harness/verify.sh` for the per-file lint gate
 wired into `PostToolUse`.
 
 ## Related

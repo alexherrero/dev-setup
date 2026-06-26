@@ -1,8 +1,7 @@
 # Public curl|bash installer — design
 
 > [!NOTE]
-> **Status:** implemented
-> **Plan:** [.harness/PLAN.md](../../.harness/PLAN.md) — `feat-curl-bash-installer`, tasks 4–6.
+> **Status:** implemented — shipped in v3.0.0 (`feat-curl-bash-installer`).
 
 The intent, trust model, and shape of the public one-liner bootstrap (`curl … | bash` on macOS / Linux, `iwr … | iex` or temp-file pattern on Windows) that pins to the latest GitHub release tag and then hands off to the existing `setup.sh` / `setup.ps1` orchestrators.
 
@@ -59,4 +58,3 @@ Forks, mirrors, and cached copies of `install.sh` / `install.ps1` after the visi
 - [Install via one-liner](../how-to/Install-Via-One-Liner) — the user-facing recipe.
 - [Scripts reference](../reference/Scripts) — flags, exit codes, file layout.
 - [Development setup — design](Development-Setup-Design) — the orchestrator that the bootstrap hands off to.
-- [.harness/PLAN.md](../../.harness/PLAN.md) — full task list, constraints, and verification strategy.

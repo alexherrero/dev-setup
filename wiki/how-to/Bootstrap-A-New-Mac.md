@@ -1,7 +1,7 @@
 # How to bootstrap a new Mac
 
 > [!NOTE]
-> **Status:** implemented (v2.0.0) — CI-verified end-to-end on `macos-latest`.
+> **Status:** implemented (v4.0.0) — CI-verified end-to-end on `macos-latest`.
 > **Goal:** Take a fresh Mac from zero to a fully configured AI-first dev environment — Antigravity, Gemini Desktop, Claude Desktop, the Claude Code / antigravity / gemini CLIs, supporting Homebrew tooling, and all captured config files in place.
 > **Prereqs:** Admin on the target Mac; internet access. The `git clone` flow needs a GitHub account; the curl|bash one-liner does not.
 

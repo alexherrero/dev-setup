@@ -104,7 +104,6 @@ re-run `setup.ps1` (or just the link-configs stage:
   Community Electron wrappers (`bwendell/gemini-desktop`,
   `dortanes/gemini-desktop`) are out of scope. Use the Gemini CLI
   (which IS installed) or Gemini in the browser.
-- **Install Codex CLI.** See above.
 - **Capture live Windows configs back to the repo.** No
   `scripts\capture.ps1` Windows variant in this scope. The current
   configs come from a Mac reference machine; Windows installs use
@@ -115,7 +114,7 @@ re-run `setup.ps1` (or just the link-configs stage:
 ```
 setup.ps1                    Top-level orchestrator
 scripts\install-tooling.ps1  winget toolchain (Git, Node LTS, gh, ripgrep)
-scripts\install-clis.ps1     Claude (winget) + Gemini (npm) + Codex (skip)
+scripts\install-clis.ps1     Claude (winget) + Gemini (npm)
 scripts\install-gui-apps.ps1 Antigravity + Claude Desktop (winget)
 scripts\link-configs.ps1     Place captured configs at Windows paths
 scripts\verify-install.ps1   Warn-only post-setup health check
@@ -144,8 +143,7 @@ scripts\auth-checklist.ps1   Print manual auth steps
 - [first-run.md](first-run.md) — manual auth checklist (claude login,
   gh auth login, etc.).
 - [debian.md](debian.md) — Debian/Ubuntu CLI-only path (no GUI apps).
-- [.harness/PLAN.md](../.harness/PLAN.md) — `feat-windows-cli-support`
-  task list.
+- [CHANGELOG.md](../CHANGELOG.md) — release history (Keep a Changelog).
 - [scripts/install-tooling.ps1](../scripts/install-tooling.ps1) — winget
   toolchain installer.
 - [scripts/install-clis.ps1](../scripts/install-clis.ps1) — CLI agent

@@ -1,8 +1,8 @@
 # Development setup — design
 
 > [!NOTE]
-> **Status:** implemented — Mac, Debian/Ubuntu, and Windows all CI-verified end-to-end at v2.0.0.
-> **Plan:** [.harness/PLAN.md](../../.harness/PLAN.md) — features `feat-mac-one-shot-setup`, `feat-debian-cli-support`, `feat-ci-verification`, `feat-windows-cli-support`.
+> **Status:** implemented — Mac, Debian/Ubuntu, and Windows all CI-verified end-to-end; current release v4.0.0.
+> **Features:** `feat-mac-one-shot-setup`, `feat-debian-cli-support`, `feat-ci-verification`, `feat-windows-cli-support`, `feat-curl-bash-installer`. See the [CHANGELOG](https://github.com/alexherrero/dev-setup/blob/main/CHANGELOG.md) for release history.
 
 ## Intent
 
@@ -49,4 +49,4 @@ setup.sh / setup.ps1
 - [Scripts reference](../reference/Scripts) — flags, exit codes, files written.
 - [`docs/architecture.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/architecture.md) — in-repo architecture overview (full repo layout tree).
 - [`docs/debian.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/debian.md) — Debian reference (supported-distro matrix, toolchain detail).
-- [`docs/windows.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/windows.md) — Windows reference (winget, MSIX redirect, Codex caveat).
+- [`docs/windows.md`](https://github.com/alexherrero/dev-setup/blob/main/docs/windows.md) — Windows reference (winget, MSIX redirect).
