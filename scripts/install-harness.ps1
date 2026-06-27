@@ -63,4 +63,16 @@ else {
 }
 
 Write-Host '    agentm: installed/updated (--scope user)'
+
+# --- Python memory engine: venv + requirements (decision D, gated) ----------
+$AgentmVenv = if ($env:AGENTM_VENV) { $env:AGENTM_VENV } else { Join-Path $HOME '.agentm/venv' }
+$py = Get-Command python3.13 -ErrorAction SilentlyContinue
+if (-not $py) { $py = Get-Command python -ErrorAction SilentlyContinue }
+$pyPath = if ($py) { $py.Path } else { 'python' }
+Write-Host ('  python  venv={0}  interpreter={1}' -f $AgentmVenv, $pyPath)
+if (-not $py) { Invoke-Run 'winget' @('install', '--id', 'Python.Python.3.13', '-e') }
+if (-not (Test-Path -LiteralPath $AgentmVenv)) { Invoke-Run $pyPath @('-m', 'venv', $AgentmVenv) }
+Invoke-Run (Join-Path $AgentmVenv 'Scripts/pip.exe') @('install', '--upgrade', '-r', (Join-Path $AgentmClone 'requirements.txt'))
+Write-Host '    python: memory-engine deps in venv'
+
 exit 0

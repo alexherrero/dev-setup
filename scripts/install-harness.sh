@@ -27,8 +27,13 @@ set -euo pipefail
 
 DRY_RUN="${DRY_RUN:-0}"
 
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=scripts/lib/os.sh
+. "$REPO_ROOT/scripts/lib/os.sh" # sets $OS (macos|debian)
+
 AGENTM_REPO="${AGENTM_REPO:-https://github.com/alexherrero/agentm.git}"
 AGENTM_CLONE="${AGENTM_CLONE:-$HOME/Antigravity/agentm}"
+AGENTM_VENV="${AGENTM_VENV:-$HOME/.agentm/venv}"
 
 # run — exec a command, or print it under DRY_RUN=1. Read-only probes (file
 # tests, directory checks) run for real either way, so the dry-run still
@@ -63,6 +68,32 @@ if [[ "$DRY_RUN" != "1" && ! -f "$installer" ]]; then
   exit 1
 fi
 run env CI=true bash "$installer" --scope user
-
 echo "    agentm: installed/updated (--scope user)"
+
+# --- Python memory engine: venv + requirements (decision D, gated) ----------
+# The MCP memory daemon (task 6) runs from this venv's interpreter, so deps live
+# in the venv — not system site-packages (homebrew python is PEP-668 externally-
+# managed). These are heavy (sentence-transformers etc.); gated behind the
+# opt-in --with-harness flag so base installs stay lean.
+PYTHON_BIN="$(command -v python3.13 || command -v python3 || true)"
+echo "  python  venv=${AGENTM_VENV}  interpreter=${PYTHON_BIN:-<none>}"
+if [[ -z "$PYTHON_BIN" ]]; then
+  if [[ "$OS" == "macos" ]]; then
+    run brew install python@3.13
+    PYTHON_BIN="/opt/homebrew/bin/python3.13"
+  else
+    echo "    FAIL: no python3 found (need >=3.10 for the memory engine)" >&2
+    [[ "$DRY_RUN" == "1" ]] || exit 1
+    PYTHON_BIN="python3"
+  fi
+fi
+[[ -d "$AGENTM_VENV" ]] || run "$PYTHON_BIN" -m venv "$AGENTM_VENV"
+reqs="$AGENTM_CLONE/requirements.txt"
+if [[ "$DRY_RUN" != "1" && ! -f "$reqs" ]]; then
+  echo "    WARN: $reqs not found — skipping memory-engine deps" >&2
+else
+  run "$AGENTM_VENV/bin/pip" install --upgrade -r "$reqs"
+fi
+echo "    python: memory-engine deps in venv"
+
 exit 0
