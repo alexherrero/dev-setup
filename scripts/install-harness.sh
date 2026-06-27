@@ -46,6 +46,41 @@ run() {
   "$@"
 }
 
+# harness_clone — clone a sibling repo, failing GRACEFULLY. A cloud/web session
+# (e.g. Codespaces) commonly scopes GitHub egress to the launching repo, so
+# sibling clones (agentm, crickets) hit the session git-proxy and return HTTP
+# 403. The harness scripts are correct — the repos are simply unreachable. Rather
+# than let `set -e` abort the whole run at exit 128, detect the failure, print
+# actionable guidance, and skip the opt-in harness stage (the base install is
+# unaffected). DRY_RUN routes through run() and never reaches the failure path.
+harness_clone() {
+  local repo="$1" dest="$2" name="$3"
+  run mkdir -p "$(dirname "$dest")"
+  if [[ "$DRY_RUN" == "1" ]]; then
+    run git clone "$repo" "$dest"
+    return 0
+  fi
+  local out
+  if out="$(git clone "$repo" "$dest" 2>&1)"; then
+    return 0
+  fi
+  printf '%s\n' "$out" >&2
+  if printf '%s' "$out" | grep -q '403'; then
+    cat >&2 <<EOF
+    SKIP: harness layer — cannot reach $name ($repo) under this session's GitHub scope.
+      Cloud/web sessions often limit GitHub egress to the launching repo, so sibling
+      clones return HTTP 403. The scripts are correct; the repos are just unreachable here.
+      Fix: broaden the session's GitHub scope to include the harness repos, point
+      AGENTM_REPO / CRICKETS_REPO at reachable mirrors, or see ROADMAP DS-5
+      (first-class cloud support — pip/npm-published artifacts).
+EOF
+  else
+    printf '    SKIP: harness layer — failed to clone %s (%s).\n' "$name" "$repo" >&2
+  fi
+  echo "    Skipping the rest of the opt-in harness stage; base install unaffected." >&2
+  exit 0
+}
+
 echo "==> harness (opt-in)"
 [[ "$DRY_RUN" == "1" ]] && echo "    (dry-run — printing actions, mutating nothing)"
 
@@ -58,8 +93,7 @@ echo "  agentm  ${AGENTM_REPO} -> ${AGENTM_CLONE}"
 if [[ -d "$AGENTM_CLONE/.git" ]]; then
   run git -C "$AGENTM_CLONE" pull --ff-only
 else
-  run mkdir -p "$(dirname "$AGENTM_CLONE")"
-  run git clone "$AGENTM_REPO" "$AGENTM_CLONE"
+  harness_clone "$AGENTM_REPO" "$AGENTM_CLONE" "agentm"
 fi
 
 installer="$AGENTM_CLONE/install.sh"
@@ -134,8 +168,7 @@ echo "  crickets  marketplace=${CRICKETS_REPO_SLUG} (github)  clone=${CRICKETS_C
 if [[ -d "$CRICKETS_CLONE/.git" ]]; then
   run git -C "$CRICKETS_CLONE" pull --ff-only
 else
-  run mkdir -p "$(dirname "$CRICKETS_CLONE")"
-  run git clone "https://github.com/${CRICKETS_REPO_SLUG}.git" "$CRICKETS_CLONE"
+  harness_clone "https://github.com/${CRICKETS_REPO_SLUG}.git" "$CRICKETS_CLONE" "crickets"
 fi
 # Register the github-source marketplace if absent; else refresh it (decision B).
 if [[ "$DRY_RUN" == "1" ]]; then
