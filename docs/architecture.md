@@ -70,7 +70,7 @@ Linux build. See [docs/debian.md](debian.md#why-antigravity-isnt-supported-on-li
   back into the repo.
 - **Idempotent everywhere.** Every stage detects already-applied state
   and skips. Pre-existing destination files are moved to
-  `~/.development-setup-backup/<utc>/` before being replaced.
+  `~/.dev-setup-backup/<utc>/` before being replaced.
 - **No `git` prereq via `install.sh` / `install.ps1`.** The bootstrap
   fetches the latest tagged release source archive over plain HTTPS,
   which is universally available. The trust boundary is GitHub's TLS

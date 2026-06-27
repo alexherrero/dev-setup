@@ -1,2 +1,13 @@
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+
+# agentm MemoryVault path (DS-2) — resolve from .agentm-config.json if present.
+# No-ops cleanly when jq or the config is absent (e.g. base install, no harness).
+if command -v jq >/dev/null 2>&1 && [ -f "$HOME/.claude/.agentm-config.json" ]; then
+  MEMORY_VAULT_PATH="$(jq -r '."plugins.obsidian-vault.vault_path" // .vault_path // empty' "$HOME/.claude/.agentm-config.json" 2>/dev/null)"
+  if [ -n "$MEMORY_VAULT_PATH" ]; then
+    export MEMORY_VAULT_PATH
+  else
+    unset MEMORY_VAULT_PATH
+  fi
+fi
