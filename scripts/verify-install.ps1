@@ -289,27 +289,28 @@ if (Test-Path -LiteralPath $harnessDir) {
   $featuresPath = Join-Path $harnessDir 'features.json'
   $verifyPath   = Join-Path $harnessDir 'verify.sh'
 
-  if (Test-Path -LiteralPath $planPath)     { Write-Ok ".harness\PLAN.md present" }     else { Write-Warn "missing .harness\PLAN.md" }
-  if (Test-Path -LiteralPath $progressPath) { Write-Ok ".harness\progress.md present" } else { Write-Warn "missing .harness\progress.md" }
-
-  if (Test-Path -LiteralPath $featuresPath) {
-    try {
-      [void](Get-Content -LiteralPath $featuresPath -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop)
-      Write-Ok ".harness\features.json valid JSON"
+  # Vault-backed projects (e.g. dev-setup) keep PLAN/progress/features/verify.sh
+  # in the MemoryVault, not the repo — absence is expected (a fresh clone has
+  # none). Only check in-repo state when PLAN.md is present.
+  if (Test-Path -LiteralPath $planPath) {
+    Write-Ok ".harness\PLAN.md present"
+    if (Test-Path -LiteralPath $progressPath) { Write-Ok ".harness\progress.md present" } else { Write-Warn "missing .harness\progress.md" }
+    if (Test-Path -LiteralPath $featuresPath) {
+      try {
+        [void](Get-Content -LiteralPath $featuresPath -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop)
+        Write-Ok ".harness\features.json valid JSON"
+      }
+      catch {
+        Write-Warn ".harness\features.json invalid JSON"
+      }
     }
-    catch {
-      Write-Warn ".harness\features.json invalid JSON"
+    else {
+      Write-Warn "missing .harness\features.json"
     }
+    if (Test-Path -LiteralPath $verifyPath) { Write-Ok ".harness\verify.sh present" }
   }
   else {
-    Write-Warn "missing .harness\features.json"
-  }
-
-  if (Test-Path -LiteralPath $verifyPath) {
-    Write-Ok ".harness\verify.sh present"
-  }
-  else {
-    Write-Warn "missing .harness\verify.sh"
+    Write-Skip "harness state (PLAN/progress/features/verify.sh) not in repo — vault-backed or vendored"
   }
 
   # Project-level Claude Code wiring.

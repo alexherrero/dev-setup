@@ -28,8 +28,8 @@ Anthropic's official curl installer (lands at `~/.local/bin/claude`).
 
 Signs you in to GitHub. Prefer: `GitHub.com` → `HTTPS` → `Login with a
 web browser`. Needed for `gh pr create`, `gh release create`, and the
-`ship-release` skill defined under
-[.claude/skills/ship-release/SKILL.md](../.claude/skills/ship-release/SKILL.md).
+`ship-release` skill (from the crickets toolkit — installed via the opt-in
+`--with-harness` stage, not the base setup).
 
 Installed as a formula by
 [scripts/install-brew.sh](../scripts/install-brew.sh).

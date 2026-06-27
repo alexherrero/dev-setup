@@ -248,32 +248,33 @@ if [[ -d "$PWD/.harness" ]]; then
   echo ""
   echo "==> verify-install (harness project tier: $PWD)"
 
-  # harness layout
+  # Harness state files. Vault-backed projects (e.g. dev-setup) keep
+  # PLAN/progress/features/verify.sh in the MemoryVault, not the repo — so
+  # absence is expected, not a defect (a fresh dev-setup clone has none). Only
+  # check them when state is actually in-repo (PLAN.md present).
   if [[ -f "$PWD/.harness/PLAN.md" ]]; then
     ok ".harness/PLAN.md present"
-  else
-    warn "missing .harness/PLAN.md"
-  fi
-  if [[ -f "$PWD/.harness/progress.md" ]]; then
-    ok ".harness/progress.md present"
-  else
-    warn "missing .harness/progress.md"
-  fi
-  if [[ -f "$PWD/.harness/features.json" ]]; then
-    if jq empty "$PWD/.harness/features.json" >/dev/null 2>&1; then
-      ok ".harness/features.json valid JSON"
+    if [[ -f "$PWD/.harness/progress.md" ]]; then
+      ok ".harness/progress.md present"
     else
-      warn ".harness/features.json invalid JSON"
+      warn "missing .harness/progress.md"
+    fi
+    if [[ -f "$PWD/.harness/features.json" ]]; then
+      if jq empty "$PWD/.harness/features.json" >/dev/null 2>&1; then
+        ok ".harness/features.json valid JSON"
+      else
+        warn ".harness/features.json invalid JSON"
+      fi
+    else
+      warn "missing .harness/features.json"
+    fi
+    if [[ -x "$PWD/.harness/verify.sh" ]]; then
+      ok ".harness/verify.sh present and executable"
+    elif [[ -f "$PWD/.harness/verify.sh" ]]; then
+      warn ".harness/verify.sh exists but is not executable"
     fi
   else
-    warn "missing .harness/features.json"
-  fi
-  if [[ -x "$PWD/.harness/verify.sh" ]]; then
-    ok ".harness/verify.sh present and executable"
-  elif [[ -f "$PWD/.harness/verify.sh" ]]; then
-    warn ".harness/verify.sh exists but is not executable"
-  else
-    warn "missing .harness/verify.sh"
+    skip "harness state (PLAN/progress/features/verify.sh) not in repo — vault-backed or vendored"
   fi
 
   # project-level Claude Code wiring
