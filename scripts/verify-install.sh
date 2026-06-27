@@ -315,6 +315,48 @@ else
   printf '    [SKIP] no .harness/ in %s — harness project tier skipped\n' "$PWD"
 fi
 
+# --- harness-layer tier (--with-harness) ------------------------------------
+# Checks the opt-in harness STAGE's outputs (distinct from the agentm-PROJECT
+# tier above). Only meaningful when setup ran with --with-harness.
+WITH_HARNESS="${WITH_HARNESS:-0}"
+if [[ "$WITH_HARNESS" == "1" ]]; then
+  echo ""
+  echo "==> verify-install (harness layer — --with-harness)"
+  check_json "$HOME/.claude/.agentm-config.json"
+  if [[ -f "$HOME/.claude/.agentm-config.json" ]]; then
+    backend="$(jq -r '."storage.backend" // "local"' "$HOME/.claude/.agentm-config.json" 2>/dev/null || echo local)"
+    ok "agentm state backend: $backend"
+  fi
+  agentm_venv="${AGENTM_VENV:-$HOME/.agentm/venv}"
+  if [[ -x "$agentm_venv/bin/python" ]]; then
+    ok "memory-engine venv present: $agentm_venv"
+  else
+    warn "memory-engine venv missing: $agentm_venv"
+  fi
+  if [[ -f "$HOME/.claude/plugins/installed_plugins.json" ]]; then
+    crickets_n="$(jq -r '[.plugins | keys[] | select(endswith("@crickets"))] | length' "$HOME/.claude/plugins/installed_plugins.json" 2>/dev/null || echo 0)"
+    if [[ "${crickets_n:-0}" -gt 0 ]]; then
+      ok "crickets plugins installed: $crickets_n"
+    else
+      warn "no @crickets plugins installed"
+    fi
+  else
+    warn "no ~/.claude/plugins/installed_plugins.json (crickets not installed)"
+  fi
+  if [[ "$OS" == "macos" ]]; then
+    if launchctl print "gui/$(id -u)/com.agentm.memory-server" >/dev/null 2>&1; then
+      ok "memory daemon loaded (com.agentm.memory-server)"
+    else
+      warn "memory daemon not loaded"
+    fi
+  else
+    skip "memory daemon (launchd is macOS-only — Linux uses local state, decision E)"
+  fi
+else
+  echo ""
+  printf '    [SKIP] harness layer — run setup.sh --with-harness to install + check it\n'
+fi
+
 # --- summary ----------------------------------------------------------------
 
 echo ""

@@ -34,6 +34,15 @@ if [[ "$OS" == "macos" ]]; then
   )
 fi
 
+# Harness-layer steps (only when --with-harness was passed).
+if [[ "${WITH_HARNESS:-0}" == "1" ]]; then
+  steps+=(
+"(harness) supply your OWN vault + forks|The harness stage uses alexherrero/agentm + alexherrero/crickets and a Google-Drive Obsidian vault as a REFERENCE, not a given. Point AGENTM_REPO / CRICKETS_REPO at your forks; set your vault via \`python3 ~/Antigravity/agentm/scripts/agentm_config.py --vault-path <yours>\` or export MEMORY_VAULT_PATH. No vault → local state."
+"(harness) Google Drive + Obsidian (optional)|For vault-backed memory: install Google Drive for Desktop, sign in, sync your Obsidian vault. macOS auto-detects it; Linux/Windows use local state (no Drive shape)."
+"(harness) MCP memory daemon token|macOS only: the launchd daemon got a generated AGENTM_TOKEN — read it from ~/Library/LaunchAgents/com.agentm.memory-server.plist to point an MCP host at http://127.0.0.1:7821. Linux: supervise memory_mcp_server.py yourself (no launchd)."
+  )
+fi
+
 # Print the checklist.
 if [[ "$OS" == "macos" ]]; then
   heading_intro="Installed tooling is in place."

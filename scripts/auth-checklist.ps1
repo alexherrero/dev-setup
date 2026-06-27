@@ -38,6 +38,18 @@ $steps += [pscustomobject]@{
   Desc = 'Launch Claude Desktop and sign in with your Anthropic account. MCP extensions and preferences persist across restarts under %APPDATA%\Claude or %LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\... depending on install variant.'
 }
 
+# Harness-layer steps (only when -WithHarness was passed).
+if ($env:WITH_HARNESS -eq '1') {
+  $steps += [pscustomobject]@{
+    Cmd  = '(harness) supply your OWN vault + forks'
+    Desc = 'The harness stage uses alexherrero/agentm + crickets and a Google-Drive Obsidian vault as a REFERENCE, not a given. Point AGENTM_REPO / CRICKETS_REPO at your forks; set your vault via agentm_config.py --vault-path <yours> or MEMORY_VAULT_PATH. No vault -> local state.'
+  }
+  $steps += [pscustomobject]@{
+    Cmd  = '(harness) MCP memory daemon'
+    Desc = 'launchd is macOS-only; on Windows supervise memory_mcp_server.py yourself (NSSM / Task Scheduler) if you want the MCP memory daemon. State is local by default.'
+  }
+}
+
 # Print.
 Write-Host '==> first-run auth checklist (OS=windows)'
 Write-Host ''

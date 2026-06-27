@@ -363,6 +363,37 @@ else {
   "    [SKIP] no .harness in $cwd — harness project tier skipped" | Write-Host
 }
 
+# --- harness-layer tier (-WithHarness) --------------------------------------
+# Checks the opt-in harness STAGE's outputs (distinct from the agentm-PROJECT
+# tier above). Only meaningful when setup ran with -WithHarness.
+if ($env:WITH_HARNESS -eq '1') {
+  Write-Host ""
+  Write-Host "==> verify-install (harness layer — -WithHarness)"
+  Test-JsonFile (Join-Path $env:USERPROFILE '.claude\.agentm-config.json')
+  $agentmVenv = if ($env:AGENTM_VENV) { $env:AGENTM_VENV } else { Join-Path $env:USERPROFILE '.agentm\venv' }
+  if (Test-Path -LiteralPath (Join-Path $agentmVenv 'Scripts\python.exe')) {
+    Write-Ok "memory-engine venv present: $agentmVenv"
+  }
+  else {
+    Write-Warn "memory-engine venv missing: $agentmVenv"
+  }
+  $pluginsJson = Join-Path $env:USERPROFILE '.claude\plugins\installed_plugins.json'
+  if (Test-Path -LiteralPath $pluginsJson) {
+    try {
+      $pj = Get-Content -LiteralPath $pluginsJson -Raw -Encoding UTF8 | ConvertFrom-Json
+      $n = @($pj.plugins.PSObject.Properties.Name | Where-Object { $_ -like '*@crickets' }).Count
+      if ($n -gt 0) { Write-Ok "crickets plugins installed: $n" } else { Write-Warn "no @crickets plugins installed" }
+    }
+    catch { Write-Warn "installed_plugins.json unreadable" }
+  }
+  else { Write-Warn "no installed_plugins.json (crickets not installed)" }
+  Write-Skip "memory daemon (launchd is macOS-only — Windows uses local state, decision E)"
+}
+else {
+  Write-Host ""
+  "    [SKIP] harness layer — run setup.ps1 -WithHarness to install + check it" | Write-Host
+}
+
 # --- summary ----------------------------------------------------------------
 
 Write-Host ""
