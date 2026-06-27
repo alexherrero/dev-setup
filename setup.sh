@@ -26,12 +26,13 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # system bash). Indexes line up across the three. Built per-OS below.
 
 if [[ "$OS" == "macos" ]]; then
-  STAGE_NAMES=(brew clis gui-apps link-configs verify-install auth-checklist)
+  STAGE_NAMES=(brew clis gui-apps link-configs harness verify-install auth-checklist)
   STAGE_SCRIPTS=(
     "$REPO_ROOT/scripts/install-brew.sh"
     "$REPO_ROOT/scripts/install-clis.sh"
     "$REPO_ROOT/scripts/install-gui-apps.sh"
     "$REPO_ROOT/scripts/link-configs.sh"
+    "$REPO_ROOT/scripts/install-harness.sh"
     "$REPO_ROOT/scripts/verify-install.sh"
     "$REPO_ROOT/scripts/auth-checklist.sh"
   )
@@ -40,15 +41,17 @@ if [[ "$OS" == "macos" ]]; then
     "Install Claude Code CLI (curl) + Gemini CLI (npm global)"
     "Install Antigravity, Gemini Desktop, Claude Desktop (browser-assisted)"
     "Place captured configs from configs/ into their OS locations"
+    "Bootstrap the agentm + crickets harness layer (opt-in: --with-harness)"
     "Health-check the install (warn-only — tools, configs, agents, skills)"
     "Print the manual auth steps (claude login, gh auth login, etc.)"
   )
 else # debian
-  STAGE_NAMES=(apt clis link-configs verify-install auth-checklist)
+  STAGE_NAMES=(apt clis link-configs harness verify-install auth-checklist)
   STAGE_SCRIPTS=(
     "$REPO_ROOT/scripts/install-apt.sh"
     "$REPO_ROOT/scripts/install-clis.sh"
     "$REPO_ROOT/scripts/link-configs.sh"
+    "$REPO_ROOT/scripts/install-harness.sh"
     "$REPO_ROOT/scripts/verify-install.sh"
     "$REPO_ROOT/scripts/auth-checklist.sh"
   )
@@ -56,6 +59,7 @@ else # debian
     "Install apt formulae (NodeSource node 22, gh, jq, ripgrep, shellcheck, shfmt)"
     "Install Claude Code CLI (curl) + Gemini CLI (npm global)"
     "Place captured configs from configs/ into their OS locations"
+    "Bootstrap the agentm + crickets harness layer (opt-in: --with-harness)"
     "Health-check the install (warn-only — tools, configs, agents, skills)"
     "Print the manual auth steps (claude login, gh auth login, etc.)"
   )
@@ -79,6 +83,8 @@ EOF
 Options:
   --dry-run           Print the ordered stage list and exit (no scripts run)
   --skip-apps         Skip the gui-apps stage (no-op on Debian — no GUI stage)
+  --with-harness      Run the opt-in harness stage (clone + install agentm +
+                      crickets, provision the memory engine; off by default)
   --only <stage>      Run only the named stage
   -h, --help          Show this help
 
@@ -91,6 +97,7 @@ EOF
 
 DRY_RUN=0
 SKIP_APPS=0
+WITH_HARNESS=0
 ONLY=""
 
 while (($# > 0)); do
@@ -98,6 +105,7 @@ while (($# > 0)); do
     -h|--help) usage; exit 0 ;;
     --dry-run) DRY_RUN=1 ;;
     --skip-apps) SKIP_APPS=1 ;;
+    --with-harness) WITH_HARNESS=1 ;;
     --only)
       [[ $# -lt 2 ]] && { echo "Error: --only requires a stage name" >&2; exit 2; }
       ONLY="$2"
@@ -113,7 +121,7 @@ while (($# > 0)); do
   shift
 done
 
-export SKIP_APPS
+export SKIP_APPS WITH_HARNESS
 
 # --- validate --only target -------------------------------------------------
 
@@ -138,6 +146,10 @@ for i in "${!STAGE_NAMES[@]}"; do
     continue
   fi
   if ((SKIP_APPS == 1)) && [[ "$name" == "gui-apps" ]]; then
+    continue
+  fi
+  # harness is opt-in: excluded from the plan unless --with-harness is passed.
+  if ((WITH_HARNESS == 0)) && [[ "$name" == "harness" ]]; then
     continue
   fi
   PLAN_IDX+=("$i")

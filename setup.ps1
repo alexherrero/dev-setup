@@ -25,6 +25,7 @@
 param(
   [switch]$DryRun,
   [switch]$SkipApps,
+  [switch]$WithHarness,
   [string]$Only,
   [switch]$Help
 )
@@ -38,6 +39,7 @@ $Stages = @(
   [pscustomobject]@{ Name = 'clis';           Script = 'install-clis.ps1';      Desc = 'Install Claude Code CLI (winget) + Gemini CLI (npm)' }
   [pscustomobject]@{ Name = 'gui-apps';       Script = 'install-gui-apps.ps1';  Desc = 'Install Antigravity Desktop + Claude Desktop (winget)' }
   [pscustomobject]@{ Name = 'link-configs';   Script = 'link-configs.ps1';      Desc = 'Place captured configs from configs/ into their Windows locations' }
+  [pscustomobject]@{ Name = 'harness';        Script = 'install-harness.ps1';   Desc = 'Bootstrap the agentm + crickets harness layer (opt-in: -WithHarness)' }
   [pscustomobject]@{ Name = 'verify-install'; Script = 'verify-install.ps1';    Desc = 'Health-check the install (warn-only — tools, configs, agents, skills)' }
   [pscustomobject]@{ Name = 'auth-checklist'; Script = 'auth-checklist.ps1';    Desc = 'Print the manual auth steps (claude login, gh auth login, etc.)' }
 )
@@ -55,6 +57,7 @@ function Show-Usage {
   Write-Host 'Options:'
   Write-Host '  -DryRun       Print the ordered stage list and exit (no scripts run)'
   Write-Host '  -SkipApps     Skip the gui-apps stage AND export SKIP_APPS=1 to sub-stages'
+  Write-Host '  -WithHarness  Run the opt-in harness stage (agentm + crickets; off by default)'
   Write-Host '  -Only <s>     Run only the named stage'
   Write-Host '  -Help         Show this help'
   Write-Host ''
@@ -67,6 +70,7 @@ if ($Help) { Show-Usage; exit 0 }
 # Export per-flag env vars so sub-stage .ps1 scripts pick them up.
 # Mirrors setup.sh's `export SKIP_APPS`.
 if ($SkipApps)  { $env:SKIP_APPS  = '1' } else { $env:SKIP_APPS  = '0' }
+if ($WithHarness) { $env:WITH_HARNESS = '1' } else { $env:WITH_HARNESS = '0' }
 
 if ($Only) {
   $validNames = $Stages | ForEach-Object { $_.Name }
@@ -79,7 +83,8 @@ if ($Only) {
 
 $plan = $Stages | Where-Object {
   (-not $Only -or $_.Name -eq $Only) -and
-  (-not $SkipApps -or $_.Name -ne 'gui-apps')
+  (-not $SkipApps -or $_.Name -ne 'gui-apps') -and
+  ($WithHarness -or $_.Name -ne 'harness')
 }
 
 if ($DryRun) {
