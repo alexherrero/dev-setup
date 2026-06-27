@@ -4,6 +4,27 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v4.1.0] — 2026-06-26
+
+> **Opt-in harness bootstrap (`--with-harness`).** A new opt-in stage layers the full agentm + crickets "harness" on top of the base install: clone + install agentm (`--scope user`), a Python memory-engine venv, the crickets plugin set via a github-source marketplace, and (macOS) a launchd memory daemon — with `state_mode: local` and daemon-skip on Linux/Windows. **Default off**, so the base curl|bash install is unchanged for existing users. Experimental: the stage is exhaustively dry-run-verified and confirmed sound by a cloud Linux test, but a full end-to-end live run is still pending (tracked for a dedicated test host) — treat `--with-harness` as experimental until then.
+
+### Added
+
+- **`--with-harness` / `-WithHarness` stage** (`scripts/install-harness.{sh,ps1}`) — opt-in harness-layer bootstrap. Clones agentm + crickets (operator-substitutable via `AGENTM_REPO` / `CRICKETS_REPO`), runs agentm's `install.sh --scope user` (install-or-update), provisions a Python memory-engine venv, installs the crickets default plugin set via the github-source marketplace, wires `MEMORY_VAULT_PATH` dynamically, and (macOS) installs the launchd memory daemon. Mac-first; Linux/Windows use `state_mode: local` (no Google-Drive vault, no daemon).
+- **`verify-install` / `auth-checklist` harness coverage** — `WITH_HARNESS`-gated checks (agentm config + state backend, memory-engine venv, crickets plugin count, daemon) and harness auth steps (incl. the "supply your own vault + forks" note).
+- **CI `--with-harness` dry-run smoke** in the macOS / Ubuntu / Windows jobs.
+
+### Changed
+
+- **`capture.sh` scoped to dev-setup-owned settings keys** (`includeCoAuthoredBy` + `permissions`) — no longer snapshots agentm/Claude-app-owned keys (`hooks`, `enabledPlugins`, `model`, …).
+- **`MEMORY_VAULT_PATH` exported dynamically** in `configs/zsh/.zshrc-additions` (resolved from `~/.claude/.agentm-config.json`, never a baked path).
+- **Backup directory canonicalized** to `~/.dev-setup-backup` across `link-configs.{sh,ps1}` + docs (was inconsistent with `~/.development-setup-backup`).
+
+### Fixed
+
+- **`install-harness.sh` executable bit** (was `0644`; direct `./` invocation failed exit 126).
+- **Graceful skip on scoped-egress clone failure** — a cloud/web session that scopes GitHub access to the launching repo returned HTTP 403 on the agentm/crickets clones, aborting the whole run; the harness stage now detects the 403 and skips gracefully with actionable guidance instead of `set -e` aborting.
+
 ## [v4.0.0] — 2026-05-10
 
 > **Codex CLI removed; repo renamed to `dev-setup`.** The OpenAI Codex CLI (`@openai/codex`) and its `--with-codex` / `-WithCodex` opt-in flag are gone from setup. Major bump because the public flag surface shrunk — anyone passing `--with-codex` will now get an `unknown argument` error and exit 2. The prior opt-in posture (Codex installed only on explicit request) made it harmless to default-include, but the cleaner contract is no Codex at all. Claude Code + Gemini CLI remain the supported CLIs; Mac and Linux orchestrators are now Claude + Gemini only, and Windows drops the entire skip-with-warn block since there's nothing to skip. Repo slug renamed `dev-machine-setup` → `dev-setup` (display name "development-setup"); old curl|bash URLs continue to work via GitHub's permanent redirect, but the canonical install URL is now `raw.githubusercontent.com/alexherrero/dev-setup/main/install.sh`.

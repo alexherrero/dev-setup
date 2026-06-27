@@ -66,6 +66,7 @@ Each platform's orchestrator runs an ordered, idempotent stage list. `--dry-run`
 | `clis` | Install Claude Code CLI + Gemini CLI |
 | `gui-apps` *(Mac/Win only)* | Install Antigravity Desktop, Claude Desktop, (Mac) Gemini Desktop |
 | `link-configs` | Place captured configs at OS-native paths with backup-on-replace |
+| `harness` *(opt-in — `--with-harness`)* | Bootstrap the agentm + crickets harness layer (Python memory engine, plugins, macOS launchd daemon; Linux/Windows use local state). Experimental |
 | `verify-install` | Warn-only post-setup health check (zero warns expected) |
 | `auth-checklist` | Print the manual auth steps |
 
@@ -77,6 +78,7 @@ Each platform's orchestrator runs an ordered, idempotent stage list. `--dry-run`
 | `--dry-run` | `-DryRun` | Print the planned stages and exit 0 |
 | `--skip-apps` | `-SkipApps` | Skip GUI installs (CI / headless) |
 | `--only <stage>` | `-Only <stage>` | Run a single stage |
+| `--with-harness` | `-WithHarness` | **Opt-in (default off):** also bootstrap the agentm + crickets harness layer (memory engine, plugins; macOS daemon). Experimental — live-verification pending |
 
 ## Documentation
 

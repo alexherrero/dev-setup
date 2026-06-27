@@ -40,6 +40,8 @@ setup.sh / setup.ps1
 - **`rc_file()` over hard-coding `~/.zshrc`.** Mac always has zsh; Debian users may run bash. A single helper keeps the rc-target consistent across linker, verifier, and checklist — flipping it in one place flips it everywhere. Windows has no rc-file equivalent; persistent PATH writes go through `[Environment]::SetEnvironmentVariable(... 'User')`.
 - **Bootstrap pulls a tagged release, not `main`.** `install.sh` / `install.ps1` themselves live at `main` (so the canonical raw URL never breaks), but they download the source archive for the latest *release tag*. Releases are reviewed and tested; `main` HEAD is not. See [Public curl|bash installer — design](Public-Curl-Bash-Installer) for the full rationale.
 
+- **Opt-in harness layer (`--with-harness`).** dev-setup is the base layer; the optional `harness` stage additionally bootstraps a sibling **agentm** (harness/memory kernel) + **crickets** (Claude Code plugins) toolkit for operators who run it — clone + install, a Python memory engine, the plugin set, and a macOS launchd daemon (Linux/Windows degrade to local state, no daemon). Default-off keeps the base bootstrap generic and dependency-free. Experimental — see the repo roadmap.
+
 ## Related
 
 - [Install via the one-liner](../how-to/Install-Via-One-Liner) — the curl|bash / irm|iex bootstrap recipe.

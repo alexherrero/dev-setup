@@ -200,6 +200,12 @@ jobs:
       - name: setup.sh --dry-run resolves all 6 Mac stages
         run: ./setup.sh --dry-run
 
+      - name: harness stage — install-harness.sh dry-run (opt-in; mutates nothing)
+        run: |
+          DRY_RUN=1 ./scripts/install-harness.sh
+          out="$(./setup.sh --with-harness --dry-run)"
+          [[ "$out" == *harness* ]] || { echo "FAIL: harness stage not in --with-harness plan"; exit 1; }
+
       - name: end-to-end install (--skip-apps)
         run: ./setup.sh --skip-apps
 
@@ -250,6 +256,12 @@ jobs:
 
       - name: setup.sh --dry-run resolves all 5 Debian stages
         run: ./setup.sh --dry-run
+
+      - name: harness stage — install-harness.sh dry-run (opt-in; mutates nothing)
+        run: |
+          DRY_RUN=1 ./scripts/install-harness.sh
+          out="$(./setup.sh --with-harness --dry-run)"
+          [[ "$out" == *harness* ]] || { echo "FAIL: harness stage not in --with-harness plan"; exit 1; }
 
       - name: end-to-end install
         run: ./setup.sh
@@ -315,6 +327,11 @@ jobs:
 
       - name: setup.ps1 -DryRun resolves all 6 stages
         run: ./setup.ps1 -DryRun
+
+      - name: harness stage — wired in -WithHarness plan (dry-run)
+        run: |
+          $plan = ./setup.ps1 -WithHarness -DryRun 6>&1 | Out-String
+          if ($plan -notmatch 'harness') { Write-Error "harness stage not in -WithHarness plan"; exit 1 }
 
       - name: end-to-end install (-SkipApps)
         run: ./setup.ps1 -SkipApps

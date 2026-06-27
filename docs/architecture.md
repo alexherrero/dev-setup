@@ -56,6 +56,13 @@ The Debian plan drops `gui-apps` deliberately — Antigravity, Claude
 Desktop, and Gemini Desktop are GUI-first products with no first-party
 Linux build. See [docs/debian.md](debian.md#why-antigravity-isnt-supported-on-linux).
 
+With `--with-harness` (opt-in, **default off**), a `harness` stage runs after
+`link-configs` to bootstrap the sibling **agentm** (harness/memory kernel) +
+**crickets** (plugins) layer — clone + install, a Python memory-engine venv, the
+plugin set, and (macOS) a launchd memory daemon; Linux/Windows use repo-local
+state and skip the daemon. It is experimental and layered on top of the base
+install; the default bootstrap is unchanged.
+
 ## Why this shape
 
 - **Single shared scripts, OS-dispatched at the top.** The alternative —
