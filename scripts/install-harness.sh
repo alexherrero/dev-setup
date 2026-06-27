@@ -96,4 +96,43 @@ else
 fi
 echo "    python: memory-engine deps in venv"
 
+# --- crickets: plugins via github-source marketplace (decisions B + C) -------
+# Marketplace is GITHUB-source (clean, consistent updates; makes every plugin a
+# real install incl. ship-release/releasing-conventions). The clone is for the
+# default-set list + local dev only — installed plugins don't need it at runtime.
+CRICKETS_REPO_SLUG="${CRICKETS_REPO:-alexherrero/crickets}"
+CRICKETS_CLONE="${CRICKETS_CLONE:-$HOME/Antigravity/crickets}"
+echo "  crickets  marketplace=${CRICKETS_REPO_SLUG} (github)  clone=${CRICKETS_CLONE}"
+if [[ -d "$CRICKETS_CLONE/.git" ]]; then
+  run git -C "$CRICKETS_CLONE" pull --ff-only
+else
+  run mkdir -p "$(dirname "$CRICKETS_CLONE")"
+  run git clone "https://github.com/${CRICKETS_REPO_SLUG}.git" "$CRICKETS_CLONE"
+fi
+# Register the github-source marketplace if absent; else refresh it (decision B).
+if [[ "$DRY_RUN" == "1" ]]; then
+  run claude plugin marketplace add "$CRICKETS_REPO_SLUG"
+elif claude plugin marketplace list 2>/dev/null | grep -qi crickets; then
+  claude plugin marketplace update crickets
+else
+  claude plugin marketplace add "$CRICKETS_REPO_SLUG"
+fi
+# Install-or-update each plugin in the default set (decision B).
+default_set="$CRICKETS_CLONE/dist/default-set.json"
+if [[ -f "$default_set" ]]; then
+  while IFS= read -r p; do
+    [[ -z "$p" ]] && continue
+    if [[ "$DRY_RUN" == "1" ]]; then
+      printf '    [dry-run] claude plugin install %s@crickets --scope user (or update)\n' "$p"
+    else
+      claude plugin install "$p@crickets" --scope user 2>/dev/null \
+        || claude plugin update "$p@crickets" \
+        || echo "    WARN: could not install/update $p@crickets" >&2
+    fi
+  done < <(jq -r '.plugins[]' "$default_set")
+else
+  echo "    WARN: $default_set not found — skipping crickets plugins" >&2
+fi
+echo "    crickets: plugins installed/updated (github-source)"
+
 exit 0

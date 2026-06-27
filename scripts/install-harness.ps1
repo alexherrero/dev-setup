@@ -75,4 +75,28 @@ if (-not (Test-Path -LiteralPath $AgentmVenv)) { Invoke-Run $pyPath @('-m', 'ven
 Invoke-Run (Join-Path $AgentmVenv 'Scripts/pip.exe') @('install', '--upgrade', '-r', (Join-Path $AgentmClone 'requirements.txt'))
 Write-Host '    python: memory-engine deps in venv'
 
+# --- crickets: plugins via github-source marketplace (decisions B + C) -------
+$CricketsSlug  = if ($env:CRICKETS_REPO) { $env:CRICKETS_REPO } else { 'alexherrero/crickets' }
+$CricketsClone = if ($env:CRICKETS_CLONE) { $env:CRICKETS_CLONE } else { Join-Path $HOME 'Antigravity/crickets' }
+Write-Host ('  crickets  marketplace={0} (github)  clone={1}' -f $CricketsSlug, $CricketsClone)
+if (Test-Path -LiteralPath (Join-Path $CricketsClone '.git')) {
+  Invoke-Run 'git' @('-C', $CricketsClone, 'pull', '--ff-only')
+}
+else {
+  $cparent = Split-Path -Parent $CricketsClone
+  if (-not $dryRun) { New-Item -ItemType Directory -Force -Path $cparent | Out-Null }
+  else { Write-Host ('    [dry-run] mkdir {0}' -f $cparent) }
+  Invoke-Run 'git' @('clone', ('https://github.com/{0}.git' -f $CricketsSlug), $CricketsClone)
+}
+Invoke-Run 'claude' @('plugin', 'marketplace', 'add', $CricketsSlug)
+$defaultSet = Join-Path $CricketsClone 'dist/default-set.json'
+if (Test-Path -LiteralPath $defaultSet) {
+  $plugins = (Get-Content -Raw $defaultSet | ConvertFrom-Json).plugins
+  foreach ($p in $plugins) {
+    Invoke-Run 'claude' @('plugin', 'install', ('{0}@crickets' -f $p), '--scope', 'user')
+  }
+}
+else { Write-Warning ('{0} not found — skipping crickets plugins' -f $defaultSet) }
+Write-Host '    crickets: plugins installed/updated (github-source)'
+
 exit 0
