@@ -64,6 +64,17 @@ else {
 
 Write-Host '    agentm: installed/updated (--scope user)'
 
+# --- vault / state-mode (decision E) — Windows has no Google-Drive vault shape
+$agentmConfig = Join-Path $AgentmClone 'scripts/agentm_config.py'
+if ($env:MEMORY_VAULT_PATH -and (Test-Path -LiteralPath $env:MEMORY_VAULT_PATH)) {
+  Write-Host ('  state   vault -> {0}' -f $env:MEMORY_VAULT_PATH)
+  Invoke-Run 'python3' @($agentmConfig, '--vault-path', $env:MEMORY_VAULT_PATH)
+}
+else {
+  Write-Host '  state   local (no Google-Drive vault shape on Windows — decision E)'
+  Invoke-Run 'python3' @($agentmConfig, '--state-mode', 'local')
+}
+
 # --- Python memory engine: venv + requirements (decision D, gated) ----------
 $AgentmVenv = if ($env:AGENTM_VENV) { $env:AGENTM_VENV } else { Join-Path $HOME '.agentm/venv' }
 $py = Get-Command python3.13 -ErrorAction SilentlyContinue

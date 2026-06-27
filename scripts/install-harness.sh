@@ -70,6 +70,34 @@ fi
 run env CI=true bash "$installer" --scope user
 echo "    agentm: installed/updated (--scope user)"
 
+# --- vault / state-mode sequencing (decision E) -----------------------------
+# agentm installed with CI=true (no interactive vault prompt), so wire the state
+# backend explicitly. Mac with a resolvable vault -> vault mode (path is
+# per-machine, NEVER baked — agentm's CI gate forbids hardcoded CloudStorage
+# literals); otherwise (Drive not synced, or Linux/Windows) -> local state.
+agentm_config="$AGENTM_CLONE/scripts/agentm_config.py"
+vault="${MEMORY_VAULT_PATH:-}"
+if [[ "$OS" == "macos" && -z "$vault" ]]; then
+  # Best-effort auto-detect (operator can always set MEMORY_VAULT_PATH instead,
+  # per decision A). Globs — not `find` — because Google Drive's File Provider
+  # materializes paths on direct stat but isn't reliably enumerable by find.
+  for cand in \
+    "$HOME/Library/CloudStorage/GoogleDrive-"*/"My Drive/Obsidian/Agent" \
+    "$HOME/Library/CloudStorage/GoogleDrive-"*/.shortcut-targets-by-id/*/"Obsidian/Agent"; do
+    [[ -d "$cand" ]] && {
+      vault="$cand"
+      break
+    }
+  done
+fi
+if [[ -n "$vault" && -d "$vault" ]]; then
+  echo "  state   vault -> $vault"
+  run python3 "$agentm_config" --vault-path "$vault"
+else
+  echo "  state   local (no vault resolvable — Linux/Windows, or Drive not synced)"
+  run python3 "$agentm_config" --state-mode local
+fi
+
 # --- Python memory engine: venv + requirements (decision D, gated) ----------
 # The MCP memory daemon (task 6) runs from this venv's interpreter, so deps live
 # in the venv — not system site-packages (homebrew python is PEP-668 externally-
