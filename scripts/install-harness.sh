@@ -112,10 +112,15 @@ fi
 # Register the github-source marketplace if absent; else refresh it (decision B).
 if [[ "$DRY_RUN" == "1" ]]; then
   run claude plugin marketplace add "$CRICKETS_REPO_SLUG"
-elif claude plugin marketplace list 2>/dev/null | grep -qi crickets; then
-  claude plugin marketplace update crickets
 else
-  claude plugin marketplace add "$CRICKETS_REPO_SLUG"
+  # Capture + bash string-match, NOT `list | grep -qi` — grep -q short-circuits
+  # the pipe and SIGPIPEs the producer, which pipefail turns into a false miss.
+  mk_list="$(claude plugin marketplace list 2>/dev/null || true)"
+  if [[ "$mk_list" == *crickets* ]]; then
+    claude plugin marketplace update crickets
+  else
+    claude plugin marketplace add "$CRICKETS_REPO_SLUG"
+  fi
 fi
 # Install-or-update each plugin in the default set (decision B).
 default_set="$CRICKETS_CLONE/dist/default-set.json"
@@ -134,5 +139,40 @@ else
   echo "    WARN: $default_set not found — skipping crickets plugins" >&2
 fi
 echo "    crickets: plugins installed/updated (github-source)"
+
+# --- launchd memory daemon (macOS only — decision E) ------------------------
+# Scripts the manual procedure documented in agentm's plist template: substitute
+# the venv interpreter (task 4 — deps live there), the absolute log dir, and
+# PYTHONPATH; inject a generated bearer token via PlistBuddy (never a repo
+# literal); launchctl bootstrap. IDEMPOTENT: skip if already loaded.
+if [[ "$OS" == "macos" ]]; then
+  plist_src="$AGENTM_CLONE/install/com.agentm.memory-server.plist"
+  plist_dst="$HOME/Library/LaunchAgents/com.agentm.memory-server.plist"
+  daemon_label="com.agentm.memory-server"
+  log_dir="$HOME/Library/Logs/agentm"
+  echo "  daemon  ${daemon_label} (launchd)"
+  if [[ "$DRY_RUN" != "1" && ! -f "$plist_src" ]]; then
+    echo "    WARN: $plist_src not found — skipping memory daemon" >&2
+  elif launchctl print "gui/$(id -u)/$daemon_label" >/dev/null 2>&1; then
+    # launchctl print (not `list | grep`): grep -q short-circuits the pipe →
+    # launchctl dies with SIGPIPE → pipefail would wrongly report not-loaded.
+    echo "    daemon: already loaded — skipping (idempotent; bootout+re-bootstrap to refresh)"
+  elif [[ "$DRY_RUN" == "1" ]]; then
+    printf '    [dry-run] sed (python3.13->%s/bin/python, AGENTM_LOG_DIR->%s, AGENTM_SCRIPTS_DIR->%s/scripts) %s > %s\n' \
+      "$AGENTM_VENV" "$log_dir" "$AGENTM_CLONE" "$plist_src" "$plist_dst"
+    printf '    [dry-run] PlistBuddy Set :EnvironmentVariables:AGENTM_TOKEN <generated> + launchctl bootstrap gui/%s %s\n' "$(id -u)" "$plist_dst"
+  else
+    mkdir -p "$log_dir" "$(dirname "$plist_dst")"
+    sed -e "s|/opt/homebrew/bin/python3.13|$AGENTM_VENV/bin/python|" \
+      -e "s|AGENTM_LOG_DIR|$log_dir|" \
+      -e "s|AGENTM_SCRIPTS_DIR|$AGENTM_CLONE/scripts|" \
+      "$plist_src" >"$plist_dst"
+    /usr/libexec/PlistBuddy -c "Set :EnvironmentVariables:AGENTM_TOKEN $(openssl rand -hex 32)" "$plist_dst"
+    launchctl bootstrap "gui/$(id -u)" "$plist_dst"
+    echo "    daemon: bootstrapped (token set; health on http://127.0.0.1:7821/health)"
+  fi
+else
+  echo "  daemon  skipped (launchd is macOS-only — decision E)"
+fi
 
 exit 0

@@ -99,4 +99,10 @@ if (Test-Path -LiteralPath $defaultSet) {
 else { Write-Warning ('{0} not found — skipping crickets plugins' -f $defaultSet) }
 Write-Host '    crickets: plugins installed/updated (github-source)'
 
+# --- memory daemon: macOS-only (decision E) ---------------------------------
+# launchd is macOS-only; there is no Windows twin in this scope. A Windows
+# operator who wants the MCP daemon supervises memory_mcp_server.py themselves
+# (NSSM / Task Scheduler) — see docs.
+Write-Host '  daemon  skipped (launchd is macOS-only — decision E)'
+
 exit 0
