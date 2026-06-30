@@ -25,7 +25,6 @@ Intent, rationale, and trade-offs — the *why*, not the *how*.
 
 - [Development setup — design](Development-Setup-Design) — intent, shape, and trade-offs of the OS-dispatch orchestrator architecture.
 - [Public curl|bash installer — design](Public-Curl-Bash-Installer) — bootstrap layer's intent, trust model, and why the redirect-Location parse beats the JSON Releases API.
-- [Architecture decisions](Decisions) — ADRs for non-obvious choices.
 
 ## Conventions
 
