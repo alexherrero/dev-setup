@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Internal
+
+- **Wiki taxonomy migrated to the six-section model** (matches agentm `cbea022` + crickets `12f9b1f`). Retired the standalone Decisions section + the ADR machinery — dev-setup had no real ADRs, only an ADR-convention stub — so decisions now live as dated entries in each design's `## Amendment log`. Added a `wiki/designs/` section: the design docs moved `wiki/explanation/{Development-Setup-Design,Public-Curl-Bash-Installer}.md` → `wiki/designs/`, each gaining an `## Amendment log`; `Home.md` / `_Sidebar.md` / `.diataxis` / `wiki/README.md` rewritten to the six-section frame (How-to · Reference · Architecture · Designs · Explanation · Operational; four always-present, two conditional); wiki cross-links converted to GitHub-Wiki basename form. The consumed crickets `wiki-maintenance` plugin was bumped to `0.3.0` (the six-section composer); `check-wiki --strict` is green. Also dropped the now-retired `[ADR 0006]` citation from `AGENTS.md`. *(Released sections below still reference the old `wiki/explanation/` paths — those are left intact as accurate records of what shipped at v2.0.0–v4.0.0; changelog history is append-only.)*
+
 ## [v4.1.0] — 2026-06-26
 
 > **Opt-in harness bootstrap (`--with-harness`).** A new opt-in stage layers the full agentm + crickets "harness" on top of the base install: clone + install agentm (`--scope user`), a Python memory-engine venv, the crickets plugin set via a github-source marketplace, and (macOS) a launchd memory daemon — with `state_mode: local` and daemon-skip on Linux/Windows. **Default off**, so the base curl|bash install is unchanged for existing users. Experimental: the stage is exhaustively dry-run-verified and confirmed sound by a cloud Linux test, but a full end-to-end live run is still pending (tracked for a dedicated test host) — treat `--with-harness` as experimental until then.
