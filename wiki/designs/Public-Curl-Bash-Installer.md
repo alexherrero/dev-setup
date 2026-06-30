@@ -7,7 +7,7 @@ The intent, trust model, and shape of the public one-liner bootstrap (`curl … 
 
 ## Intent
 
-The repo went public to enable a true zero-prereq bootstrap: a fresh Mac or Debian/Ubuntu host (or Windows machine) needs neither `git` nor an SSH key to land in a fully configured AI-first dev environment. The `git clone` flow keeps working — see [Bootstrap a new Mac](../how-to/Bootstrap-A-New-Mac) — but the curl|bash flow removes the bootstrap-the-bootstrap problem.
+The repo went public to enable a true zero-prereq bootstrap: a fresh Mac or Debian/Ubuntu host (or Windows machine) needs neither `git` nor an SSH key to land in a fully configured AI-first dev environment. The `git clone` flow keeps working — see [Bootstrap a new Mac](Bootstrap-A-New-Mac) — but the curl|bash flow removes the bootstrap-the-bootstrap problem.
 
 Two architectural choices anchor the design:
 
@@ -55,6 +55,10 @@ Forks, mirrors, and cached copies of `install.sh` / `install.ps1` after the visi
 
 ## Related
 
-- [Install via one-liner](../how-to/Install-Via-One-Liner) — the user-facing recipe.
-- [Scripts reference](../reference/Scripts) — flags, exit codes, file layout.
+- [Install via one-liner](Install-Via-One-Liner) — the user-facing recipe.
+- [Scripts reference](Scripts) — flags, exit codes, file layout.
 - [Development setup — design](Development-Setup-Design) — the orchestrator that the bootstrap hands off to.
+
+## Amendment log
+
+_No amendments yet. Record load-bearing decisions to this design here as dated entries, newest first, in the form: **`YYYY-MM-DD — summary.`** decision · *Why not the alternative:* … · *Re-audit trigger:* … — the ADR model is retired, so this log (not a Decisions section) is where decisions live._

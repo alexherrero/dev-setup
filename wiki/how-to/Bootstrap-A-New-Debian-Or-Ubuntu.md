@@ -47,5 +47,5 @@ Antigravity Desktop, Claude Desktop, and Gemini Desktop are macOS / Windows bina
 
 - [Install via the one-liner](Install-Via-One-Liner) — the curl|bash bootstrap flow (no `git` prereq).
 - [Bootstrap a new Mac](Bootstrap-A-New-Mac) — the GUI + CLI counterpart.
-- [Development setup — design](../explanation/Development-Setup-Design) — why the OS-dispatch architecture looks the way it does.
-- [Scripts reference](../reference/Scripts) — flags, exit codes, files written.
+- [Development setup — design](Development-Setup-Design) — why the OS-dispatch architecture looks the way it does.
+- [Scripts reference](Scripts) — flags, exit codes, files written.

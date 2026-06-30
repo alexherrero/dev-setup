@@ -40,7 +40,7 @@ curl -fsSL https://raw.githubusercontent.com/alexherrero/dev-setup/main/install.
   | bash -s -- --skip-apps
 ```
 
-The `-s --` is the standard `bash` idiom for forwarding args to a script read from stdin. Other supported flags pass through the same way: `--skip-apps`, `--dry-run`, `--only <stage>`. See [Scripts reference](../reference/Scripts) for the full list.
+The `-s --` is the standard `bash` idiom for forwarding args to a script read from stdin. Other supported flags pass through the same way: `--skip-apps`, `--dry-run`, `--only <stage>`. See [Scripts reference](Scripts) for the full list.
 
 ### Windows — with flags (recommended temp-file pattern)
 
@@ -81,7 +81,7 @@ notepad $tmp           # read it
 & $tmp -SkipApps
 ```
 
-Trust model details: see [Public curl|bash installer — design](../explanation/Public-Curl-Bash-Installer#trust-model).
+Trust model details: see [Public curl|bash installer — design](Public-Curl-Bash-Installer#trust-model).
 
 ## Verify
 
@@ -99,7 +99,7 @@ cd $env:TEMP\dev-setup-bootstrap-<id>\dev-setup-3.0.0
 .\scripts\verify-install.ps1
 ```
 
-See [Scripts reference](../reference/Scripts) for the canonical entry-point table.
+See [Scripts reference](Scripts) for the canonical entry-point table.
 
 ## Troubleshooting
 
@@ -114,7 +114,7 @@ See [Scripts reference](../reference/Scripts) for the canonical entry-point tabl
 
 ## Related
 
-- [Public curl|bash installer — design](../explanation/Public-Curl-Bash-Installer) — why the bootstrap looks the way it does, and the trust model.
-- [Scripts reference](../reference/Scripts) — flags, exit codes, files written.
+- [Public curl|bash installer — design](Public-Curl-Bash-Installer) — why the bootstrap looks the way it does, and the trust model.
+- [Scripts reference](Scripts) — flags, exit codes, files written.
 - [Bootstrap a new Mac](Bootstrap-A-New-Mac) — the equivalent flow via `git clone`.
 - [Bootstrap a new Debian or Ubuntu host](Bootstrap-A-New-Debian-Or-Ubuntu) — Linux equivalent via `git clone`.

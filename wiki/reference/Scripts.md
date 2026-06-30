@@ -38,7 +38,7 @@ The canonical lookup surface for the repo-root entry-point scripts — the curl|
 | `-Only <stage>` | Forwards to `setup.ps1 -Only <stage>` — run only the named stage. |
 | `-Help` | Forwards to `setup.ps1 -Help`. |
 
-Forwarding only works with the temp-file invocation pattern. `iwr … \| iex` cannot bind named params — see [Install via the one-liner](../how-to/Install-Via-One-Liner#variants).
+Forwarding only works with the temp-file invocation pattern. `iwr … \| iex` cannot bind named params — see [Install via the one-liner](Install-Via-One-Liner#variants).
 
 ### `setup.sh` (POSIX orchestrator)
 
@@ -93,7 +93,7 @@ Forwarding only works with the temp-file invocation pattern. `iwr … \| iex` ca
 
 ## Related
 
-- [Install via the one-liner](../how-to/Install-Via-One-Liner) — task-level recipe.
-- [Public curl\|bash installer — design](../explanation/Public-Curl-Bash-Installer) — intent, trust model, trade-offs.
-- [Bootstrap a new Mac](../how-to/Bootstrap-A-New-Mac) — `git clone` flow on macOS.
-- [Bootstrap a new Debian or Ubuntu host](../how-to/Bootstrap-A-New-Debian-Or-Ubuntu) — `git clone` flow on Linux.
+- [Install via the one-liner](Install-Via-One-Liner) — task-level recipe.
+- [Public curl\|bash installer — design](Public-Curl-Bash-Installer) — intent, trust model, trade-offs.
+- [Bootstrap a new Mac](Bootstrap-A-New-Mac) — `git clone` flow on macOS.
+- [Bootstrap a new Debian or Ubuntu host](Bootstrap-A-New-Debian-Or-Ubuntu) — `git clone` flow on Linux.

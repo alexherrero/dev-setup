@@ -82,7 +82,7 @@ install; the default bootstrap is unchanged.
   fetches the latest tagged release source archive over plain HTTPS,
   which is universally available. The trust boundary is GitHub's TLS
   cert + the repo owner's release-signing discipline. See
-  [wiki/explanation/Public-Curl-Bash-Installer.md](../wiki/explanation/Public-Curl-Bash-Installer.md).
+  [wiki/designs/Public-Curl-Bash-Installer.md](../wiki/designs/Public-Curl-Bash-Installer.md).
 
 ## Development
 
@@ -99,5 +99,5 @@ wired into `PostToolUse`.
 - [docs/first-run.md](first-run.md) — manual auth checklist.
 - [docs/debian.md](debian.md) — Debian/Ubuntu specifics.
 - [docs/windows.md](windows.md) — Windows specifics.
-- [wiki/explanation/Development-Setup-Design.md](../wiki/explanation/Development-Setup-Design.md) — design rationale.
+- [wiki/designs/Development-Setup-Design.md](../wiki/designs/Development-Setup-Design.md) — design rationale.
 - [wiki/reference/Scripts.md](../wiki/reference/Scripts.md) — entry-point table.
