@@ -76,7 +76,7 @@ When a plan ships paired releases across sibling repos:
 
 ### Wake-on-CI pattern
 
-Don't mark tasks `[x]` speculatively. Push → schedule a ~90s wake → close out with `[x]` + `progress.md` append only when CI confirms green across the OS matrix.
+Don't mark tasks `[x]` speculatively. Push (or open/update a PR, whichever actually triggers the project's CI) → schedule a ~90s wake → close out with `[x]` + `progress.md` append only when the relevant check-suite confirms green across the OS matrix. In agentm + crickets specifically (per-plan CI, 2026-07-06), the full matrix triggers on `pull_request`, not on push to `main` — wake on the PR's check-suite there, not a bare push's.
 
 ### Documentation soft-warnings
 
