@@ -17,7 +17,13 @@
 #                          inserts auto-channel keys, etc.). Symlinking would
 #                          cause constant repo churn. Fresh-machine seed only;
 #                          drift is managed by re-running scripts/capture.sh.
-#     - ~/.claude/settings.json               (Claude Code rewrites regularly)
+#     - ~/.claude/settings.json               (Claude Code rewrites regularly;
+#                                              dev-setup owns its permissions
+#                                              block — see capture.sh — so a few
+#                                              specific entries are actively
+#                                              *ensured* post-seed via jq merge,
+#                                              not just seeded: includeCoAuthoredBy
+#                                              and the gh-pr-merge allow.)
 #     - ~/Library/.../claude_desktop_config.json (Mac only — Claude Desktop)
 #     - ~/.gemini/settings.json               (Gemini CLI writes back preferences)
 #     - ~/.antigravity/argv.json              (Electron/VS Code derivative;
@@ -187,6 +193,49 @@ ensure_claude_co_authored_by_disabled() {
   printf '    co-author %-55s (merged includeCoAuthoredBy=false)\n' "$f"
 }
 
+# Ensure `gh pr merge` can run without a prompt in an unattended agentm
+# dispatch, by keeping `Bash(gh pr merge:*)` in the `allow` list (and out of
+# `ask`/`deny`) of ~/.claude/settings.json. Same reason the co-author step
+# exists — copy-if-absent preserves a Claude-Code-created default and never
+# lands our captured permissions — plus a mechanical one specific to this rule:
+# Claude Code resolves permissions deny > ask > allow, so an `ask` entry beats
+# any `allow` at any scope. Provisioning it is therefore a *move* (remove from
+# ask/deny, add to allow), not just an append, and it must happen in the global
+# file — which is dev-setup's to own (see the `permissions` note in the
+# copy-if-absent block above; agentm's own installer deliberately never writes
+# this, its doctor only detects the gap). Idempotent: already-in-allow-not-ask
+# is a no-op. Order-preserving: appends only if absent, so the live file's
+# permission array isn't reshuffled on every run.
+ensure_gh_pr_merge_allowed() {
+  local f="$HOME/.claude/settings.json"
+  local rule='Bash(gh pr merge:*)'
+  [[ -f "$f" ]] || return 0
+  if ! jq empty "$f" >/dev/null 2>&1; then
+    echo "    WARN: $f is invalid JSON — skipping gh-pr-merge allow merge" >&2
+    return 0
+  fi
+  if jq -e --arg r "$rule" '
+        (.permissions.allow // [] | index($r)) != null
+        and (.permissions.ask  // [] | index($r)) == null
+        and (.permissions.deny // [] | index($r)) == null
+      ' "$f" >/dev/null 2>&1; then
+    printf '    gh-merge  %-55s (already allow, not ask/deny)\n' "$f"
+    return 0
+  fi
+  local tmp
+  tmp="$(mktemp)"
+  jq --arg r "$rule" '
+      .permissions = (.permissions // {})
+    | .permissions.ask   = ((.permissions.ask   // []) - [$r])
+    | .permissions.deny  = ((.permissions.deny  // []) - [$r])
+    | .permissions.allow = (
+        if ((.permissions.allow // []) | index($r)) then (.permissions.allow // [])
+        else ((.permissions.allow // []) + [$r]) end
+      )
+  ' "$f" > "$tmp" && mv "$tmp" "$f"
+  printf '    gh-merge  %-55s (moved %s -> allow)\n' "$f" "$rule"
+}
+
 # --- main -------------------------------------------------------------------
 
 echo "==> linking configs"
@@ -204,6 +253,7 @@ link_copy_if_absent configs/antigravity/argv.json                 "$HOME/.antigr
 append_shell_additions
 merge_gitconfig
 ensure_claude_co_authored_by_disabled
+ensure_gh_pr_merge_allowed
 
 # --- post-check -------------------------------------------------------------
 
