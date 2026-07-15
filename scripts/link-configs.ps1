@@ -209,6 +209,57 @@ function Set-ClaudeCoAuthoredByDisabled {
   '    co-author {0,-55} (merged includeCoAuthoredBy=false)' -f $f | Write-Host
 }
 
+function Set-ClaudeGhPrMergeAllowed {
+  # Keep `Bash(gh pr merge:*)` in the `allow` list (and out of `ask`/`deny`)
+  # of %USERPROFILE%\.claude\settings.json so an unattended agentm dispatch's
+  # `gh pr merge` step doesn't block. Claude Code resolves permissions
+  # deny > ask > allow, so an `ask` entry beats any `allow` — provisioning is
+  # a *move* (remove from ask/deny, add to allow), not just an append. Same
+  # belt-and-braces reason as the co-author step (copy-if-absent won't land
+  # our captured permissions), using ConvertFrom/ConvertTo instead of jq.
+  # Idempotent + order-preserving (appends only if absent).
+  $f = Join-Path $env:USERPROFILE '.claude\settings.json'
+  $rule = 'Bash(gh pr merge:*)'
+  if (-not (Test-Path -LiteralPath $f)) { return }
+  try {
+    $json = Get-Content -LiteralPath $f -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+  }
+  catch {
+    Write-Warning "$f is invalid JSON — skipping gh-pr-merge allow merge"
+    return
+  }
+  if ((-not ($json.PSObject.Properties.Name -contains 'permissions')) -or ($null -eq $json.permissions)) {
+    $json | Add-Member -NotePropertyName 'permissions' -NotePropertyValue ([pscustomobject]@{}) -Force
+  }
+  $perms = $json.permissions
+
+  function Get-RuleList($obj, $name) {
+    if (($obj.PSObject.Properties.Name -contains $name) -and ($null -ne $obj.$name)) { return @($obj.$name) }
+    return @()
+  }
+  function Set-RuleList($obj, $name, $value) {
+    if ($obj.PSObject.Properties.Name -contains $name) { $obj.$name = @($value) }
+    else { $obj | Add-Member -NotePropertyName $name -NotePropertyValue @($value) -Force }
+  }
+
+  $allow = Get-RuleList $perms 'allow'
+  $ask   = Get-RuleList $perms 'ask'
+  $deny  = Get-RuleList $perms 'deny'
+
+  if (($allow -contains $rule) -and (-not ($ask -contains $rule)) -and (-not ($deny -contains $rule))) {
+    '    gh-merge  {0,-55} (already allow, not ask/deny)' -f $f | Write-Host
+    return
+  }
+
+  Set-RuleList $perms 'ask'  @($ask  | Where-Object { $_ -ne $rule })
+  Set-RuleList $perms 'deny' @($deny | Where-Object { $_ -ne $rule })
+  if (-not ($allow -contains $rule)) { $allow = @($allow + $rule) }
+  Set-RuleList $perms 'allow' $allow
+
+  $json | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $f -Encoding UTF8
+  '    gh-merge  {0,-55} (moved {1} -> allow)' -f $f, $rule | Write-Host
+}
+
 # --- main -------------------------------------------------------------------
 
 Write-Host "==> linking configs"
@@ -238,6 +289,7 @@ Copy-RepoFileIfAbsent `
 
 Merge-Gitconfig
 Set-ClaudeCoAuthoredByDisabled
+Set-ClaudeGhPrMergeAllowed
 
 # --- post-check -------------------------------------------------------------
 

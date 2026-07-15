@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **`gh pr merge` allow provisioned for unattended agentm dispatch** (`link-configs.{sh,ps1}`). A new `ensure_gh_pr_merge_allowed` / `Set-ClaudeGhPrMergeAllowed` step keeps `Bash(gh pr merge:*)` in the `allow` list — and out of `ask`/`deny` — of `~/.claude/settings.json`, so an unattended agentm N1 dispatch's merge-on-green step doesn't stall at the final `gh pr merge`. It runs alongside the existing `includeCoAuthoredBy` ensure-step and for the same reason (copy-if-absent preserves a Claude-Code-created default and never lands our captured permissions), plus a mechanical one specific to this rule: Claude Code resolves permissions `deny > ask > allow`, so an `ask` entry beats any `allow` at any scope — provisioning is a *move* (remove from ask/deny, add to allow), not just an append, and it must happen in the global file. dev-setup owns this because it already owns the `permissions` block of `~/.claude/settings.json` (see `capture.sh`'s whitelist); agentm's own installer deliberately never writes the global permission surface, and its `doctor` (`machinery_doctor.py`) only *detects* the gap and points here. Idempotent + order-preserving.
+
+### Changed
+
+- **`configs/claude/settings.json` seed resynced from live** via `capture.sh`'s own jq (was an April snapshot: `gh pr merge:*` still sat in `ask`, and ~30 permission rules added since had drifted out of the seed). The seed is only a fresh-machine copy-if-absent fallback, so this mostly keeps the repo honest; the `ensure_*` steps are what actually land on a machine where Claude Code pre-created the file.
+
 ### Internal
 
 - **Wiki taxonomy migrated to the six-section model** (matches agentm `cbea022` + crickets `12f9b1f`). Retired the standalone Decisions section + the ADR machinery — dev-setup had no real ADRs, only an ADR-convention stub — so decisions now live as dated entries in each design's `## Amendment log`. Added a `wiki/designs/` section: the design docs moved `wiki/explanation/{Development-Setup-Design,Public-Curl-Bash-Installer}.md` → `wiki/designs/`, each gaining an `## Amendment log`; `Home.md` / `_Sidebar.md` / `.diataxis` / `wiki/README.md` rewritten to the six-section frame (How-to · Reference · Architecture · Designs · Explanation · Operational; four always-present, two conditional); wiki cross-links converted to GitHub-Wiki basename form. The consumed crickets `wiki-maintenance` plugin was bumped to `0.3.0` (the six-section composer); `check-wiki --strict` is green. Also dropped the now-retired `[ADR 0006]` citation from `AGENTS.md`. *(Released sections below still reference the old `wiki/explanation/` paths — those are left intact as accurate records of what shipped at v2.0.0–v4.0.0; changelog history is append-only.)*
