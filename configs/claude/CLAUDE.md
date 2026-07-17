@@ -28,6 +28,14 @@ The stop-gate on a push is **recoverability, not destructiveness or blast-radius
 
 When in doubt about a **routine** push, push — the operator can always reset or force-push back, and forcing them to micromanage routine pushes is the bigger cost. When uncertain whether a **destructive** push is recoverable, treat it as unrecoverable (the conservative default the doctrine names). Applies to every repo on this device.
 
+## Background-task chip sessions
+
+A session spun off from a `spawn_task` chip (Claude Code Desktop's background-task feature) carries the same authority as an explicit operator command for the task it names — clicking the chip **is** the "yes, do this" the generic ask-before-every-commit default requires. In any harness-installed repo (signal: `.harness/PLAN.md` or `.harness/ROADMAP.md` present — today `agentm` + `crickets`), a chip-spawned session runs its task to completion under the same recoverable → proceed doctrine as `/work` / `/release` (see Push and confirmation, above): commit, push, open a PR, and — where the worktree-native carve-out already applies (agentm + crickets) — auto-merge on green required checks, then clean up the worktree/branch. Announce each step; don't wait for conversational confirmation on any of it.
+
+Stop and ask only when the task itself hits something in the **Explicit permission required** / **Prohibited** action categories, or the push doctrine's unrecoverable bucket above — the same exceptions that gate `/work`, not a lower bar. When the run finishes, say so and stop; the operator archives the completed plan/PR on their own schedule — don't wait around for that or nudge for it.
+
+Outside a harness-installed repo, a chip-spawned session has no plan/progress safety net to run against — keep the generic ask-before-commit default there.
+
 ## GitHub `claude` contributor chip
 
 The user has accepted the residual `claude` entry in `mentionableUsers` / contributor sidebar on `alexherrero/agentm` and `alexherrero/sherwood` (the former from cache lag after a history rewrite, the latter anchored to immutable closed PR #23). Do not propose a GitHub Support ticket, PR deletion, or any further cleanup for this. If the topic comes up again, treat it as resolved unless the user explicitly reopens it.
